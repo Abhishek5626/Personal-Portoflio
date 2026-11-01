@@ -89,11 +89,17 @@ function ProjectCardMedia({ card }: { card: LandingCardContent }) {
   settle into the grid. Flight clones live in a page-level layer so travel is
   visible above the Tools card; in-grid faces stay opacity 0 until landing.
   Timing matches the homepage card entrance (soft decelerate + short stagger).
+  The clones' targets are viewport coordinates measured at take-off, so they
+  are only valid while the grid stays put: if the page pans (wheel, drag,
+  keys) or resizes mid-flight, the flight is dropped and the real logos fade
+  in where the grid actually is.
 */
 const toolEnterDurationMs = 1250
 const toolEnterStaggerMs = 55
 const toolEnterBaseDelayMs = 40
 const toolEnterEasing = 'cubic-bezier(0.16, 1, 0.3, 1)'
+const toolInterruptFadeMs = 160
+const toolMoveTolerancePx = 1
 
 function settleToolMotions(root: HTMLElement) {
   root
@@ -183,6 +189,7 @@ function ToolGrid({ tools }: { tools: readonly LandingTool[] }) {
     const animations: Animation[] = []
     const failSafe = window.setTimeout(() => {
       if (cancelled) return
+      stopWatching()
       settleToolMotions(root)
       layer?.remove()
       layer = null
@@ -240,11 +247,76 @@ function ToolGrid({ tools }: { tools: readonly LandingTool[] }) {
       return
     }
 
+    // Watch the grid's on-screen origin for the length of the flight.
+    const takeOff = root.getBoundingClientRect()
+    let monitor = 0
+    let finished = false
+
+    const stopWatching = () => {
+      finished = true
+      if (monitor) cancelAnimationFrame(monitor)
+      monitor = 0
+      window.removeEventListener('wheel', checkMoved)
+      window.removeEventListener('keydown', checkMoved)
+      window.removeEventListener('pointermove', checkMoved)
+      window.removeEventListener('resize', checkMoved)
+    }
+
+    // The grid moved under the clones: drop the flight and show the real
+    // logos in place with a short crossfade instead of a detached landing.
+    const interrupt = () => {
+      if (finished || cancelled) return
+      stopWatching()
+      window.clearTimeout(failSafe)
+      settleToolMotions(root)
+      const flight = layer
+      layer = null
+      if (!flight) return
+      for (const motion of root.querySelectorAll<HTMLElement>('[data-tool-motion]')) {
+        motion.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: toolInterruptFadeMs,
+          easing: 'ease-out',
+        })
+      }
+      flight
+        .animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: toolInterruptFadeMs,
+          easing: 'ease-out',
+          fill: 'forwards',
+        })
+        .finished.catch(() => undefined)
+        .then(() => flight.remove())
+    }
+
+    function checkMoved() {
+      if (finished || cancelled) return
+      const now = root!.getBoundingClientRect()
+      if (
+        Math.abs(now.left - takeOff.left) > toolMoveTolerancePx ||
+        Math.abs(now.top - takeOff.top) > toolMoveTolerancePx ||
+        Math.abs(now.width - takeOff.width) > toolMoveTolerancePx
+      ) {
+        interrupt()
+      }
+    }
+
+    const tick = () => {
+      checkMoved()
+      if (!finished && !cancelled) monitor = requestAnimationFrame(tick)
+    }
+    monitor = requestAnimationFrame(tick)
+    // Events catch moves even when frames are throttled (background tabs).
+    window.addEventListener('wheel', checkMoved, { passive: true })
+    window.addEventListener('keydown', checkMoved)
+    window.addEventListener('pointermove', checkMoved, { passive: true })
+    window.addEventListener('resize', checkMoved)
+
     void Promise.all(
       animations.map((anim) => anim.finished.catch(() => undefined)),
     ).then(() => {
       window.clearTimeout(failSafe)
-      if (cancelled) return
+      if (cancelled || finished) return
+      stopWatching()
       settleToolMotions(root)
       layer?.remove()
       layer = null
@@ -252,6 +324,7 @@ function ToolGrid({ tools }: { tools: readonly LandingTool[] }) {
 
     return () => {
       cancelled = true
+      stopWatching()
       window.clearTimeout(failSafe)
       for (const anim of animations) anim.cancel()
       layer?.remove()
