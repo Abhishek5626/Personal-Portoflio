@@ -651,8 +651,7 @@
   margin: 0;
   padding: 14px 20px;
   border-radius: 12px;
-  background: #121212;
-  color: #777;
+  color: var(--theme-text-muted);
   font-size: 10px;
   font-weight: 500;
   line-height: 15px;
@@ -1113,55 +1112,26 @@
 }
 
 .tobe-pill {
-  position: relative;
   height: 44px;
   padding: 15px 21px;
-  border: 0;
   border-radius: 88px;
-  background: rgba(255, 255, 255, 0.05);
   color: #fff;
   font-family: Satoshi, Inter, sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 16.8px;
   white-space: nowrap;
-  cursor: pointer;
 }
 
 .tobe-pill-glow,
 .tobe-pill-sheen,
 .tobe-pill-fill {
-  position: absolute;
-  pointer-events: none;
-}
-
-.tobe-pill-glow {
-  inset: 0;
-  border-radius: 54px;
-  background: radial-gradient(25% 48% at 44% 7%, #fff 0%, transparent 100%);
-  filter: blur(11px);
-}
-
-.tobe-pill-sheen {
-  inset: 0;
-  border-radius: 54px;
-  background: radial-gradient(20% 49% at 44% 7%, #fff 0%, transparent 100%);
-}
-
-.tobe-pill-fill {
-  inset: 2px 1px 2px 2px;
-  border-radius: 85px;
-  background: #000;
+  display: none;
 }
 
 .tobe-pill > span:last-child {
   position: relative;
-  z-index: 1;
-}
-
-.tobe-pill:hover,
-.tobe-pill:focus-visible {
-  background: rgba(255, 255, 255, 0.16);
+  z-index: 2;
 }
 
 .mvp-board {
@@ -1420,16 +1390,12 @@
   width: 195px;
   height: 48px;
   margin-top: 28px;
-  border: 0;
-  border-radius: 9px;
-  background: #7043e0;
-  box-shadow: 0 6px 0 #2e1d63;
-  color: #fff;
+  border-radius: 99px;
+  color: var(--theme-text);
   font-family: Inter, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16.8px;
-  cursor: pointer;
 }
 
 .next-project p:first-child {
@@ -1464,8 +1430,7 @@
   display: inline-flex;
   align-items: center;
   border-radius: 99px;
-  background: #333;
-  color: #fcfcfc;
+  color: #fff;
   font-size: 13px;
 }
 
@@ -1558,10 +1523,10 @@
   margin-top: 28px;
   padding: 0 28px;
   border-radius: 85px;
-  background: #000;
-  color: #fff;
+  color: var(--theme-text);
   font-size: 16px;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .footer-art {

@@ -1,0 +1,618 @@
+import {
+  useEffect,
+  useEffectEvent,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
+import {
+  createYouTubePlayer,
+  YT_PLAYER_STATE,
+  type YouTubePlayer,
+} from './youtubePlayerApi.ts'
+import './music-card.css'
+
+const track = {
+  title: "L'Amour Toujours",
+  artist: "Gigi D'Agostino",
+  videoId: 'uU_B9eZvc0U',
+  youtubeUrl: 'https://www.youtube.com/watch?v=uU_B9eZvc0U',
+}
+
+const SKIP_SECONDS = 10
+const waveHeights = [
+  3, 5, 8, 4, 7, 11, 6, 9, 4, 8, 12, 5, 7, 3, 9, 6, 11, 4, 8, 5, 10, 7, 3, 6,
+  9, 12, 5, 8, 4, 7, 11, 6, 3, 9, 5, 8, 12, 4, 7, 10, 6, 3, 8, 5, 11, 7, 4, 9,
+  6, 12, 5, 8, 3, 7, 10, 4, 6, 9, 11, 5, 8, 3, 7, 4, 10, 6, 9, 5, 12, 7, 4, 8,
+  3, 6, 11, 5, 9, 7, 4, 8, 10, 6, 3, 5, 9, 7, 4, 8, 6, 11,
+]
+const WAVE_STEP = 4.4
+const WAVE_VIEW_HEIGHT = 14
+
+type PlayerStatus = 'idle' | 'loading' | 'ready' | 'unavailable'
+
+function formatElapsed(seconds: number) {
+  const safe = Math.max(0, Math.floor(seconds))
+  const mins = Math.floor(safe / 60)
+  const secs = safe % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+function formatRemaining(current: number, duration: number) {
+  if (!(duration > 0)) {
+    return '-0:00'
+  }
+  const remaining = Math.max(0, Math.ceil(duration - current))
+  return `-${formatElapsed(remaining)}`
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function PlayTriangle() {
+  return (
+    <svg className="music-card-play-icon" width="13" height="15" viewBox="0 0 13 15" aria-hidden="true">
+      <path
+        d="M2.1 1.05c0-.72.79-1.16 1.4-.78l8.15 5.45c.55.37.55 1.19 0 1.56L3.5 12.73c-.61.38-1.4-.06-1.4-.78V1.05Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+function PauseBars() {
+  return (
+    <svg className="music-card-pause-icon" width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
+      <rect x="1" y="1" width="3.5" height="12" rx="1" fill="currentColor" />
+      <rect x="7.5" y="1" width="3.5" height="12" rx="1" fill="currentColor" />
+    </svg>
+  )
+}
+
+function SkipBackIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6h2v12H6zM20 6l-10 6 10 6z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function SkipForwardIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M16 6h2v12h-2zM4 6l10 6-10 6z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function WaveformSeek({
+  progress,
+  disabled,
+  labelledBy,
+  onSeek,
+}: {
+  progress: number
+  disabled: boolean
+  labelledBy: string
+  onSeek: (ratio: number) => void
+}) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const draggingRef = useRef(false)
+  const [dragging, setDragging] = useState(false)
+
+  const ratioFromClientX = (clientX: number) => {
+    const track = trackRef.current
+    if (!track) {
+      return 0
+    }
+    const rect = track.getBoundingClientRect()
+    if (rect.width <= 0) {
+      return 0
+    }
+    return clamp((clientX - rect.left) / rect.width, 0, 1)
+  }
+
+  const finishPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) {
+      return
+    }
+    draggingRef.current = false
+    setDragging(false)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+
+  const playedBars = Math.round(waveHeights.length * clamp(progress, 0, 1))
+
+  return (
+    <div
+      ref={trackRef}
+      className={[
+        'music-card-seek',
+        dragging ? 'is-dragging' : '',
+        disabled ? 'is-disabled' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      role="slider"
+      tabIndex={disabled ? -1 : 0}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(clamp(progress, 0, 1) * 100)}
+      aria-valuetext={`${Math.round(clamp(progress, 0, 1) * 100)}% through the track`}
+      aria-labelledby={labelledBy}
+      aria-disabled={disabled || undefined}
+      onPointerDown={(event) => {
+        if (disabled || event.button !== 0) {
+          return
+        }
+        event.preventDefault()
+        draggingRef.current = true
+        setDragging(true)
+        event.currentTarget.setPointerCapture(event.pointerId)
+        onSeek(ratioFromClientX(event.clientX))
+      }}
+      onPointerMove={(event) => {
+        if (!draggingRef.current) {
+          return
+        }
+        onSeek(ratioFromClientX(event.clientX))
+      }}
+      onPointerUp={finishPointer}
+      onPointerCancel={finishPointer}
+      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+        if (disabled) {
+          return
+        }
+        const step = event.shiftKey ? 0.1 : 0.05
+        if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+          event.preventDefault()
+          onSeek(clamp(progress + step, 0, 1))
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+          event.preventDefault()
+          onSeek(clamp(progress - step, 0, 1))
+        } else if (event.key === 'Home') {
+          event.preventDefault()
+          onSeek(0)
+        } else if (event.key === 'End') {
+          event.preventDefault()
+          onSeek(1)
+        }
+      }}
+    >
+      <svg
+        className="music-card-wave"
+        viewBox={`0 0 ${waveHeights.length * WAVE_STEP} ${WAVE_VIEW_HEIGHT}`}
+        height="10"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {waveHeights.map((bar, index) => (
+          <rect
+            key={index}
+            x={index * WAVE_STEP + 2}
+            y={(WAVE_VIEW_HEIGHT - bar) / 2}
+            width="2"
+            height={bar}
+            rx="1"
+            className={index < playedBars ? 'is-played' : 'is-unplayed'}
+          />
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+export function MusicCard() {
+  const reactId = useId()
+  const hostId = `music-yt-host-${reactId.replace(/:/g, '')}`
+  const titleId = `music-card-title-${reactId.replace(/:/g, '')}`
+  const statusId = `music-card-status-${reactId.replace(/:/g, '')}`
+
+  const playerRef = useRef<YouTubePlayer | null>(null)
+  const shellRef = useRef<HTMLDivElement>(null)
+  const tickerRef = useRef<number | null>(null)
+  const tickerModeRef = useRef<'raf' | 'timeout' | null>(null)
+  const playIntentRef = useRef(false)
+  const reduceMotionRef = useRef(false)
+
+  const [status, setStatus] = useState<PlayerStatus>('loading')
+  const [playing, setPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const stopTicker = () => {
+    if (tickerRef.current === null) {
+      return
+    }
+    if (tickerModeRef.current === 'timeout') {
+      window.clearTimeout(tickerRef.current)
+    } else {
+      cancelAnimationFrame(tickerRef.current)
+    }
+    tickerRef.current = null
+    tickerModeRef.current = null
+  }
+
+  const readTimes = useEffectEvent(() => {
+    const player = playerRef.current
+    if (!player) {
+      return
+    }
+    try {
+      const nextCurrent = player.getCurrentTime() || 0
+      const nextDuration = player.getDuration() || 0
+      setCurrentTime(nextCurrent)
+      if (nextDuration > 0) {
+        setDuration(nextDuration)
+      }
+    } catch {
+      // Player may be mid-teardown.
+    }
+  })
+
+  const startTicker = useEffectEvent(() => {
+    stopTicker()
+    const tick = () => {
+      readTimes()
+      if (reduceMotionRef.current) {
+        tickerModeRef.current = 'timeout'
+        tickerRef.current = window.setTimeout(tick, 250)
+      } else {
+        tickerModeRef.current = 'raf'
+        tickerRef.current = requestAnimationFrame(tick)
+      }
+    }
+    tick()
+  })
+
+  useEffect(() => {
+    reduceMotionRef.current = prefersReducedMotion()
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onChange = () => {
+      reduceMotionRef.current = media.matches
+    }
+    media.addEventListener('change', onChange)
+
+    let cancelled = false
+    let becameReady = false
+    setStatus('loading')
+    setErrorMessage(null)
+    setPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+
+    let readyPoll: number | null = null
+    let readyTimeout: number | null = null
+
+    const shell = shellRef.current
+    if (!shell) {
+      setStatus('unavailable')
+      setErrorMessage(
+        'Playback is unavailable right now. Open the track on YouTube instead.',
+      )
+      return () => {
+        media.removeEventListener('change', onChange)
+      }
+    }
+
+    shell.replaceChildren()
+    const mountNode = document.createElement('div')
+    mountNode.id = hostId
+    shell.appendChild(mountNode)
+
+    const clearReadyWaiters = () => {
+      if (readyPoll !== null) {
+        window.clearInterval(readyPoll)
+        readyPoll = null
+      }
+      if (readyTimeout !== null) {
+        window.clearTimeout(readyTimeout)
+        readyTimeout = null
+      }
+    }
+
+    const markReady = (player: YouTubePlayer) => {
+      if (cancelled || becameReady) {
+        return
+      }
+      becameReady = true
+      clearReadyWaiters()
+      playerRef.current = player
+      setStatus('ready')
+      try {
+        const readyDuration = player.getDuration() || 0
+        if (readyDuration > 0) {
+          setDuration(readyDuration)
+        }
+        setCurrentTime(player.getCurrentTime() || 0)
+      } catch {
+        // Duration can arrive after buffering starts.
+      }
+      if (playIntentRef.current) {
+        try {
+          player.playVideo()
+        } catch {
+          // Ignore until the API becomes fully responsive.
+        }
+      }
+    }
+
+    createYouTubePlayer(mountNode, {
+      height: 48,
+      width: 48,
+      videoId: track.videoId,
+      playerVars: {
+        autoplay: 0,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        modestbranding: 1,
+        playsinline: 1,
+        rel: 0,
+      },
+      events: {
+        onReady: (event) => {
+          markReady(event.target)
+        },
+        onStateChange: (event) => {
+          if (cancelled) {
+            return
+          }
+          playerRef.current = event.target
+          const state = event.data
+          if (state === YT_PLAYER_STATE.PLAYING) {
+            setPlaying(true)
+            setStatus('ready')
+            setErrorMessage(null)
+            startTicker()
+            readTimes()
+          } else if (
+            state === YT_PLAYER_STATE.PAUSED ||
+            state === YT_PLAYER_STATE.ENDED ||
+            state === YT_PLAYER_STATE.CUED
+          ) {
+            setPlaying(false)
+            stopTicker()
+            readTimes()
+            if (state === YT_PLAYER_STATE.ENDED) {
+              playIntentRef.current = false
+            }
+          } else if (state === YT_PLAYER_STATE.BUFFERING) {
+            setStatus('ready')
+            startTicker()
+          }
+        },
+        onError: () => {
+          if (cancelled) {
+            return
+          }
+          playIntentRef.current = false
+          setPlaying(false)
+          stopTicker()
+          setStatus('unavailable')
+          setErrorMessage(
+            'This track cannot be played here. Open it on YouTube instead.',
+          )
+        },
+      },
+    })
+      .then((player) => {
+        if (cancelled) {
+          try {
+            player.destroy()
+          } catch {
+            // Ignore destroy races during teardown.
+          }
+          return
+        }
+        playerRef.current = player
+        readyPoll = window.setInterval(() => {
+          try {
+            const nextDuration = player.getDuration() || 0
+            const state = player.getPlayerState()
+            if (
+              nextDuration > 0 ||
+              state === YT_PLAYER_STATE.CUED ||
+              state === YT_PLAYER_STATE.PAUSED ||
+              state === YT_PLAYER_STATE.PLAYING
+            ) {
+              markReady(player)
+            }
+          } catch {
+            // Keep polling until the API responds.
+          }
+        }, 200)
+        readyTimeout = window.setTimeout(() => {
+          if (cancelled || becameReady) {
+            return
+          }
+          markReady(player)
+        }, 5000)
+      })
+      .catch(() => {
+        if (cancelled) {
+          return
+        }
+        setStatus('unavailable')
+        setErrorMessage(
+          'Playback is unavailable right now. Open the track on YouTube instead.',
+        )
+      })
+
+    return () => {
+      cancelled = true
+      stopTicker()
+      clearReadyWaiters()
+      try {
+        playerRef.current?.destroy()
+      } catch {
+        // Ignore destroy races.
+      }
+      playerRef.current = null
+      shell.replaceChildren()
+      media.removeEventListener('change', onChange)
+    }
+  }, [hostId])
+
+  const canSeek = status === 'ready' && duration > 0
+  const progress = duration > 0 ? clamp(currentTime / duration, 0, 1) : 0
+
+  const seekToRatio = (ratio: number) => {
+    const player = playerRef.current
+    if (!player || !(duration > 0) || status === 'unavailable') {
+      return
+    }
+    const next = clamp(ratio, 0, 1) * duration
+    setCurrentTime(next)
+    try {
+      player.seekTo(next, true)
+    } catch {
+      setErrorMessage('Could not seek this track.')
+    }
+  }
+
+  const skipBy = (delta: number) => {
+    if (!(duration > 0)) {
+      return
+    }
+    seekToRatio(clamp((currentTime + delta) / duration, 0, 1))
+  }
+
+  const togglePlayback = () => {
+    if (status === 'unavailable') {
+      return
+    }
+    const player = playerRef.current
+    if (!player) {
+      playIntentRef.current = true
+      setStatus('loading')
+      return
+    }
+    try {
+      if (playing) {
+        playIntentRef.current = false
+        player.pauseVideo()
+        setPlaying(false)
+        stopTicker()
+        readTimes()
+      } else {
+        playIntentRef.current = true
+        setErrorMessage(null)
+        player.playVideo()
+      }
+    } catch {
+      // Keep the card usable; YouTube may still raise onError if playback fails.
+    }
+  }
+
+  return (
+    <article className="music-card" data-hover-tile="" data-repel="">
+      <div className="music-card-surface">
+        <img
+          className="music-card-photo"
+          src="/landing/music-cover.png"
+          alt=""
+          width={477}
+          height={851}
+        />
+        <div className="music-card-heading">
+          <span className="music-card-icon" aria-hidden="true">
+            <img src="/landing/music-aperture.svg" alt="" width={14} height={14} />
+          </span>
+          <h2 className="music-card-label">My Fav Music</h2>
+        </div>
+        <div className="music-card-body">
+          <div className="music-card-track">
+            <div className="music-card-meta">
+              <p id={titleId} className="music-card-title">
+                {track.title}
+              </p>
+              <p className="music-card-artist">{track.artist}</p>
+            </div>
+            <div className="music-card-controls">
+              <button
+                type="button"
+                className="music-card-skip"
+                aria-label={`Back ${SKIP_SECONDS} seconds`}
+                disabled={!canSeek}
+                onClick={() => skipBy(-SKIP_SECONDS)}
+              >
+                <SkipBackIcon />
+              </button>
+              <button
+                type="button"
+                className="music-card-play"
+                aria-label={
+                  playing
+                    ? `Pause ${track.title} by ${track.artist}`
+                    : `Play ${track.title} by ${track.artist}`
+                }
+                aria-pressed={playing}
+                aria-describedby={statusId}
+                disabled={status === 'unavailable'}
+                onClick={togglePlayback}
+              >
+                {status === 'loading' && !playing ? (
+                  <span className="music-card-loading-dot" aria-hidden="true" />
+                ) : playing ? (
+                  <PauseBars />
+                ) : (
+                  <PlayTriangle />
+                )}
+              </button>
+              <button
+                type="button"
+                className="music-card-skip"
+                aria-label={`Forward ${SKIP_SECONDS} seconds`}
+                disabled={!canSeek}
+                onClick={() => skipBy(SKIP_SECONDS)}
+              >
+                <SkipForwardIcon />
+              </button>
+            </div>
+          </div>
+          <div className="music-card-progress">
+            <WaveformSeek
+              progress={progress}
+              disabled={!canSeek}
+              labelledBy={titleId}
+              onSeek={seekToRatio}
+            />
+            <div className="music-card-times">
+              <span>{formatElapsed(currentTime)}</span>
+              <span>{formatRemaining(currentTime, duration)}</span>
+            </div>
+          </div>
+        </div>
+        {errorMessage ? (
+          <p className="music-card-error" role="status">
+            {errorMessage}{' '}
+            <a href={track.youtubeUrl} target="_blank" rel="noreferrer">
+              Open on YouTube
+            </a>
+          </p>
+        ) : null}
+      </div>
+      <div ref={shellRef} className="music-card-yt-host" aria-hidden="true" />
+      <p id={statusId} className="visually-hidden" role="status">
+        {status === 'loading'
+          ? 'Loading track.'
+          : status === 'unavailable'
+            ? errorMessage || 'Track unavailable.'
+            : playing
+              ? 'Playing.'
+              : 'Paused.'}
+      </p>
+    </article>
+  )
+}

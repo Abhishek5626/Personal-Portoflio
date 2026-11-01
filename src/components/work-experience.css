@@ -1,0 +1,348 @@
+.work-experience {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  min-height: 191px;
+  padding: 2px;
+  border: 1px solid var(--landing-glass-border);
+  border-radius: 18px;
+  background: transparent;
+  backdrop-filter: var(--landing-glass-blur);
+  -webkit-backdrop-filter: var(--landing-glass-blur);
+}
+
+.work-experience-surface {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: var(--landing-surface-pad);
+  border-radius: 18px;
+  background-color: var(--theme-surface);
+  isolation: isolate;
+  transition:
+    background-color var(--theme-duration) var(--theme-ease),
+    color var(--theme-duration) var(--theme-ease);
+}
+
+.work-experience-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--landing-glass-fill);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--theme-duration) var(--theme-ease);
+}
+
+html[data-theme='dark'] .work-experience-surface::before {
+  opacity: 0;
+}
+
+.work-experience-surface > * {
+  position: relative;
+  z-index: 1;
+}
+
+html:not([data-theme='dark']) .work-experience .project-card-icon {
+  background: var(--landing-glass-fill), rgba(255, 255, 255, 0.1);
+}
+
+.work-experience-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.work-experience-label {
+  margin: 0;
+  color: #2f2d2d;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 17px;
+}
+
+.work-experience-timeline {
+  position: relative;
+}
+
+.work-experience-scale {
+  position: relative;
+  height: 76px;
+  touch-action: pan-y;
+  cursor: ew-resize;
+  overflow: hidden;
+  user-select: none;
+  mask-image: linear-gradient(to right, transparent 0%, #000 15%, #000 85%, transparent 100%);
+}
+
+.work-experience-scale.is-dragging {
+  cursor: ew-resize;
+}
+
+.work-experience-scale:focus-visible {
+  outline: 3px solid var(--theme-text);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.work-experience-strip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  align-items: flex-end;
+  height: 62px;
+  pointer-events: none;
+  transition: transform 150ms ease-out;
+}
+
+.work-experience-scale.is-dragging .work-experience-strip {
+  transition: none;
+}
+
+.work-experience-tick {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 6px;
+  height: 100%;
+}
+
+.work-experience-tick span {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  color: #ea580c;
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  transform: translateX(-50%);
+}
+
+.work-experience-tick i {
+  display: block;
+  border-radius: 999px;
+  background: #ea580c;
+}
+
+.work-experience-tick.is-year i {
+  width: 2px;
+  height: 42px;
+}
+
+.work-experience-tick.is-half i {
+  width: 1.5px;
+  height: 30px;
+  opacity: 0.7;
+}
+
+.work-experience-tick.is-minor i {
+  width: 1.5px;
+  height: 20px;
+  opacity: 0.4;
+}
+
+.work-experience-tick.is-future span {
+  color: rgba(18, 18, 18, 0.3);
+}
+
+.work-experience-tick.is-future.is-year i {
+  background: rgba(18, 18, 18, 0.2);
+  opacity: 1;
+}
+
+.work-experience-tick.is-future.is-half i {
+  background: rgba(18, 18, 18, 0.12);
+  opacity: 1;
+}
+
+.work-experience-tick.is-future.is-minor i {
+  background: rgba(18, 18, 18, 0.08);
+  opacity: 1;
+}
+
+.work-experience-marker {
+  position: absolute;
+  top: 65px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid #ea580c;
+  border-left: 6px solid transparent;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.work-experience-reset {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.work-experience-reset[hidden] {
+  display: none;
+}
+
+.work-experience-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.work-experience-role-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.work-experience-identity {
+  display: flex;
+  align-items: center;
+  min-height: 17px;
+}
+
+.work-experience-logo {
+  display: block;
+  width: 42px;
+  height: 17px;
+}
+
+.work-experience-company {
+  margin: 0;
+  overflow: hidden;
+  color: #666;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 17px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.work-experience-role {
+  margin: 0;
+  overflow: hidden;
+  color: #2f2d2d;
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 22px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.work-experience-stat {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+}
+
+.work-experience-total {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  color: #ea580c;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.work-experience-amount {
+  font-family: Inter, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.work-experience-unit {
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.work-experience-year {
+  color: #6e6d6d;
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 15px;
+}
+
+html[data-theme='dark'] .work-experience-label,
+html[data-theme='dark'] .work-experience-role {
+  color: var(--theme-text);
+}
+
+html[data-theme='dark'] .work-experience-company,
+html[data-theme='dark'] .work-experience-year {
+  color: var(--theme-text-muted);
+}
+
+html[data-theme='dark'] .work-experience-total,
+html[data-theme='dark'] .work-experience-tick span,
+html[data-theme='dark'] .work-experience-tick i,
+html[data-theme='dark'] .work-experience-marker {
+  color: #fb923c;
+}
+
+html[data-theme='dark'] .work-experience-tick i,
+html[data-theme='dark'] .work-experience-marker {
+  background: #fb923c;
+  border-bottom-color: #fb923c;
+}
+
+html[data-theme='dark'] .work-experience-tick.is-future span {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+html[data-theme='dark'] .work-experience-tick.is-future.is-year i {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme='dark'] .work-experience-tick.is-future.is-half i {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme='dark'] .work-experience-tick.is-future.is-minor i {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 760px) {
+  .work-experience-role {
+    font-size: 16px;
+    line-height: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-experience-surface,
+  .work-experience-strip {
+    transition: none;
+  }
+}

@@ -1,13 +1,4 @@
-@property --shipped-rim-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: -75deg;
-}
-
 .shipped-badge {
-  --shipped-rim-angle: -75deg;
-  position: relative;
-  isolation: isolate;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -16,19 +7,7 @@
   height: 36px;
   margin: 0;
   padding: 10px 20px;
-  border: 0;
   border-radius: 999px;
-  background: linear-gradient(
-    -75deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.22),
-    rgba(255, 255, 255, 0.05)
-  );
-  box-shadow:
-    inset 0 2px 2px rgba(0, 0, 0, 0.05),
-    inset 0 -2px 2px rgba(255, 255, 255, 0.5),
-    0 4px 2px -2px rgba(0, 0, 0, 0.2),
-    inset 0 0 1.6px 4px rgba(255, 255, 255, 0.2);
   color: #121212;
   font-family: "Open Runde", Inter, sans-serif;
   font-size: 12px;
@@ -36,76 +15,11 @@
   letter-spacing: 0.025em;
   line-height: 16px;
   white-space: nowrap;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition:
-    box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-    backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-    -webkit-backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-    color var(--theme-duration) var(--theme-ease);
 }
 
 .shipped-badge.is-on-media,
 html[data-theme="dark"] .shipped-badge {
   color: #fff;
-}
-
-html[data-theme="dark"] .shipped-badge {
-  background: linear-gradient(
-    -75deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.08),
-    rgba(255, 255, 255, 0.02)
-  );
-  box-shadow:
-    inset 0 2px 2px rgba(255, 255, 255, 0.05),
-    inset 0 -2px 2px rgba(255, 255, 255, 0.25),
-    0 4px 2px -2px rgba(0, 0, 0, 0.7),
-    inset 0 0 1.6px 4px rgba(255, 255, 255, 0.15);
-}
-
-.shipped-badge::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: -0.5px;
-  box-sizing: border-box;
-  border-radius: inherit;
-  padding: 1px;
-  background:
-    conic-gradient(
-      from var(--shipped-rim-angle) at 50% 50%,
-      rgba(0, 0, 0, 0.5),
-      transparent 5% 40%,
-      rgba(0, 0, 0, 0.5) 50%,
-      transparent 60% 95%,
-      rgba(0, 0, 0, 0.5)
-    ),
-    linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
-  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-  transition: --shipped-rim-angle 0.5s ease;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-}
-
-html[data-theme="dark"] .shipped-badge::after {
-  background:
-    conic-gradient(
-      from var(--shipped-rim-angle) at 50% 50%,
-      rgba(255, 255, 255, 0.7),
-      transparent 5% 40%,
-      rgba(255, 255, 255, 0.7) 50%,
-      transparent 60% 95%,
-      rgba(255, 255, 255, 0.7)
-    ),
-    linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
 }
 
 .shipped-badge-dot,
@@ -120,44 +34,52 @@ html[data-theme="dark"] .shipped-badge::after {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #22c55e;
-  animation: shipped-dot-breathe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Solid fill on ::after so the ::before glow paints behind it. */
+  background: transparent;
 }
 
-@keyframes shipped-dot-breathe {
-  50% {
+.shipped-badge-dot::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(8px * 4 / 3);
+  height: calc(8px * 4 / 3);
+  border-radius: 50%;
+  background: #22c55e;
+  filter: blur(4px);
+  opacity: 0.5;
+  transform: translate(-50%, -50%) scale(1);
+  animation: shipped-dot-glow-breathe 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.shipped-badge-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #22c55e;
+  pointer-events: none;
+}
+
+@keyframes shipped-dot-glow-breathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
     opacity: 0.5;
   }
-}
 
-@media (hover: hover) and (pointer: fine) {
-  .shipped-badge:hover {
-    --shipped-rim-angle: -125deg;
-    box-shadow:
-      inset 0 2px 2px rgba(0, 0, 0, 0.05),
-      inset 0 -2px 2px rgba(255, 255, 255, 0.5),
-      0 2.4px 0.8px -1.6px rgba(0, 0, 0, 0.25),
-      inset 0 0 0.8px 1.6px rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(0.16px);
-    -webkit-backdrop-filter: blur(0.16px);
-  }
-
-  html[data-theme="dark"] .shipped-badge:hover {
-    box-shadow:
-      inset 0 2px 2px rgba(255, 255, 255, 0.08),
-      inset 0 -2px 2px rgba(255, 255, 255, 0.35),
-      0 2.4px 0.8px -1.6px rgba(0, 0, 0, 0.9),
-      inset 0 0 0.8px 1.6px rgba(255, 255, 255, 0.35);
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.8;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shipped-badge,
-  .shipped-badge::after {
-    transition: none;
-  }
-
-  .shipped-badge-dot {
+  .shipped-badge-dot::before {
     animation: none;
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(1);
   }
 }

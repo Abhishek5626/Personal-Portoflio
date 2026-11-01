@@ -1,0 +1,171 @@
+/* Full-page infinite fisheye card field. Hero / nav stay outside. */
+
+.landing-page.is-fisheye-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 0;
+}
+
+.landing-fisheye-hero {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  max-width: 42rem;
+  padding-bottom: 18px;
+}
+
+.landing-fisheye-main {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: min(72vh, 720px);
+  margin: 0 calc(-1 * var(--landing-gutter, 42px));
+  width: calc(100% + 2 * var(--landing-gutter, 42px));
+}
+
+.page-fisheye-field {
+  height: min(78vh, 820px);
+  min-height: 420px;
+  border-radius: 0;
+  border-block: 1px solid var(--theme-border);
+  background: var(--theme-page);
+}
+
+.project-fisheye-field {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  overflow: hidden;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  perspective: 900px;
+}
+
+.project-fisheye-field[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+.project-fisheye-field:focus-visible {
+  box-shadow: inset 0 0 0 2px
+    color-mix(in srgb, var(--theme-text) 55%, transparent);
+}
+
+.project-fisheye-hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.project-fisheye-plane {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.project-fisheye-tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--fisheye-cell-w, 280px);
+  height: var(--fisheye-cell-h, 240px);
+  transform-origin: center center;
+  will-change: transform;
+  visibility: hidden;
+}
+
+.project-fisheye-tile > * {
+  width: 100%;
+  height: 100%;
+}
+
+.project-fisheye-tile > div {
+  width: 100%;
+  height: 100%;
+}
+
+.project-fisheye-tile .project-card,
+.project-fisheye-tile .about-me-card,
+.project-fisheye-tile .work-experience,
+.project-fisheye-tile .music-card,
+.project-fisheye-tile .design-strategy,
+.project-fisheye-tile .testimonial-card {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.project-fisheye-tile .project-card.is-showcase {
+  height: 100%;
+}
+
+.project-fisheye-tile .project-card-surface,
+.project-fisheye-tile .about-me-surface,
+.project-fisheye-tile .work-experience-surface,
+.project-fisheye-tile .music-card-surface,
+.project-fisheye-tile .testimonial-surface {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.project-fisheye-tile .project-card-surface.is-media {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.project-fisheye-links {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.project-fisheye-links a:focus-visible {
+  outline: 2px solid var(--theme-accent, #00c950);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1100px) {
+  .page-fisheye-field {
+    height: min(70vh, 680px);
+  }
+}
+
+@media (max-width: 760px) {
+  .landing-fisheye-main {
+    margin: 0 calc(-1 * var(--landing-gutter, 20px));
+    width: calc(100% + 2 * var(--landing-gutter, 20px));
+  }
+
+  .page-fisheye-field {
+    height: min(64vh, 560px);
+    min-height: 360px;
+  }
+
+  .landing-fisheye-hero {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-fisheye-tile {
+    will-change: auto;
+  }
+}
