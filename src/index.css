@@ -118,6 +118,38 @@ html[data-theme="dark"] {
   box-sizing: border-box;
 }
 
+/*
+  Theme switch (see theme.tsx): element transitions are suspended for the
+  one style change so nested color fades can't restart in steps; the page
+  crossfades as a single View Transition instead. The toggle keeps its own.
+*/
+html.theme-switching,
+html.theme-switching *:not(.theme-toggle, .theme-toggle *),
+html.theme-switching *:not(.theme-toggle, .theme-toggle *)::before,
+html.theme-switching *:not(.theme-toggle, .theme-toggle *)::after {
+  transition: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--theme-duration);
+  animation-timing-function: var(--theme-ease);
+}
+
+/* The toggle animates live; its frozen old frame would leave a ghost knob. */
+::view-transition-old(.theme-toggle) {
+  display: none;
+}
+
+::view-transition-new(.theme-toggle) {
+  animation: none;
+}
+
+/* Keep the page interactive while the crossfade runs. */
+::view-transition {
+  pointer-events: none;
+}
+
 html {
   background-color: var(--theme-page);
   transition: background-color var(--theme-duration) var(--theme-ease);

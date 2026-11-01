@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 
 export type ThemeName = 'light' | 'dark'
 
@@ -29,6 +30,60 @@ function applyTheme(theme: ThemeName) {
   document.documentElement.style.colorScheme = theme
 }
 
+/*
+  Theme switch, done once at the root.
+  Many elements carry their own color/background transitions, and `color`
+  is inherited, so a token swap restarted nested transitions frame by frame
+  and colors that had none snapped: text stepped and flickered. Instead the
+  swap is applied with element transitions suspended for that single style
+  change, and the whole page crossfades as one View Transition snapshot.
+  The toggle keeps its own knob/icon transitions and shows only its live
+  state, so it slides exactly as before.
+*/
+const toggleTransitionClass = 'theme-toggle'
+
+function applyThemeAtOnce(theme: ThemeName, render: () => void) {
+  const root = document.documentElement
+  root.classList.add('theme-switching')
+  applyTheme(theme)
+  render()
+  // Flush styles while transitions are suspended so none start.
+  void getComputedStyle(root).color
+  requestAnimationFrame(() => root.classList.remove('theme-switching'))
+}
+
+function switchTheme(theme: ThemeName, render: () => void) {
+  if (typeof document.startViewTransition !== 'function') {
+    applyThemeAtOnce(theme, render)
+    return
+  }
+  // Toggles on screen get their own live layer (names must be unique).
+  const toggles = Array.from(
+    document.querySelectorAll<HTMLElement>('.theme-toggle'),
+  ).filter((toggle) => {
+    const rect = toggle.getBoundingClientRect()
+    return (
+      rect.bottom > 0 &&
+      rect.right > 0 &&
+      rect.top < window.innerHeight &&
+      rect.left < window.innerWidth
+    )
+  })
+  toggles.forEach((toggle, index) => {
+    toggle.style.setProperty('view-transition-name', `theme-toggle-${index}`)
+    toggle.style.setProperty('view-transition-class', toggleTransitionClass)
+  })
+  const transition = document.startViewTransition(() =>
+    applyThemeAtOnce(theme, render),
+  )
+  void transition.finished.finally(() => {
+    toggles.forEach((toggle) => {
+      toggle.style.removeProperty('view-transition-name')
+      toggle.style.removeProperty('view-transition-class')
+    })
+  })
+}
+
 type ThemeContextValue = {
   theme: ThemeName
   toggleTheme: () => void
@@ -48,17 +103,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme])
 
   const toggleTheme = useCallback(() => {
-    setTheme((current) => {
-      const next = current === 'dark' ? 'light' : 'dark'
-      /* Apply before paint so CSS transitions start from the committed theme. */
-      applyTheme(next)
-      try {
-        localStorage.setItem(themeStorageKey, next)
-      } catch {
-        /* The choice still applies for this visit. */
-      }
-      return next
-    })
+    // The root attribute is the single source of truth for the live theme.
+    const next: ThemeName = readTheme() === 'dark' ? 'light' : 'dark'
+    try {
+      localStorage.setItem(themeStorageKey, next)
+    } catch {
+      /* The choice still applies for this visit. */
+    }
+    switchTheme(next, () => flushSync(() => setTheme(next)))
   }, [])
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
