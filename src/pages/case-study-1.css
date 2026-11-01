@@ -1952,9 +1952,131 @@ html[data-theme='dark'] .cs1-results-body > p {
   }
 }
 
+/*
+  Spacing rhythm from the Framer reference (abhishekkashid.framer.website/
+  case-study-1, measured at 1440px): sections 132px apart, a section's
+  header row 52px above its body, groups 68px apart, and a caption row 22px
+  under the stage it describes.
+*/
+.cs1 {
+  --cs1-head-gap: 52px;
+  --cs1-group-gap: 68px;
+  --cs1-caption-gap: 22px;
+}
+
+/*
+  `.case-study p { margin: 0 }` outranks these single-class rules, which
+  dropped their margins; restate them with the page scope.
+*/
+.cs1 .cs1-problem-note {
+  margin-inline: auto;
+}
+
+@media (min-width: 901px) {
+  /* LinkedIn-style post: 18px between header, profile and post text. */
+  .cs1 .cs1-person {
+    margin-top: 18px;
+  }
+
+  .cs1 .cs1-post-body {
+    margin-top: 18px;
+  }
+
+  .cs1 .cs1-more {
+    margin-top: 4px;
+  }
+
+  /* Product owner: head → stage, stage → its caption row, then groups. */
+  .cs1 .cs1-owner {
+    gap: 0;
+  }
+
+  .cs1 .cs1-owner > * + * {
+    margin-top: var(--cs1-group-gap);
+  }
+
+  .cs1 .cs1-owner > .cs1-owner-head + * {
+    margin-top: var(--cs1-head-gap);
+  }
+
+  .cs1 .cs1-owner > .cs1-bento-still + .cs1-owner-split {
+    margin-top: var(--cs1-caption-gap);
+  }
+
+  .cs1 .cs1-program {
+    gap: 0;
+  }
+
+  .cs1 .cs1-program > * + * {
+    margin-top: var(--cs1-group-gap);
+  }
+
+  .cs1 .cs1-program > .cs1-feature-stage + .cs1-program-phase {
+    margin-top: var(--cs1-caption-gap);
+  }
+
+  .cs1 .cs1-feature-stage {
+    gap: 18px;
+  }
+
+  /* From strategy: groups 68px apart, caption rows 22px under their stage. */
+  .cs1 .cs1-strategy {
+    gap: 0;
+  }
+
+  .cs1 .cs1-strategy > * + * {
+    margin-top: var(--cs1-group-gap);
+  }
+
+  .cs1 .cs1-strategy > .cs1-strategy-stage + .cs1-strategy-split {
+    margin-top: var(--cs1-caption-gap);
+  }
+
+  .cs1 .cs1-strategy-intro > .cs1-strategy-eyebrow {
+    margin-top: 4px;
+  }
+
+  /* Results: 32px under the intro, 28px between figures. */
+  .cs1 .cs1-results-body {
+    gap: 28px;
+  }
+
+  .cs1 .cs1-results-body > :first-child {
+    margin-bottom: 4px;
+  }
+
+  /* Journey: 28px from the issues to the personas, 14px avatar → name. */
+  .cs1 .cs1-personas {
+    margin-top: 14px;
+  }
+
+  .cs1 .cs1-personas figure {
+    gap: 14px;
+  }
+
+  .cs1 .cs1-board {
+    padding-top: 79px;
+  }
+
+  .cs1 .cs1-board-caption {
+    margin-bottom: 21px;
+  }
+}
+
 @media (max-width: 900px) {
   .cs1 .cs-column {
     max-width: calc(100% - 32px);
+    /* Reference at 375px: 58px between sections. */
+    row-gap: 58px;
+  }
+
+  /* Reference at 375px: 28px / 20px from these headers to their bodies. */
+  .cs1 .cs1-owner > .cs1-owner-head + * {
+    margin-top: 12px;
+  }
+
+  .cs1 .cs1-strategy > .cs1-strategy-head + * {
+    margin-top: 4px;
   }
 
   .cs1-cover {
