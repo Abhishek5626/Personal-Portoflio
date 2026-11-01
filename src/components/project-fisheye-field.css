@@ -1,34 +1,26 @@
-/* Full-page infinite fisheye card field. Hero / nav stay outside. */
+/* Whole-page infinite fisheye field. Only the nav and drawer sit above it. */
 
-.landing-page.is-fisheye-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  padding-bottom: 0;
+/* The field pans itself; the document must never scroll underneath it
+   (the collapsed nav panel otherwise extends the page past the fold). */
+html:has(.landing-page.is-fisheye-page) {
+  overflow: hidden;
 }
 
-.landing-fisheye-hero {
-  position: relative;
-  z-index: 2;
-  flex: 0 0 auto;
-  max-width: 42rem;
-  padding-bottom: 18px;
+.landing-page.is-fisheye-page {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .landing-fisheye-main {
   position: relative;
-  z-index: 1;
-  flex: 1 1 auto;
-  min-height: min(72vh, 720px);
-  margin: 0 calc(-1 * var(--landing-gutter, 42px));
-  width: calc(100% + 2 * var(--landing-gutter, 42px));
+  width: 100%;
+  height: 100%;
 }
 
 .page-fisheye-field {
-  height: min(78vh, 820px);
-  min-height: 420px;
-  border-radius: 0;
-  border-block: 1px solid var(--theme-border);
   background: var(--theme-page);
 }
 
@@ -37,14 +29,12 @@
   isolation: isolate;
   width: 100%;
   height: 100%;
-  min-height: inherit;
   overflow: hidden;
   outline: none;
   cursor: grab;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  perspective: 900px;
 }
 
 .project-fisheye-field[data-dragging='true'] {
@@ -71,7 +61,52 @@
 .project-fisheye-plane {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
+}
+
+/* Half the reference vignette, matching the halved lens strength. */
+.project-fisheye-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 48%,
+    rgba(42, 35, 24, 0.065) 100%
+  );
+}
+
+:root[data-theme='dark'] .project-fisheye-vignette {
+  background: radial-gradient(
+    circle at center,
+    transparent 48%,
+    rgba(0, 0, 0, 0.14) 100%
+  );
+}
+
+/*
+  The hero keeps its Figma height (173), so on narrow screens its 584px
+  design is scaled as one piece instead of reflowing taller. It never grows
+  past 1 and always fits inside the viewport gutters.
+*/
+.fisheye-hero-tile {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.fisheye-hero-tile > .hero-introduction {
+  flex: none;
+  width: 584px;
+  transform-origin: 0 0;
+  transform: scale(
+    min(
+      1,
+      var(--fisheye-scale, 1),
+      calc((var(--fisheye-view-w, 1440) - 70) / 584)
+    )
+  );
 }
 
 .project-fisheye-tile {
@@ -80,7 +115,7 @@
   left: 0;
   width: var(--fisheye-cell-w, 280px);
   height: var(--fisheye-cell-h, 240px);
-  transform-origin: center center;
+  transform-origin: 0 0;
   will-change: transform;
   visibility: hidden;
 }
@@ -119,6 +154,24 @@
   box-sizing: border-box;
 }
 
+/*
+  Figma node 54:616: 10px inset and a two-line quote inside 191px. The live
+  quote is longer, so clamp it to the same two lines rather than grow the card.
+*/
+.project-fisheye-tile .testimonial-surface {
+  gap: 13px;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.project-fisheye-tile .testimonial-quote p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 .project-fisheye-tile .project-card-surface.is-media {
   width: 100%;
   height: 100%;
@@ -140,28 +193,6 @@
 .project-fisheye-links a:focus-visible {
   outline: 2px solid var(--theme-accent, #00c950);
   outline-offset: 2px;
-}
-
-@media (max-width: 1100px) {
-  .page-fisheye-field {
-    height: min(70vh, 680px);
-  }
-}
-
-@media (max-width: 760px) {
-  .landing-fisheye-main {
-    margin: 0 calc(-1 * var(--landing-gutter, 20px));
-    width: calc(100% + 2 * var(--landing-gutter, 20px));
-  }
-
-  .page-fisheye-field {
-    height: min(64vh, 560px);
-    min-height: 360px;
-  }
-
-  .landing-fisheye-hero {
-    max-width: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -17,7 +17,10 @@ import {
 } from '../components/useProjectDrawer.ts'
 import { ThemeToggleVisual } from '../components/ThemeToggle.tsx'
 import { useTheme } from '../theme.tsx'
-import { ProjectFisheyeField } from '../components/ProjectFisheyeField.tsx'
+import {
+  ProjectFisheyeField,
+  type FisheyeLayout,
+} from '../components/ProjectFisheyeField.tsx'
 import { aboutMeCard, heroContent, landingCards } from './landingContent.ts'
 import type { LandingCardContent, LandingTool } from './landingContent.ts'
 import './landing.css'
@@ -432,6 +435,72 @@ function HeroIntroduction() {
       <p className="hero-summary">{heroContent.summary}</p>
     </header>
   )
+}
+
+/**
+ * Hero and theme switch for assistive tech and keyboard users; the visible
+ * copies live inside the aria-hidden fisheye field.
+ */
+function AccessibleHero() {
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === 'dark'
+
+  return (
+    <header>
+      <h1 className="visually-hidden">{heroContent.headline}</h1>
+      <p className="visually-hidden">
+        {heroContent.roleDesign} {heroContent.roleEngineer}.{' '}
+        {heroContent.summary}
+      </p>
+      <button
+        type="button"
+        className="skip-link"
+        aria-pressed={isDark}
+        onClick={toggleTheme}
+      >
+        {isDark ? 'Dark Mode' : heroContent.themeLabel}
+      </button>
+    </header>
+  )
+}
+
+/**
+ * Figma "Portfolio 2026", node 2-14 (Desktop 1440 × 1313): card rects in
+ * design px, relative to the content frame at gutters 35 / 34. Item numbers
+ * follow the field's child order (0 is the hero). The left group and the
+ * case-study column loop vertically on their own heights.
+ */
+const fisheyeLayout: FisheyeLayout = {
+  width: 1370,
+  gutterX: 35,
+  gutterY: 34,
+  minScale: 0.85,
+  maxScale: 1.2,
+  strips: [
+    {
+      height: 1245,
+      items: [
+        { item: 0, x: 0, y: 0, w: 584, h: 173 },
+        { item: 1, x: 0, y: 197, w: 584, h: 297 },
+        { item: 2, x: 0, y: 518, w: 281, h: 297 },
+        { item: 3, x: 303, y: 518, w: 281, h: 297 },
+        { item: 4, x: 608, y: 0, w: 315, h: 351 },
+        { item: 5, x: 608, y: 375, w: 315, h: 209 },
+        { item: 6, x: 608, y: 608, w: 315, h: 207 },
+        { item: 7, x: 0, y: 839, w: 449.5, h: 191 },
+        { item: 8, x: 473.5, y: 839, w: 449.5, h: 191 },
+        { item: 9, x: 0, y: 1054, w: 923, h: 191 },
+      ],
+    },
+    {
+      height: 1128,
+      items: [
+        { item: 10, x: 947, y: 0, w: 423, h: 360 },
+        { item: 11, x: 947, y: 384, w: 423, h: 360 },
+        { item: 12, x: 947, y: 768, w: 423, h: 360 },
+      ],
+    },
+  ],
 }
 
 const badgeSize = 96
@@ -959,16 +1028,14 @@ export function LandingPage() {
         Skip to content
       </a>
       <div ref={pageRef} className="landing-page is-fisheye-page">
-        <header className="landing-fisheye-hero">
-          <HeroIntroduction />
-        </header>
+        <AccessibleHero />
         <main
           id={drawerPresent ? undefined : 'main'}
           className="landing-fisheye-main"
         >
           <ProjectFisheyeField
-            aria-label="Portfolio cards — drag to explore"
-            columns={4}
+            aria-label="Portfolio — drag to explore"
+            layout={fisheyeLayout}
             links={[
               {
                 href: landingCards.titleColumnTop.href!,
@@ -987,6 +1054,9 @@ export function LandingPage() {
               },
             ]}
           >
+            <div className="fisheye-hero-tile">
+              <HeroIntroduction />
+            </div>
             <DesignStrategyCard />
             <ProjectCard card={landingCards.buildingInCode} />
             <ProjectCard card={landingCards.designingAiProduct} />

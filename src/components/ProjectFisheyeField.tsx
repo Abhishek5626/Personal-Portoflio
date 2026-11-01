@@ -1,16 +1,29 @@
 /**
- * Page-wide infinite fisheye card field.
- * Interaction inspired by Componentry Fisheye Infinite Grid (MIT).
+ * Page-wide infinite fisheye field.
+ * Port of Componentry's Fisheye Infinite Grid (MIT, Harsh Jadhav —
+ * https://github.com/harshjdhv/componentry) for live DOM instead of a WebGL
+ * image atlas. The reference warps the whole viewport as one continuous lens
+ * surface in a fragment shader; here the same lens curve is applied to every
+ * tile's four corners and each tile is projected with a matrix3d homography,
+ * so neighbouring tiles bend together as one surface.
+ *
  * Reference default lensStrength = 0.24; this field uses exactly 50% (0.12).
  *
- * Each unique card is mounted once and repositioned with wrapped coordinates
- * (no cloned page text, no per-pointer React renders, rAF only while moving).
+ * `layout` is the Figma frame as fixed rects. Its columns are grouped into
+ * strips that loop vertically on their own period, and the whole block loops
+ * horizontally, so the field is infinite with no holes and the first paint is
+ * the Figma arrangement. Heights are always the Figma heights; only x
+ * positions and widths adapt to the viewport. Live copies are mounted only as
+ * far as the viewport needs them.
  */
 import {
   Children,
+  cloneElement,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   type ReactElement,
   type ReactNode,
   isValidElement,
@@ -26,22 +39,149 @@ const DRAG_CLICK_THRESHOLD_PX = 8
 const INERTIA = 0.94
 const WHEEL_SENSITIVITY = 0.42
 
-/** Visual response curves calibrated so REFERENCE_LENS_STRENGTH ≈ the demo. */
-const SCALE_FACTOR = 0.55
-const ROT_FACTOR = 55
-const PUSH_FACTOR = 48
-
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value))
 
 const wrapInto = (value: number, min: number, max: number) => {
   const span = max - min
   if (span <= 0) return value
-  let next = value
-  while (next < min) next += span
-  while (next >= max) next -= span
-  return next
+  return min + ((((value - min) % span) + span) % span)
 }
+
+/**
+ * Screen → world mapping from the reference shader, inverted so world
+ * points can be placed on screen. Lens space is centred on the viewport and
+ * normalised by half its height.
+ */
+const lensCurve = (lx: number, ly: number, aspectTerm: number, k: number) => {
+  // Radius 1 is the viewport corner. Capping it keeps the inverse stable for
+  // the off-screen corners of edge tiles without changing anything visible.
+  const radius = Math.min(4, (lx * lx + ly * ly) / aspectTerm)
+  return k * (0.34 * radius + 0.12 * radius * radius)
+}
+
+const warpPoint = (
+  wx: number,
+  wy: number,
+  halfW: number,
+  halfH: number,
+  aspectTerm: number,
+  k: number,
+): [number, number] => {
+  if (k === 0) return [wx, wy]
+  const ux = (wx - halfW) / halfH
+  const uy = (wy - halfH) / halfH
+  let sx = ux
+  let sy = uy
+  for (let i = 0; i < 6; i += 1) {
+    const scale = 1 + lensCurve(sx, sy, aspectTerm, k)
+    sx = ux * scale
+    sy = uy * scale
+  }
+  return [halfW + sx * halfH, halfH + sy * halfH]
+}
+
+/** matrix3d that maps a w×h box onto the quad tl, tr, br, bl. */
+const quadMatrix = (
+  w: number,
+  h: number,
+  [x0, y0]: [number, number],
+  [x1, y1]: [number, number],
+  [x2, y2]: [number, number],
+  [x3, y3]: [number, number],
+) => {
+  const dx1 = x1 - x2
+  const dx2 = x3 - x2
+  const dx3 = x0 - x1 + x2 - x3
+  const dy1 = y1 - y2
+  const dy2 = y3 - y2
+  const dy3 = y0 - y1 + y2 - y3
+  let g = 0
+  let hh = 0
+  const det = dx1 * dy2 - dx2 * dy1
+  if (Math.abs(det) > 1e-9 && (Math.abs(dx3) > 1e-9 || Math.abs(dy3) > 1e-9)) {
+    g = (dx3 * dy2 - dx2 * dy3) / det
+    hh = (dx1 * dy3 - dx3 * dy1) / det
+  }
+  const a = x1 - x0 + g * x1
+  const b = x3 - x0 + hh * x3
+  const d = y1 - y0 + g * y1
+  const e = y3 - y0 + hh * y3
+  return `matrix3d(${a / w},${d / w},0,${g / w},${b / h},${e / h},0,${hh / h},0,0,1,0,${x0},${y0},0,1)`
+}
+
+export type FisheyeRect = {
+  item: number
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+export type FisheyeStrip = {
+  /** Strip content height in design px; it loops every height + 2 gutters. */
+  height: number
+  items: readonly FisheyeRect[]
+}
+
+export type FisheyeLayout = {
+  /** Design width of the block without gutters. */
+  width: number
+  gutterX: number
+  gutterY: number
+  /** Narrowest / widest horizontal scale applied to x positions and widths. */
+  minScale: number
+  maxScale: number
+  strips: readonly FisheyeStrip[]
+}
+
+type Copies = { x: number; y: readonly number[] }
+
+type Placement = FisheyeRect & {
+  strip: number
+  copyX: number
+  copyY: number
+}
+
+const scaleFor = (layout: FisheyeLayout, viewW: number) =>
+  clamp(
+    (viewW - layout.gutterX * 2) / layout.width,
+    layout.minScale,
+    layout.maxScale,
+  )
+
+const blockPeriodFor = (layout: FisheyeLayout, scale: number) =>
+  layout.width * scale + layout.gutterX * 2
+
+/** How many live copies each axis needs so wrapping never opens a hole. */
+const copiesFor = (
+  layout: FisheyeLayout,
+  viewW: number,
+  viewH: number,
+): Copies => {
+  const scale = scaleFor(layout, viewW)
+  const widest = Math.max(
+    ...layout.strips.flatMap((strip) => strip.items.map((r) => r.w * scale)),
+  )
+  return {
+    x: Math.max(
+      1,
+      Math.ceil((viewW + widest) / blockPeriodFor(layout, scale)),
+    ),
+    y: layout.strips.map((strip) => {
+      const tallest = Math.max(...strip.items.map((r) => r.h))
+      return Math.max(
+        1,
+        Math.ceil((viewH + tallest) / (strip.height + layout.gutterY * 2)),
+      )
+    }),
+  }
+}
+
+const sameCopies = (a: Copies, b: Copies) =>
+  a.x === b.x &&
+  a.y.length === b.y.length &&
+  a.y.every((value, index) => value === b.y[index])
 
 export type ProjectFisheyeLink = {
   href: string
@@ -51,16 +191,16 @@ export type ProjectFisheyeLink = {
 
 type ProjectFisheyeFieldProps = {
   children: ReactNode
+  layout: FisheyeLayout
   links?: readonly ProjectFisheyeLink[]
-  columns?: number
   'aria-label'?: string
 }
 
 export function ProjectFisheyeField({
   children,
+  layout,
   links = [],
-  columns: columnsProp,
-  'aria-label': ariaLabel = 'Portfolio cards — drag to explore',
+  'aria-label': ariaLabel = 'Portfolio — drag to explore',
 }: ProjectFisheyeFieldProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
@@ -73,12 +213,44 @@ export function ProjectFisheyeField({
     return list
   }, [children])
 
-  const cardCount = Math.max(1, faces.length)
-  const gridCols = Math.max(
-    2,
-    columnsProp ?? Math.ceil(Math.sqrt(cardCount)),
+  const [copies, setCopies] = useState<Copies>(() =>
+    copiesFor(layout, window.innerWidth, window.innerHeight),
   )
-  const gridRows = Math.max(1, Math.ceil(cardCount / gridCols))
+
+  const placements = useMemo(() => {
+    const list: Placement[] = []
+    for (let copyX = 0; copyX < copies.x; copyX += 1) {
+      layout.strips.forEach((strip, stripIndex) => {
+        const copiesY = copies.y[stripIndex] ?? 1
+        for (let copyY = 0; copyY < copiesY; copyY += 1) {
+          strip.items.forEach((rect) => {
+            if (rect.item < faces.length) {
+              list.push({ ...rect, strip: stripIndex, copyX, copyY })
+            }
+          })
+        }
+      })
+    }
+    return list
+  }, [layout, copies, faces.length])
+
+  // Mount more copies before paint when the viewport outgrows the current set.
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+    const sync = () => {
+      const rect = root.getBoundingClientRect()
+      const next = copiesFor(layout, rect.width, rect.height)
+      setCopies((current) => (sameCopies(current, next) ? current : next))
+    }
+    sync()
+    const observer = new ResizeObserver(sync)
+    observer.observe(root)
+    return () => observer.disconnect()
+  }, [layout])
+
+  // The pan offset survives copy-count changes so a resize never jumps.
+  const positionRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     const root = rootRef.current
@@ -90,14 +262,13 @@ export function ProjectFisheyeField({
     ]
     if (tiles.length === 0) return
 
-    // Keep recycled / panned anchors out of tab order; use the accessible nav.
-    plane.querySelectorAll('a').forEach((anchor) => {
-      anchor.tabIndex = -1
+    // Panned tiles stay out of tab order; the accessible nav covers them.
+    plane.querySelectorAll<HTMLElement>('a, button').forEach((control) => {
+      control.tabIndex = -1
     })
 
-    const position = { x: 0, y: 0 }
+    const position = positionRef.current
     const velocity = { x: 0, y: 0 }
-    const pointer = { x: 0, y: 0, inside: false }
     const drag = {
       active: false,
       moved: false,
@@ -111,11 +282,18 @@ export function ProjectFisheyeField({
 
     let viewW = 1
     let viewH = 1
-    let cellW = 280
-    let cellH = 240
-    let gap = 16
+    let scale = 1
+    let blockPeriod = 1
     let periodX = 1
-    let periodY = 1
+    const stripPeriods = layout.strips.map(
+      (strip) => strip.height + layout.gutterY * 2,
+    )
+    const periodY = stripPeriods.map(
+      (period, index) => (copies.y[index] ?? 1) * period,
+    )
+    // Common multiple of the strip loops, so wrapping the pan offset by it
+    // never shifts any strip.
+    const panPeriodY = periodY.reduce((a, b) => a * b, 1)
     let reducedMotion = false
     let frame = 0
     let previous = performance.now()
@@ -136,73 +314,65 @@ export function ProjectFisheyeField({
       const rect = root.getBoundingClientRect()
       viewW = Math.max(1, rect.width)
       viewH = Math.max(1, rect.height)
-      gap = viewW < 640 ? 12 : 18
-
-      // Prefer ~3 visible columns; ensure the wrap period covers the viewport.
-      const visibleCols = viewW < 640 ? 2 : viewW < 1100 ? 3 : 3.25
-      cellW = Math.max(160, viewW / visibleCols - gap)
-      cellH = Math.max(150, cellW * 0.88)
-      periodX = gridCols * (cellW + gap)
-      periodY = gridRows * (cellH + gap)
-
-      if (periodX < viewW) {
-        cellW = viewW / gridCols - gap
-        periodX = gridCols * (cellW + gap)
-      }
-      if (periodY < viewH) {
-        cellH = viewH / gridRows - gap
-        periodY = gridRows * (cellH + gap)
-      }
-
-      root.style.setProperty('--fisheye-cell-w', `${cellW}px`)
-      root.style.setProperty('--fisheye-cell-h', `${cellH}px`)
-      root.style.setProperty('--fisheye-gap', `${gap}px`)
+      scale = scaleFor(layout, viewW)
+      blockPeriod = blockPeriodFor(layout, scale)
+      periodX = copies.x * blockPeriod
+      // Unitless, so card CSS can fit fixed-height content with calc().
+      root.style.setProperty('--fisheye-scale', String(scale))
+      root.style.setProperty('--fisheye-view-w', String(viewW))
     }
 
     const paint = () => {
-      const lensX = pointer.inside ? pointer.x : viewW * 0.5
-      const lensY = pointer.inside ? pointer.y : viewH * 0.5
-      const maxR = Math.hypot(viewW, viewH) * 0.55 || 1
-      const strength = reducedMotion ? 0 : LENS_STRENGTH
-      const strideX = cellW + gap
-      const strideY = cellH + gap
+      const k = reducedMotion ? 0 : LENS_STRENGTH
+      const halfW = viewW * 0.5
+      const halfH = viewH * 0.5
+      const aspect = viewW / viewH
+      const aspectTerm = aspect * aspect + 1
+      // Pan is stored in design px horizontally so a resize keeps the view.
+      const panX = position.x * scale
 
       tiles.forEach((tile, index) => {
-        if (index >= cardCount) {
-          tile.style.visibility = 'hidden'
-          return
-        }
+        const placement = placements[index]
+        if (!placement) return
+        const w = placement.w * scale
+        const h = placement.h
+        const x = wrapInto(
+          panX +
+            layout.gutterX +
+            placement.x * scale +
+            placement.copyX * blockPeriod,
+          -w,
+          -w + periodX,
+        )
+        const y = wrapInto(
+          position.y +
+            layout.gutterY +
+            placement.y +
+            placement.copyY * stripPeriods[placement.strip]!,
+          -h,
+          -h + periodY[placement.strip]!,
+        )
 
-        const col = index % gridCols
-        const row = Math.floor(index / gridCols)
-        let x = position.x + col * strideX
-        let y = position.y + row * strideY
-
-        // Wrap each card into one period so the field loops without clones.
-        x = wrapInto(x, -cellW, -cellW + periodX)
-        y = wrapInto(y, -cellH, -cellH + periodY)
-
-        const centerX = x + cellW * 0.5
-        const centerY = y + cellH * 0.5
-        const dx = centerX - lensX
-        const dy = centerY - lensY
-        const dist = Math.hypot(dx, dy)
-        const t = clamp(dist / maxR, 0, 1)
-        const falloff = (1 - t) * (1 - t)
-        const bulge = strength * falloff
-        const scale = 1 + bulge * SCALE_FACTOR
-        const rotY = reducedMotion ? 0 : (dx / maxR) * ROT_FACTOR * strength
-        const rotX = reducedMotion ? 0 : (-dy / maxR) * ROT_FACTOR * strength
-        const push = bulge * PUSH_FACTOR
-        const nx = dist > 0.001 ? dx / dist : 0
-        const ny = dist > 0.001 ? dy / dist : 0
-
+        // Off-screen tiles are clipped by the root; the lens only pushes
+        // points outward, so they never warp back into view. (Hiding them
+        // would not work: some cards force `visibility: visible` inside.)
+        tile.style.width = `${w}px`
+        tile.style.height = `${h}px`
         tile.style.visibility = 'visible'
-        tile.style.width = `${cellW}px`
-        tile.style.height = `${cellH}px`
-        tile.style.transform = `translate3d(${x + nx * push}px, ${y + ny * push}px, 0) perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`
-        tile.style.zIndex = String(Math.round(2000 - dist))
+        tile.style.transform = quadMatrix(
+          w,
+          h,
+          warpPoint(x, y, halfW, halfH, aspectTerm, k),
+          warpPoint(x + w, y, halfW, halfH, aspectTerm, k),
+          warpPoint(x + w, y + h, halfW, halfH, aspectTerm, k),
+          warpPoint(x, y + h, halfW, halfH, aspectTerm, k),
+        )
       })
+    }
+
+    const panBy = (dx: number, dy: number) => {
+      position.x += dx / scale
+      position.y += dy
     }
 
     const tick = (time: number) => {
@@ -210,29 +380,26 @@ export function ProjectFisheyeField({
       previous = time
 
       if (!drag.active && !reducedMotion) {
-        position.x += velocity.x * delta
-        position.y += velocity.y * delta
+        panBy(velocity.x * delta, velocity.y * delta)
         const decay = Math.pow(INERTIA, delta / 16.667)
         velocity.x *= decay
         velocity.y *= decay
-        if (Math.hypot(velocity.x, velocity.y) < 0.006) {
-          velocity.x = 0
-          velocity.y = 0
-        }
       } else if (!drag.active) {
         velocity.x = 0
         velocity.y = 0
       }
 
-      // Keep pan bounded to one period (content wraps via wrapInto).
-      position.x = ((position.x % periodX) + periodX) % periodX
-      position.y = ((position.y % periodY) + periodY) % periodY
+      // Each tile wraps itself; this only keeps the offset from growing.
+      position.x = wrapInto(position.x, 0, periodX / scale)
+      position.y = wrapInto(position.y, 0, panPeriodY)
 
       paint()
 
       if (drag.active || Math.hypot(velocity.x, velocity.y) > 0.006) {
         frame = requestAnimationFrame(tick)
       } else {
+        velocity.x = 0
+        velocity.y = 0
         frame = 0
       }
     }
@@ -250,32 +417,12 @@ export function ProjectFisheyeField({
 
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(root)
+    // Position 0 is the Figma origin: block copy 0 sits at the frame gutters.
     layoutMetrics()
-    position.x = gap
-    position.y = gap
     paint()
-
-    const onPointerEnter = (event: PointerEvent) => {
-      if (event.pointerType !== 'mouse') return
-      pointer.inside = true
-      const rect = root.getBoundingClientRect()
-      pointer.x = event.clientX - rect.left
-      pointer.y = event.clientY - rect.top
-      requestRender()
-    }
-
-    const onPointerLeave = () => {
-      if (drag.active) return
-      pointer.inside = false
-      requestRender()
-    }
 
     const onPointerDown = (event: PointerEvent) => {
       if (event.button !== 0 || !event.isPrimary) return
-      const rect = root.getBoundingClientRect()
-      pointer.inside = true
-      pointer.x = event.clientX - rect.left
-      pointer.y = event.clientY - rect.top
       drag.active = true
       drag.moved = false
       drag.pointerId = event.pointerId
@@ -286,35 +433,29 @@ export function ProjectFisheyeField({
       drag.time = performance.now()
       velocity.x = 0
       velocity.y = 0
-      root.dataset.dragging = 'true'
-      root.setPointerCapture(event.pointerId)
       requestRender()
     }
 
     const onPointerMove = (event: PointerEvent) => {
-      const rect = root.getBoundingClientRect()
-      pointer.x = event.clientX - rect.left
-      pointer.y = event.clientY - rect.top
-      pointer.inside = true
-
-      if (!drag.active || drag.pointerId !== event.pointerId) {
-        if (!reducedMotion) requestRender()
-        return
-      }
+      if (!drag.active || drag.pointerId !== event.pointerId) return
 
       if (
+        !drag.moved &&
         Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) >
-        DRAG_CLICK_THRESHOLD_PX
+          DRAG_CLICK_THRESHOLD_PX
       ) {
+        // Capture only once it is a real drag so short clicks reach links.
         drag.moved = true
+        root.dataset.dragging = 'true'
+        root.setPointerCapture(event.pointerId)
       }
+      if (!drag.moved) return
 
       const time = performance.now()
       const deltaTime = Math.max(8, time - drag.time)
       const deltaX = event.clientX - drag.x
       const deltaY = event.clientY - drag.y
-      position.x += deltaX
-      position.y += deltaY
+      panBy(deltaX, deltaY)
       velocity.x = clamp(deltaX / deltaTime, -2.4, 2.4)
       velocity.y = clamp(deltaY / deltaTime, -2.4, 2.4)
       drag.x = event.clientX
@@ -356,6 +497,7 @@ export function ProjectFisheyeField({
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.target !== root) return
       const step = 56
       const map: Record<string, [number, number]> = {
         ArrowLeft: [step, 0],
@@ -366,8 +508,7 @@ export function ProjectFisheyeField({
       const delta = map[event.key]
       if (!delta) return
       event.preventDefault()
-      position.x += delta[0]
-      position.y += delta[1]
+      panBy(delta[0], delta[1])
       velocity.x = 0
       velocity.y = 0
       paint()
@@ -384,30 +525,22 @@ export function ProjectFisheyeField({
             : 1
 
       if (reducedMotion) {
-        position.x -= event.deltaX * mode * Math.max(0, WHEEL_SENSITIVITY)
-        position.y -= event.deltaY * mode * Math.max(0, WHEEL_SENSITIVITY)
+        panBy(
+          -event.deltaX * mode * WHEEL_SENSITIVITY,
+          -event.deltaY * mode * WHEEL_SENSITIVITY,
+        )
         velocity.x = 0
         velocity.y = 0
         paint()
         return
       }
 
-      const impulse = Math.max(0, WHEEL_SENSITIVITY) * 0.003
-      velocity.x = clamp(
-        velocity.x - event.deltaX * mode * impulse,
-        -1.25,
-        1.25,
-      )
-      velocity.y = clamp(
-        velocity.y - event.deltaY * mode * impulse,
-        -1.25,
-        1.25,
-      )
+      const impulse = WHEEL_SENSITIVITY * 0.003
+      velocity.x = clamp(velocity.x - event.deltaX * mode * impulse, -1.25, 1.25)
+      velocity.y = clamp(velocity.y - event.deltaY * mode * impulse, -1.25, 1.25)
       requestRender()
     }
 
-    root.addEventListener('pointerenter', onPointerEnter)
-    root.addEventListener('pointerleave', onPointerLeave)
     root.addEventListener('pointerdown', onPointerDown)
     root.addEventListener('pointermove', onPointerMove)
     root.addEventListener('pointerup', endDrag)
@@ -421,8 +554,6 @@ export function ProjectFisheyeField({
       cancelAnimationFrame(frame)
       resizeObserver.disconnect()
       motionQuery.removeEventListener('change', syncMotion)
-      root.removeEventListener('pointerenter', onPointerEnter)
-      root.removeEventListener('pointerleave', onPointerLeave)
       root.removeEventListener('pointerdown', onPointerDown)
       root.removeEventListener('pointermove', onPointerMove)
       root.removeEventListener('pointerup', endDrag)
@@ -431,7 +562,7 @@ export function ProjectFisheyeField({
       root.removeEventListener('keydown', onKeyDown)
       root.removeEventListener('wheel', onWheel)
     }
-  }, [cardCount, gridCols, gridRows])
+  }, [placements, layout, copies])
 
   return (
     <div
@@ -444,22 +575,33 @@ export function ProjectFisheyeField({
       data-lens={LENS_STRENGTH}
     >
       <span className="project-fisheye-hint">
-        Drag or use arrow keys to pan all portfolio cards. Fisheye strength is
-        half of the Craftwork reference. Short clicks still open links.
+        Drag, scroll or use arrow keys to pan the whole page in any direction.
+        Short clicks still open links.
       </span>
 
       <div ref={planeRef} className="project-fisheye-plane" aria-hidden="true">
-        {faces.map((face, index) => (
-          <div
-            key={index}
-            className="project-fisheye-tile"
-            data-fisheye-tile=""
-            data-fisheye-index={index}
-          >
-            {face}
-          </div>
-        ))}
+        {placements.map((placement) => {
+          const face = faces[placement.item]!
+          const props = face.props as { id?: string }
+          const copy = `${placement.copyX}-${placement.copyY}`
+          return (
+            <div
+              key={`${placement.item}-${copy}`}
+              className="project-fisheye-tile"
+              data-fisheye-tile=""
+              data-fisheye-item={placement.item}
+              data-fisheye-copy={copy}
+            >
+              {/* Copies drop the id so anchors like #about stay unique. */}
+              {copy !== '0-0' && props.id
+                ? cloneElement(face, { id: undefined } as Partial<unknown>)
+                : face}
+            </div>
+          )
+        })}
       </div>
+
+      <div className="project-fisheye-vignette" aria-hidden="true" />
 
       {links.length > 0 ? (
         <nav className="project-fisheye-links" aria-label="Projects">
