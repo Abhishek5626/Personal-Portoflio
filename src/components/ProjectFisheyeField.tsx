@@ -592,10 +592,14 @@ export function ProjectFisheyeField({
               data-fisheye-item={placement.item}
               data-fisheye-copy={copy}
             >
-              {/* Copies drop the id so anchors like #about stay unique. */}
-              {copy !== '0-0' && props.id
-                ? cloneElement(face, { id: undefined } as Partial<unknown>)
-                : face}
+              {/* Entrance layer: the page's load swoop animates this, so it
+                  never touches the tile's lens transform. */}
+              <div className="project-fisheye-entrance" data-entrance="">
+                {/* Copies drop the id so anchors like #about stay unique. */}
+                {copy !== '0-0' && props.id
+                  ? cloneElement(face, { id: undefined } as Partial<unknown>)
+                  : face}
+              </div>
             </div>
           )
         })}

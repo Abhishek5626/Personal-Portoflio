@@ -697,7 +697,9 @@ function ProjectPointerBadge() {
   dousanmiao.com entrance (from their bundle):
   ox/oy = (cardCenter - viewportCenter) * 0.6
   soft decelerate; delay = 0.25s + index * 0.04s
-  Animates [data-entrance] wrappers only — hover/repel stay on inner cards.
+  Animates the fisheye field's [data-entrance] layers only: the tile above
+  keeps the lens transform and the card below keeps hover/repel, so the three
+  transforms never overwrite each other.
 */
 const entranceOffsetFactor = 0.6
 const entranceBaseDelayMs = 250
@@ -730,14 +732,30 @@ function entranceOffset(
   return [ox, oy] as const
 }
 
+/** Cards render hidden behind this class until the swoop starts. */
+const entrancePendingOnLoad = () =>
+  !window.matchMedia(reducedMotionQuery).matches
+
 function useCardEntrance(rootRef: RefObject<HTMLElement | null>) {
-  useLayoutEffect(() => {
+  // A passive effect runs after the fisheye field has painted its tiles, so
+  // every card is measured at its real (lens-warped) Figma position.
+  useEffect(() => {
     const root = rootRef.current
     if (!root) return
 
     const stage = root.closest<HTMLElement>('.landing-stage')
     const reducedMotion = window.matchMedia(reducedMotionQuery)
-    const tiles = Array.from(root.querySelectorAll<HTMLElement>('[data-entrance]'))
+    const viewW = window.innerWidth
+    const viewH = window.innerHeight
+    // Only cards on screen at load swoop; off-screen copies just appear.
+    const tiles = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-entrance]'),
+    ).filter((el) => {
+      const rect = el.getBoundingClientRect()
+      return (
+        rect.right > 0 && rect.bottom > 0 && rect.left < viewW && rect.top < viewH
+      )
+    })
 
     const markDone = () => {
       root.classList.remove('is-entrance-pending')
@@ -751,8 +769,8 @@ function useCardEntrance(rootRef: RefObject<HTMLElement | null>) {
       return
     }
 
-    const cx = window.innerWidth / 2
-    const cy = window.innerHeight / 2
+    const cx = viewW / 2
+    const cy = viewH / 2
     const narrow = window.innerWidth < 768
     const factor = narrow ? 0.55 : entranceOffsetFactor
     const maxTravel = narrow
@@ -783,33 +801,32 @@ function useCardEntrance(rootRef: RefObject<HTMLElement | null>) {
     })
 
     let cancelled = false
-    void Promise.all(animations.map((anim) => anim.finished.catch(() => undefined))).then(() => {
+    const finish = () => {
       if (cancelled) return
-      for (const anim of animations) {
-        try {
-          anim.commitStyles()
-        } catch {
-          // Unsupported in some engines after cancel — safe to ignore.
-        }
-        anim.cancel()
-      }
-      for (const el of tiles) {
-        el.style.removeProperty('transform')
-        el.style.removeProperty('opacity')
-      }
+      cancelled = true
+      window.clearTimeout(failsafe)
+      // Final keyframe is identity, so cancelling lands exactly in place.
+      for (const anim of animations) anim.cancel()
       markDone()
-    })
+    }
+    // Never leave cards hidden if an animation stalls (e.g. a hidden tab).
+    const failsafe = window.setTimeout(
+      finish,
+      entranceBaseDelayMs +
+        tiles.length * entranceStaggerMs +
+        entranceDurationMs +
+        800,
+    )
+    void Promise.all(
+      animations.map((anim) => anim.finished.catch(() => undefined)),
+    ).then(finish)
 
     return () => {
+      // Strict Mode remount: cancel and let the next run replay from hidden
+      // (the pending class keeps the final layout from flashing early).
       cancelled = true
+      window.clearTimeout(failsafe)
       for (const anim of animations) anim.cancel()
-      // Stay hidden through Strict Mode remount so the final layout never flashes early.
-      for (const el of tiles) {
-        el.style.opacity = '0'
-        el.style.removeProperty('transform')
-      }
-      root.classList.remove('is-entrance-pending')
-      stage?.classList.remove('is-entrance-pending')
     }
   }, [rootRef])
 }
@@ -996,6 +1013,7 @@ export function LandingPage() {
     () => projectFromHash(window.location.hash) !== null,
   )
   useTileHover(pageRef)
+  const [entrancePending] = useState(entrancePendingOnLoad)
   useCardEntrance(pageRef)
 
   useEffect(() => {
@@ -1027,7 +1045,14 @@ export function LandingPage() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <div ref={pageRef} className="landing-page is-fisheye-page">
+      <div
+        ref={pageRef}
+        className={
+          entrancePending
+            ? 'landing-page is-fisheye-page is-entrance-pending'
+            : 'landing-page is-fisheye-page'
+        }
+      >
         <AccessibleHero />
         <main
           id={drawerPresent ? undefined : 'main'}

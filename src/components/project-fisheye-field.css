@@ -120,14 +120,35 @@ html:has(.landing-page.is-fisheye-page) {
   visibility: hidden;
 }
 
-.project-fisheye-tile > * {
+.project-fisheye-tile > *,
+.project-fisheye-entrance > * {
   width: 100%;
   height: 100%;
 }
 
-.project-fisheye-tile > div {
+/*
+  Load swoop layer (animated from LandingPage). Cards stay hidden while the
+  page is pending so the final layout never flashes before the swoop. If the
+  script never starts or stalls, the CSS fallback reveals them after 4s.
+*/
+.project-fisheye-entrance {
+  position: relative;
   width: 100%;
   height: 100%;
+}
+
+.is-entrance-pending .project-fisheye-entrance {
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: project-fisheye-entrance-failsafe 0s linear 4s forwards;
+}
+
+@keyframes project-fisheye-entrance-failsafe {
+  to {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .project-fisheye-tile .project-card,
@@ -198,5 +219,10 @@ html:has(.landing-page.is-fisheye-page) {
 @media (prefers-reduced-motion: reduce) {
   .project-fisheye-tile {
     will-change: auto;
+  }
+
+  .project-fisheye-entrance {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
