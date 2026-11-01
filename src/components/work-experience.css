@@ -16,9 +16,10 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  padding: var(--landing-surface-pad);
+  /* Comfortable, even inset; the card keeps its Figma height (191px). */
+  padding: 16px;
   border-radius: 18px;
   background-color: var(--theme-surface);
   isolation: isolate;
@@ -69,131 +70,22 @@ html:not([data-theme='dark']) .work-experience .project-card-icon {
   line-height: 17px;
 }
 
-.work-experience-timeline {
-  position: relative;
-}
-
-.work-experience-scale {
-  position: relative;
-  height: 76px;
-  touch-action: pan-y;
-  cursor: ew-resize;
-  overflow: hidden;
-  user-select: none;
-  mask-image: linear-gradient(to right, transparent 0%, #000 15%, #000 85%, transparent 100%);
-}
-
-.work-experience-scale.is-dragging {
-  cursor: ew-resize;
-}
-
-.work-experience-scale:focus-visible {
-  outline: 3px solid var(--theme-text);
-  outline-offset: 4px;
-  border-radius: 8px;
-}
-
-.work-experience-strip {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  display: flex;
-  align-items: flex-end;
-  height: 62px;
-  pointer-events: none;
-  transition: transform 150ms ease-out;
-}
-
-.work-experience-scale.is-dragging .work-experience-strip {
-  transition: none;
-}
-
-.work-experience-tick {
-  position: relative;
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  width: 6px;
-  height: 100%;
-}
-
-.work-experience-tick span {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  color: #ea580c;
+.work-experience-year {
+  margin-left: auto;
+  color: #6e6d6d;
   font-family: Inter, sans-serif;
   font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  transform: translateX(-50%);
-}
-
-.work-experience-tick i {
-  display: block;
-  border-radius: 999px;
-  background: #ea580c;
-}
-
-.work-experience-tick.is-year i {
-  width: 2px;
-  height: 42px;
-}
-
-.work-experience-tick.is-half i {
-  width: 1.5px;
-  height: 30px;
-  opacity: 0.7;
-}
-
-.work-experience-tick.is-minor i {
-  width: 1.5px;
-  height: 20px;
-  opacity: 0.4;
-}
-
-.work-experience-tick.is-future span {
-  color: rgba(18, 18, 18, 0.3);
-}
-
-.work-experience-tick.is-future.is-year i {
-  background: rgba(18, 18, 18, 0.2);
-  opacity: 1;
-}
-
-.work-experience-tick.is-future.is-half i {
-  background: rgba(18, 18, 18, 0.12);
-  opacity: 1;
-}
-
-.work-experience-tick.is-future.is-minor i {
-  background: rgba(18, 18, 18, 0.08);
-  opacity: 1;
-}
-
-.work-experience-marker {
-  position: absolute;
-  top: 65px;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-right: 6px solid transparent;
-  border-bottom: 8px solid #ea580c;
-  border-left: 6px solid transparent;
-  transform: translateX(-50%);
-  pointer-events: none;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 15px;
 }
 
 .work-experience-reset {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 2;
   display: grid;
-  width: 40px;
-  height: 40px;
+  flex: none;
+  width: 28px;
+  height: 28px;
   place-items: center;
   padding: 0;
   border-radius: 999px;
@@ -203,17 +95,72 @@ html:not([data-theme='dark']) .work-experience .project-card-icon {
   display: none;
 }
 
+/*
+  Exposure ticker (after Smooth UI's Exposure Slider): 3px notches on a 13px
+  pitch, the centre notch in the accent, neighbours clipped and faded by
+  distance in WorkExperienceCard.tsx. The track never resizes, so moving it
+  can't shift the layout.
+*/
+.work-experience-scale {
+  position: relative;
+  flex: none;
+  height: 40px;
+  overflow: hidden;
+  color: rgba(18, 18, 18, 0.55);
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+}
+
+.work-experience-scale.is-dragging {
+  cursor: grabbing;
+}
+
+.work-experience-scale:focus-visible {
+  outline: 2px solid var(--theme-text);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+.work-experience-track {
+  position: absolute;
+  top: 0;
+  /* Centre of notch 0 sits on the card's centre line. */
+  left: calc(50% - 6.5px);
+  display: flex;
+  height: 100%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.work-experience-notch {
+  flex: none;
+  width: 3px;
+  height: 40px;
+  margin: 0 5px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.work-experience-notch.is-center {
+  background: #ea580c;
+}
+
 .work-experience-footer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 12px;
+  min-height: 60px;
 }
 
 .work-experience-role-block {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   min-width: 0;
 }
 
@@ -242,31 +189,64 @@ html:not([data-theme='dark']) .work-experience .project-card-icon {
   text-overflow: ellipsis;
 }
 
+/* Up to two lines, so the longest role never runs past the card edge. */
 .work-experience-role {
+  display: -webkit-box;
   margin: 0;
   overflow: hidden;
   color: #2f2d2d;
   font-family: Inter, sans-serif;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 500;
   letter-spacing: -0.04em;
-  line-height: 22px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  line-height: 20px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-.work-experience-stat {
-  display: flex;
+/* Progress ring (reference indicator): years so far against "Present". */
+.work-experience-ring {
+  position: relative;
+  display: grid;
   flex: none;
-  flex-direction: column;
-  align-items: flex-start;
-  margin: 0;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  color: rgba(18, 18, 18, 0.55);
+}
+
+.work-experience-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.work-experience-ring-track {
+  fill: currentColor;
+  fill-opacity: 0.067;
+  stroke: currentColor;
+  stroke-opacity: 0.3;
+  stroke-width: 4;
+}
+
+.work-experience-ring-value {
+  fill: none;
+  stroke: #ea580c;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 1 0;
+  transform: rotate(-90deg);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 
 .work-experience-total {
+  position: relative;
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 1px;
   color: #ea580c;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -274,24 +254,16 @@ html:not([data-theme='dark']) .work-experience .project-card-icon {
 
 .work-experience-amount {
   font-family: Inter, sans-serif;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .work-experience-unit {
   font-family: Inter, sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   opacity: 0.8;
-}
-
-.work-experience-year {
-  color: #6e6d6d;
-  font-family: Inter, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 15px;
 }
 
 html[data-theme='dark'] .work-experience-label,
@@ -304,45 +276,32 @@ html[data-theme='dark'] .work-experience-year {
   color: var(--theme-text-muted);
 }
 
-html[data-theme='dark'] .work-experience-total,
-html[data-theme='dark'] .work-experience-tick span,
-html[data-theme='dark'] .work-experience-tick i,
-html[data-theme='dark'] .work-experience-marker {
+html[data-theme='dark'] .work-experience-total {
   color: #fb923c;
 }
 
-html[data-theme='dark'] .work-experience-tick i,
-html[data-theme='dark'] .work-experience-marker {
+html[data-theme='dark'] .work-experience-scale,
+html[data-theme='dark'] .work-experience-ring {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+html[data-theme='dark'] .work-experience-notch.is-center {
   background: #fb923c;
-  border-bottom-color: #fb923c;
 }
 
-html[data-theme='dark'] .work-experience-tick.is-future span {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-html[data-theme='dark'] .work-experience-tick.is-future.is-year i {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-html[data-theme='dark'] .work-experience-tick.is-future.is-half i {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-html[data-theme='dark'] .work-experience-tick.is-future.is-minor i {
-  background: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .work-experience-ring-value {
+  stroke: #fb923c;
 }
 
 @media (max-width: 760px) {
   .work-experience-role {
     font-size: 16px;
-    line-height: 20px;
+    line-height: 19px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .work-experience-surface,
-  .work-experience-strip {
+  .work-experience-surface {
     transition: none;
   }
 }
