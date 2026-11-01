@@ -294,6 +294,8 @@ export function ProjectFisheyeField({
       x: 0,
       y: 0,
       time: 0,
+      /** Card control with its own one-axis drag the gesture started on. */
+      owner: null as HTMLElement | null,
     }
 
     let viewW = 1
@@ -447,25 +449,42 @@ export function ProjectFisheyeField({
       drag.x = event.clientX
       drag.y = event.clientY
       drag.time = performance.now()
+      drag.owner =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>('[data-fisheye-drag-axis]')
+          : null
       velocity.x = 0
       velocity.y = 0
       requestRender()
     }
 
+    const clearSelection = () => {
+      const selection = window.getSelection()
+      if (selection && !selection.isCollapsed) selection.removeAllRanges()
+    }
+
     const onPointerMove = (event: PointerEvent) => {
       if (!drag.active || drag.pointerId !== event.pointerId) return
 
-      if (
-        !drag.moved &&
-        Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) >
-          DRAG_CLICK_THRESHOLD_PX
-      ) {
+      if (!drag.moved) {
+        const dx = event.clientX - drag.startX
+        const dy = event.clientY - drag.startY
+        if (Math.hypot(dx, dy) <= DRAG_CLICK_THRESHOLD_PX) return
+        // A control with its own drag (wheel, seek bar, timeline) keeps
+        // gestures along its axis; anything else pans the field.
+        const axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'
+        if (drag.owner?.dataset.fisheyeDragAxis === axis) {
+          drag.active = false
+          return
+        }
         // Capture only once it is a real drag so short clicks reach links.
+        // Taking capture also tells a control that had it to stand down.
         drag.moved = true
         root.dataset.dragging = 'true'
         root.setPointerCapture(event.pointerId)
       }
-      if (!drag.moved) return
+      // Drop text the press began to select before the drag was recognised.
+      clearSelection()
 
       const time = performance.now()
       const deltaTime = Math.max(8, time - drag.time)
@@ -564,6 +583,14 @@ export function ProjectFisheyeField({
     window.addEventListener('blur', cancelDrag)
     root.addEventListener('keydown', onKeyDown)
     root.addEventListener('wheel', onWheel, { passive: false })
+    // Card links and images are natively draggable; the browser's own drag
+    // fires pointercancel and kills the pan, so it never starts in here.
+    const preventNative = (event: Event) => event.preventDefault()
+    const onSelectStart = (event: Event) => {
+      if (drag.moved && drag.active) event.preventDefault()
+    }
+    root.addEventListener('dragstart', preventNative)
+    root.addEventListener('selectstart', onSelectStart)
 
     return () => {
       disposed = true
@@ -578,6 +605,8 @@ export function ProjectFisheyeField({
       window.removeEventListener('blur', cancelDrag)
       root.removeEventListener('keydown', onKeyDown)
       root.removeEventListener('wheel', onWheel)
+      root.removeEventListener('dragstart', preventNative)
+      root.removeEventListener('selectstart', onSelectStart)
     }
   }, [placements, layout, copies])
 

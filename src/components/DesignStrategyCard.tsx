@@ -188,6 +188,7 @@ export function StrategyOptionList({
     <div
       ref={listRef}
       className="strategy-option-list"
+      data-fisheye-drag-axis="y"
       role="listbox"
       aria-labelledby="design-strategy-title"
       aria-activedescendant="strategy-option-zero-to-one"
@@ -842,6 +843,20 @@ export function DesignStrategyCard() {
       animateSnap()
     }
 
+    // The page's drag took the pointer (a sideways drag that started here):
+    // settle any spin, but never treat it as a press on an option.
+    const onLostCapture = (event: PointerEvent) => {
+      if (!pointerDown || event.pointerId !== pointerId) return
+      if (dragging) {
+        endDrag(event)
+        return
+      }
+      pointerDown = false
+      pressTarget = null
+      list.classList.remove('is-grabbing')
+      render()
+    }
+
     const onPointerLeave = () => {
       if (pointerDown) return
       pointerInside = false
@@ -956,6 +971,7 @@ export function DesignStrategyCard() {
     list.addEventListener('pointermove', onPointerMove)
     list.addEventListener('pointerup', endDrag)
     list.addEventListener('pointercancel', endDrag)
+    list.addEventListener('lostpointercapture', onLostCapture)
     list.addEventListener('pointerleave', onPointerLeave)
     list.addEventListener('click', onClick)
     list.addEventListener('focusin', onFocusIn)
@@ -986,6 +1002,7 @@ export function DesignStrategyCard() {
       list.removeEventListener('pointermove', onPointerMove)
       list.removeEventListener('pointerup', endDrag)
       list.removeEventListener('pointercancel', endDrag)
+      list.removeEventListener('lostpointercapture', onLostCapture)
       list.removeEventListener('pointerleave', onPointerLeave)
       list.removeEventListener('click', onClick)
       list.removeEventListener('focusin', onFocusIn)

@@ -205,6 +205,16 @@ export function WorkExperienceCard() {
           onPointerMove={onPointerMove}
           onPointerUp={(event) => stopDrag(event, false)}
           onPointerCancel={(event) => stopDrag(event, true)}
+          data-fisheye-drag-axis="x"
+          onLostPointerCapture={(event) => {
+            // The page's drag took over (a vertical drag began here): put
+            // the timeline back so panning never scrubs it.
+            const drag = dragRef.current
+            if (!drag.active || event.pointerId !== drag.pointerId) return
+            drag.active = false
+            event.currentTarget.classList.remove('is-dragging')
+            apply(drag.startYears)
+          }}
           onKeyDown={onKeyDown}
         >
           <div ref={stripRef} className="work-experience-strip">

@@ -105,6 +105,7 @@ function WaveformSeek({
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const draggingRef = useRef(false)
+  const pressProgressRef = useRef(0)
   const [dragging, setDragging] = useState(false)
 
   const ratioFromClientX = (clientX: number) => {
@@ -155,6 +156,7 @@ function WaveformSeek({
           return
         }
         event.preventDefault()
+        pressProgressRef.current = progress
         draggingRef.current = true
         setDragging(true)
         event.currentTarget.setPointerCapture(event.pointerId)
@@ -168,6 +170,16 @@ function WaveformSeek({
       }}
       onPointerUp={finishPointer}
       onPointerCancel={finishPointer}
+      data-fisheye-drag-axis="x"
+      onLostPointerCapture={(event) => {
+        // The page's drag took over (a vertical drag began here): undo the
+        // press-to-seek so panning never skips the track.
+        if (!draggingRef.current) {
+          return
+        }
+        onSeek(pressProgressRef.current)
+        finishPointer(event)
+      }}
       onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
         if (disabled) {
           return

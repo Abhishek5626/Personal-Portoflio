@@ -32,13 +32,19 @@ html:has(.landing-page.is-fisheye-page) {
   overflow: hidden;
   outline: none;
   cursor: grab;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
+  /*
+    The field is this page's scroll surface (the document never scrolls), so
+    one-finger pans must reach its pointer handlers; pinch-zoom stays native.
+  */
+  touch-action: pinch-zoom;
 }
 
-.project-fisheye-field[data-dragging='true'] {
-  cursor: grabbing;
+/* Only a recognised drag blocks selection and shows the grabbing hand. */
+.project-fisheye-field[data-dragging='true'],
+.project-fisheye-field[data-dragging='true'] * {
+  cursor: grabbing !important;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .project-fisheye-field:focus-visible {
