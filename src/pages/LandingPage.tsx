@@ -654,16 +654,51 @@ function ProjectPointerBadge() {
       ensureFrame()
     }
 
+    // Keyboard users reach projects through the fisheye field's link list
+    // (the panned tiles are out of tab order); point the badge at the
+    // matching card that is on screen, the nearest one to the centre.
+    const onScreenCardFor = (link: Element) => {
+      const href = link.getAttribute('href')
+      if (!href || !link.closest('.project-fisheye-links')) return null
+      let best: HTMLElement | null = null
+      let bestDistance = Infinity
+      document
+        .querySelectorAll<HTMLElement>('.project-card-link')
+        .forEach((candidate) => {
+          if (candidate.getAttribute('href') !== href) return
+          const rect = candidate.getBoundingClientRect()
+          const x = rect.left + rect.width / 2
+          const y = rect.top + rect.height / 2
+          if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) return
+          const distance = Math.hypot(
+            x - window.innerWidth / 2,
+            y - window.innerHeight / 2,
+          )
+          if (distance < bestDistance) {
+            best = candidate
+            bestDistance = distance
+          }
+        })
+      return best as HTMLElement | null
+    }
+
     const onFocusIn = (event: FocusEvent) => {
-      const card = cardFrom(event.target)
       const target = event.target
-      if (!card || !(target instanceof Element) || !card.matches(':focus-visible')) return
+      if (!(target instanceof Element) || !target.matches(':focus-visible')) return
+      const card = cardFrom(target) ?? onScreenCardFor(target)
+      if (!card) return
       const rect = card.getBoundingClientRect()
       revealAt(rect.left + rect.width / 2, rect.top + rect.height / 2)
     }
 
     const onFocusOut = (event: FocusEvent) => {
-      if (cardFrom(event.relatedTarget)) return
+      const next = event.relatedTarget
+      if (
+        cardFrom(next) ||
+        (next instanceof Element && next.closest('.project-fisheye-links'))
+      ) {
+        return
+      }
       shown = Boolean(document.querySelector('.project-card-link:hover'))
       ensureFrame()
     }

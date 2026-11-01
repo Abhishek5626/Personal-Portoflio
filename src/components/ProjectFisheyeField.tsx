@@ -263,8 +263,24 @@ export function ProjectFisheyeField({
     if (tiles.length === 0) return
 
     // Panned tiles stay out of tab order; the accessible nav covers them.
-    plane.querySelectorAll<HTMLElement>('a, button').forEach((control) => {
-      control.tabIndex = -1
+    // Cards add controls later (e.g. the music card's player), so keep
+    // re-applying as the tiles change.
+    const untab = () => {
+      plane
+        .querySelectorAll<HTMLElement>(
+          'a, button, input, select, textarea, iframe, [tabindex]',
+        )
+        .forEach((control) => {
+          if (control.tabIndex !== -1) control.tabIndex = -1
+        })
+    }
+    untab()
+    const tabObserver = new MutationObserver(untab)
+    tabObserver.observe(plane, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['tabindex'],
     })
 
     const position = positionRef.current
@@ -553,6 +569,7 @@ export function ProjectFisheyeField({
       disposed = true
       cancelAnimationFrame(frame)
       resizeObserver.disconnect()
+      tabObserver.disconnect()
       motionQuery.removeEventListener('change', syncMotion)
       root.removeEventListener('pointerdown', onPointerDown)
       root.removeEventListener('pointermove', onPointerMove)

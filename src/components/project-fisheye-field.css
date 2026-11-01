@@ -211,8 +211,41 @@ html:has(.landing-page.is-fisheye-page) {
   border: 0;
 }
 
+/*
+  Keyboard equivalent of hovering a project: the list shows while focused.
+  Top centre, because the page-level progressive blur covers the bottom edge
+  and this field's isolated stacking context can't rise above it.
+*/
+.project-fisheye-links:focus-within {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  z-index: 21;
+  justify-content: center;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: auto;
+  max-width: calc(100vw - 32px);
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+.project-fisheye-links:focus-within a {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--theme-surface);
+  box-shadow: var(--theme-glass-shadow);
+  color: var(--theme-text);
+  font: 500 14px/1.2 Inter, sans-serif;
+}
+
 .project-fisheye-links a:focus-visible {
-  outline: 2px solid var(--theme-accent, #00c950);
+  outline: 2px solid var(--theme-text);
   outline-offset: 2px;
 }
 

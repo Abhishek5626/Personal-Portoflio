@@ -49,6 +49,22 @@ html .work-experience-reset {
     opacity var(--theme-duration) var(--theme-ease);
 }
 
+/*
+  The project badge borrows the glass look but is a pointer-following
+  overlay: keep it fixed to the viewport (the shared `position: relative`
+  above dropped it into page flow, below the full-height landing page) and
+  leave transform/opacity to its per-frame spring — CSS transitions on those
+  would lag and fight it.
+*/
+html .view-project-badge {
+  position: fixed;
+  transition:
+    box-shadow var(--theme-glass-duration) var(--theme-glass-ease),
+    backdrop-filter var(--theme-glass-duration) var(--theme-glass-ease),
+    -webkit-backdrop-filter var(--theme-glass-duration) var(--theme-glass-ease),
+    color var(--theme-duration) var(--theme-ease);
+}
+
 html .glass-control::after,
 html .shipped-badge::after,
 html .portfolio-nav-toggle-face::after,
