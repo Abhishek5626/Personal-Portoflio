@@ -99,6 +99,10 @@
   gap: 10px;
 }
 
+.hero-head .shipped-badge {
+  align-self: flex-start;
+}
+
 .cs-title-row {
   display: flex;
   justify-content: space-between;
@@ -1938,12 +1942,7 @@
     gap: 14px;
   }
 
-  .case-study .hero-head {
-    align-items: flex-start;
-  }
-
   .case-study .cs-title-row {
-    width: 100%;
     gap: 8px;
   }
 
