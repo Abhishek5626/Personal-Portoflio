@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import './case-study.css'
 import './case-study-2.css'
@@ -329,6 +330,218 @@ const board = [
   ['Aditi Sinha', '2,422 XP'],
 ]
 
+const dashNav = [
+  { items: ['Home', 'Bookmarks'] },
+  { title: 'Learn', items: ['Courses', 'Assignments', 'Masterclass', 'Briefs', 'Classes'] },
+  { title: 'Grow', items: ['Showcase', 'Certificate', 'Job Board'] },
+]
+
+/** The LMS sidebar and top bar shared by the screens on the Framer page. */
+function DashChrome({
+  clipped = false,
+  children,
+}: {
+  clipped?: boolean
+  children: ReactNode
+}) {
+  return (
+    <div className="cs2-dash-frame">
+      <div className={clipped ? 'cs2-dash is-clipped' : 'cs2-dash'}>
+        <div className="cs2-dash-side">
+          <span className="cs2-dash-brand">
+            <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true">
+              <path d="M6.5 0 8 5l5 1.5L8 8l-1.5 5L5 8 0 6.5 5 5Z" fill="#8b5cf6" />
+            </svg>
+            MasterClass
+          </span>
+          {dashNav.map((group, index) => (
+            <div key={index} className="cs2-dash-group">
+              {group.title ? (
+                <span className="cs2-dash-group-title">{group.title}</span>
+              ) : null}
+              {group.items.map((item) => (
+                <span
+                  key={item}
+                  className={
+                    item === 'Home' ? 'cs2-dash-link is-active' : 'cs2-dash-link'
+                  }
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          ))}
+          <div className="cs2-dash-update">
+            <span className="cs2-dash-update-art" />
+            <span className="cs2-dash-update-row">
+              <span>We’ve made some updates</span>
+              <span className="cs2-dash-update-button">Updates</span>
+            </span>
+          </div>
+          <span className="cs2-dash-link cs2-dash-settings">Settings</span>
+        </div>
+
+        <div className="cs2-dash-main">
+          <div className="cs2-dash-top">
+            <span className="cs2-dash-search">
+              Search Instructors, Classes, Topics and more
+            </span>
+            <img src="/case-study-2/avatar.png" width={16} height={16} alt="" />
+          </div>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LeaderboardDashboard() {
+  return (
+    <DashChrome>
+          <div className="cs2-dash-league">
+            <svg width="50" height="50" viewBox="0 0 24 24" aria-hidden="true">
+              <defs>
+                <linearGradient id="cs2-dash-star" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#ffd978" />
+                  <stop offset="1" stopColor="#f59a23" />
+                </linearGradient>
+              </defs>
+              <path
+                d="m12 1.8 3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.9l-6.4 3.5L7 14.3l-5.3-5 7.2-.9Z"
+                fill="url(#cs2-dash-star)"
+              />
+            </svg>
+            <span className="cs2-dash-league-name">Gold league</span>
+            <span className="cs2-dash-muted">Top 20 advances to next league</span>
+            <span className="cs2-dash-muted">7 Days left</span>
+            <span className="cs2-dash-locks" aria-hidden="true">
+              {Array.from({ length: 8 }, (_, index) => (
+                <svg key={index} width="16" height="16" viewBox="0 0 16 16">
+                  <path
+                    d="M5 7V5a3 3 0 0 1 6 0v2h1a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm1.5 0h3V5a1.5 1.5 0 0 0-3 0Z"
+                    fill="#8b5cf6"
+                  />
+                </svg>
+              ))}
+            </span>
+          </div>
+
+          <ul className="cs2-board">
+            {board.map(([name, xp], index) => (
+              <li key={`${name}-${index}`}>
+                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                  <path d="M3.5 7 2 11.5l2.2-.8L6 12l1.8-1.3 2.2.8L8.5 7Z" fill="#d98a1f" />
+                  <circle cx="6" cy="4.5" r="4" fill="#f7b93e" />
+                </svg>
+                <span className="cs2-board-face" />
+                <span className="cs2-board-name">{name}</span>
+                <span className="cs2-board-xp">{xp}</span>
+              </li>
+            ))}
+          </ul>
+          <span className="cs2-dash-cta">Start Assesment</span>
+    </DashChrome>
+  )
+}
+
+const coursePills = ['All', 'UX', 'UI', 'AI', 'Career', 'Interaction', 'Design System', 'Framer', 'HTML', 'CSS', 'React', 'Skill Path']
+const showcasePills = ['Application', 'UI Element', 'Websites', 'Design System', 'Creativity', 'Interaction', 'Coding', 'Framer']
+
+function DashPills({ pills, active }: { pills: string[]; active: string }) {
+  return (
+    <ul className="cs2-dash-pills">
+      {pills.map((pill) => (
+        <li key={pill} className={pill === active ? 'is-active' : undefined}>
+          {pill}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function CoursesDashboard() {
+  return (
+    <DashChrome clipped>
+      <div className="cs2-dash-page">
+        <span className="cs2-dash-page-title">Courses</span>
+        <span className="cs2-dash-page-sub">
+          Improve your skills through interactive, hands-on professional courses.
+        </span>
+        <DashPills pills={coursePills} active="UI" />
+        <span className="cs2-dash-path-title">
+          Master Navigation Patterns for Mobile &amp; Desktop UI
+        </span>
+        <span className="cs2-dash-path-sub">6 courses · intermediate</span>
+        <ul className="cs2-dash-courses">
+          {Array.from({ length: 6 }, (_, index) => (
+            <li key={index}>
+              <span className="cs2-dash-course-art" />
+              <span className="cs2-dash-course-title">Product Designer</span>
+              <span className="cs2-dash-course-body">
+                Explore AI concepts, principles and praotices essentail for
+                creating human
+              </span>
+              <span className="cs2-dash-course-progress">3% · 6h left</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </DashChrome>
+  )
+}
+
+function ShowcaseCard({ preview }: { preview?: ReactNode }) {
+  return (
+    <li>
+      <span className="cs2-dash-show-preview">
+        {preview ?? <span className="cs2-dash-show-welcome">Welcome to SpaceX</span>}
+      </span>
+      <span className="cs2-dash-show-meta">
+        <span>
+          <span className="cs2-dash-show-kicker">Assessment</span>
+          <span className="cs2-dash-show-title">Space Technology Website</span>
+        </span>
+        <span className="cs2-board-face" />
+      </span>
+      <span className="cs2-dash-show-body">
+        Exercise where you learn about the fundamental principles of designs by
+        replicating the design as it is.
+      </span>
+      <span className="cs2-dash-show-points">
+        {[0, 1].map((index) => (
+          <span key={index}>
+            <span className="cs2-dash-show-coin" />
+            <span>
+              <span className="cs2-dash-show-value">2,524 Points</span>
+              <span className="cs2-dash-show-label">My Exp Points</span>
+            </span>
+          </span>
+        ))}
+      </span>
+    </li>
+  )
+}
+
+function ShowcaseDashboard() {
+  return (
+    <DashChrome clipped>
+      <div className="cs2-dash-page">
+        <span className="cs2-dash-page-title">Showcase</span>
+        <span className="cs2-dash-page-sub">
+          Improve your skills through interactive, hands-on professional courses.
+        </span>
+        <DashPills pills={showcasePills} active="Websites" />
+        <ul className="cs2-dash-showcase">
+          <ShowcaseCard />
+          <ShowcaseCard />
+          <ShowcaseCard preview={<MotionPhone />} />
+          <ShowcaseCard />
+        </ul>
+      </div>
+    </DashChrome>
+  )
+}
+
 const features = [
   [
     ['Goal', 'Boost motivation'],
@@ -362,6 +575,21 @@ function MetaRow({
       {items.map(([label, value]) => (
         <div className="cs2-feature-meta-col" key={label}>
           <p>{label}</p>
+          <svg
+            className="cs2-feature-meta-arrow"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 2v12M3.5 9.5 8 14l4.5-4.5"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
           <MetaValue>{value}</MetaValue>
         </div>
       ))}
@@ -687,22 +915,7 @@ export function CaseStudy2() {
           <article className="cs2-feature">
             <div className="cs2-feature-visual">
               <div className="cs2-stage">
-                <div className="cs2-app">
-                  <p className="cs2-app-brand">MasterClass</p>
-                  <p className="cs2-app-kicker">Leaderboard</p>
-                  <p className="cs2-app-league">Gold league</p>
-                  <p className="cs2-app-muted">Top 20 advances to next league</p>
-                  <p className="cs2-app-muted">7 Days left</p>
-                  <ul className="cs2-board">
-                    {board.map(([name, xp], index) => (
-                      <li key={`${name}-${index}`}>
-                        <span>{name}</span>
-                        <span>{xp}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="cs2-app-cta">Start Assesment</p>
-                </div>
+                <LeaderboardDashboard />
               </div>
               <p className="cs2-feature-cap cs2-feature-cap-board">Leaderboard</p>
             </div>
@@ -727,11 +940,40 @@ export function CaseStudy2() {
                   </div>
                 </div>
                 <div className="cs2-stage">
-                  <div className="cs2-reward">
-                    <p className="cs2-reward-title">UX Audit Doc!</p>
-                    <p>You got UX Audit Doc worth</p>
-                    <p className="cs2-reward-free">Rps 499 for Free</p>
-                    <p className="cs2-app-cta">Claim</p>
+                  <div className="cs2-reward-frame">
+                    <div className="cs2-reward">
+                      <p className="cs2-reward-title">UX Audit Doc!</p>
+                      <svg
+                        className="cs2-reward-doc"
+                        width="72"
+                        height="88"
+                        viewBox="0 0 72 88"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M12 2h34l24 24v50a10 10 0 0 1-10 10H12A10 10 0 0 1 2 76V12A10 10 0 0 1 12 2Z"
+                          fill="#8a55e6"
+                        />
+                        <path d="M46 2v14a10 10 0 0 0 10 10h14Z" fill="#d9c6ff" />
+                        <text
+                          x="36"
+                          y="62"
+                          fill="#5c31a8"
+                          fontFamily="Inter, sans-serif"
+                          fontSize="22"
+                          fontWeight="800"
+                          textAnchor="middle"
+                        >
+                          PDF
+                        </text>
+                      </svg>
+                      <p className="cs2-reward-copy">
+                        You got UX Audit Doc worth
+                        <br />
+                        Rps 499 for Free
+                      </p>
+                      <p className="cs2-reward-claim">Claim</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -745,27 +987,7 @@ export function CaseStudy2() {
           <article className="cs2-feature">
             <div className="cs2-feature-visual">
               <div className="cs2-stage">
-                <div className="cs2-app cs2-app-wide">
-                  <p className="cs2-app-brand">MasterClass</p>
-                  <p className="cs2-app-league">Courses</p>
-                  <p className="cs2-app-muted">
-                    Improve your skills through interactive, hands-on
-                    professional courses.
-                  </p>
-                  <ul className="cs2-pills-row">
-                    {['All', 'UX', 'UI', 'AI', 'Career', 'Interaction', 'Design System', 'Framer', 'HTML', 'CSS', 'React'].map((pill) => (
-                      <li key={pill}>{pill}</li>
-                    ))}
-                  </ul>
-                  <div className="cs2-course">
-                    <p>Product Designer</p>
-                    <p>
-                      Explore AI concepts, principles and praotices essentail
-                      for creating human
-                    </p>
-                    <p>3% · 6h left</p>
-                  </div>
-                </div>
+                <CoursesDashboard />
               </div>
               <p className="cs2-feature-cap">Recorded Sessions</p>
             </div>
@@ -775,7 +997,7 @@ export function CaseStudy2() {
           <article className="cs2-feature">
             <div className="cs2-feature-visual">
               <div className="cs2-stage">
-                <MotionPhone />
+                <ShowcaseDashboard />
               </div>
               <p className="cs2-feature-cap">
                 Showcase Tab to show the work of every students something

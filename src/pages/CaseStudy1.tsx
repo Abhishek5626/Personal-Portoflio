@@ -468,61 +468,204 @@ function MapChevron({ direction }: { direction: 'up' | 'down' | 'right' }) {
   )
 }
 
-const coursePreviewTabs = [
-  'UX',
-  'UI',
-  'Design System',
-  'Career',
+const moduleFilters = [
+  'All',
+  'UX Research',
+  'Case Study',
   'AI',
-  'Masterclass',
+  'Design System',
+  'UI',
+  'UX',
 ] as const
 
-/** A static mockup, as on the Framer page: its tabs don't switch the cards. */
-function CoursePreview() {
+type ModuleFilter = (typeof moduleFilters)[number]
+
+type CourseModule = {
+  id: string
+  number: string
+  title: string
+  category: Exclude<ModuleFilter, 'All'>
+  image: string
+  imageWidth: number
+  imageHeight: number
+  alt: string
+}
+
+const courseModules: CourseModule[] = [
+  {
+    id: 'case-study-1',
+    number: '1',
+    title: 'Case Study 1 – With Guidance',
+    category: 'Case Study',
+    image: '/case-study-1/hub-card-case-study.png',
+    imageWidth: 536,
+    imageHeight: 213,
+    alt: 'Collaborative case study document with Abhishek and Shreyasii cursors.',
+  },
+  {
+    id: 'chatgpt',
+    number: '1',
+    title: 'AI Research with ChatGPT',
+    category: 'AI',
+    image: '/case-study-1/hub-card-chatgpt.png',
+    imageWidth: 536,
+    imageHeight: 213,
+    alt: 'ChatGPT prompt card asking for a four-week UX research plan.',
+  },
+  {
+    id: 'interviews',
+    number: '1',
+    title: 'Stakeholder Interviews',
+    category: 'UX Research',
+    image: '/case-study-1/hub-card-interviews.png',
+    imageWidth: 536,
+    imageHeight: 213,
+    alt: 'Video call window with stakeholder avatars for an interview session.',
+  },
+  {
+    id: 'foundation',
+    number: '1',
+    title: 'UX Foundation',
+    category: 'UX',
+    image: '/case-study-1/hub-card-foundation.png',
+    imageWidth: 512,
+    imageHeight: 203,
+    alt: 'Purple chips labeled Core Product Statement and User Personas.',
+  },
+  {
+    id: 'design-system',
+    number: '1',
+    title: 'Building an MVP Design System',
+    category: 'Design System',
+    image: '/case-study-1/hub-card-design-system.jpg',
+    imageWidth: 512,
+    imageHeight: 203,
+    alt: 'Design system canvas with tooltip, status, and pagination components.',
+  },
+  {
+    id: 'buttons',
+    number: '1',
+    title: 'Button Components & Interaction States',
+    category: 'UI',
+    image: '/case-study-1/hub-card-buttons.png',
+    imageWidth: 512,
+    imageHeight: 203,
+    alt: 'Primary, outlined, and text Button CTA variants on a dark field.',
+  },
+]
+
+const modulesPageSize = 6
+
+function CourseModulesBoard() {
+  const [filter, setFilter] = useState<ModuleFilter>('All')
+  const [visibleCount, setVisibleCount] = useState(modulesPageSize)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  const filtered =
+    filter === 'All'
+      ? courseModules
+      : courseModules.filter((module) => module.category === filter)
+  const visible = filtered.slice(0, visibleCount)
+  const canLoadMore = visibleCount < filtered.length
+
+  useEffect(() => {
+    setVisibleCount(modulesPageSize)
+    setExpandedId(null)
+  }, [filter])
+
   return (
-    <figure
-      className="cs1-strategy-stage cs1-course-preview"
-      role="img"
-      aria-label="Course dashboard with category tabs for UX, UI, Design System, Career, AI and Masterclass above a grid of Module 1, UX Workflow cards."
-    >
-      <span className="cs1-course-tabs">
-        {coursePreviewTabs.map((tab, index) => (
-          <span
-            key={tab}
-            className={index === 0 ? 'cs1-course-tab is-active' : 'cs1-course-tab'}
-          >
-            {tab}
-          </span>
-        ))}
-      </span>
-      <span className="cs1-course-grid">
-        {Array.from({ length: 6 }, (_, index) => (
-          <span key={index} className="cs1-course-card">
-            <span className="cs1-course-media">
-              <svg width="50" height="50" viewBox="0 0 40 40" fill="none">
-                <circle cx="20.24" cy="19.76" r="19.38" fill="#2D2D2D" stroke="#525252" strokeWidth="0.76" />
-                <path d="M12.64 12.16a3.8 3.8 0 0 1 3.8-3.8h3.8v7.6h-3.8a3.8 3.8 0 0 1-3.8-3.8Z" fill="#F24E1E" />
-                <path d="M20.24 8.36h3.8a3.8 3.8 0 0 1 0 7.6h-3.8v-7.6Z" fill="#FF7262" />
-                <path d="M12.64 19.76a3.8 3.8 0 0 1 3.8-3.8h3.8v7.6h-3.8a3.8 3.8 0 0 1-3.8-3.8Z" fill="#A259FF" />
-                <circle cx="24.04" cy="19.76" r="3.8" fill="#1ABCFE" />
-                <path d="M16.44 31.16a3.8 3.8 0 0 0 3.8-3.8v-3.8h-3.8a3.8 3.8 0 0 0 0 7.6Z" fill="#0ACF83" />
-              </svg>
-            </span>
-            <span className="cs1-course-meta">
-              <span className="cs1-course-copy">
-                <span className="cs1-course-label">Module 1</span>
-                <span className="cs1-course-title">UX Workflow</span>
-              </span>
-              <span className="cs1-course-chevron">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M15.25 10.75 12 14.25l-3.25-3.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            </span>
-          </span>
-        ))}
-      </span>
-    </figure>
+    <div className="cs1-modules" aria-label="Course modules">
+      <div
+        className="cs1-modules-filters"
+        role="tablist"
+        aria-label="Module categories"
+      >
+        {moduleFilters.map((item) => {
+          const selected = filter === item
+          return (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              className={
+                selected
+                  ? 'cs1-modules-filter is-active'
+                  : 'cs1-modules-filter'
+              }
+              onClick={() => setFilter(item)}
+            >
+              {item}
+            </button>
+          )
+        })}
+      </div>
+
+      <ul className="cs1-modules-grid">
+        {visible.map((module) => {
+          const expanded = expandedId === module.id
+          return (
+            <li key={module.id} className="cs1-modules-card">
+              <div className="cs1-modules-media">
+                <img
+                  src={module.image}
+                  alt={module.alt}
+                  width={module.imageWidth}
+                  height={module.imageHeight}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div className="cs1-modules-meta">
+                <div className="cs1-modules-copy">
+                  <p className="cs1-modules-number">{module.number}</p>
+                  <h3 className="cs1-modules-title">{module.title}</h3>
+                  {expanded ? (
+                    <p className="cs1-modules-category">{module.category}</p>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  className={
+                    expanded
+                      ? 'cs1-modules-chevron is-open'
+                      : 'cs1-modules-chevron'
+                  }
+                  aria-expanded={expanded}
+                  aria-label={
+                    expanded
+                      ? `Hide category for ${module.title}`
+                      : `Show category for ${module.title}`
+                  }
+                  onClick={() =>
+                    setExpandedId(expanded ? null : module.id)
+                  }
+                >
+                  <span aria-hidden="true" />
+                </button>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+
+      {filtered.length === 0 ? (
+        <p className="cs1-modules-empty">No modules in this category yet.</p>
+      ) : null}
+
+      <button
+        type="button"
+        className="cs1-modules-more"
+        disabled={!canLoadMore}
+        aria-disabled={!canLoadMore}
+        onClick={() => {
+          if (!canLoadMore) return
+          setVisibleCount((count) => count + modulesPageSize)
+        }}
+      >
+        Load More
+      </button>
+    </div>
   )
 }
 
@@ -532,10 +675,10 @@ function ProgramFeatures() {
       <div className="cs1-feature-stage">
         <figure className="cs1-feature-card">
           <img
-            src="/case-study-1/feature-live-figma.jpg"
+            src="/case-study-1/feature-live-figma-classes.png"
             alt="Live Figma Classes: presenter mosaic beside a collaborative Figma workspace with Anshika and Aniket cursors, with title and description below."
             width={1052}
-            height={566}
+            height={564}
             loading="lazy"
             decoding="async"
           />
@@ -707,6 +850,130 @@ function ResultsNextSteps() {
   )
 }
 
+type ProofTile =
+  | { kind: 'quote' }
+  | { kind: 'memoji'; tone: 'grey' | 'white' }
+  | { kind: 'stat'; value: string; label: string }
+  | { kind: 'note'; title: string; body: string }
+
+const greyMemoji: ProofTile = { kind: 'memoji', tone: 'grey' }
+const whiteMemoji: ProofTile = { kind: 'memoji', tone: 'white' }
+
+/** Only the first tile is a person's words; the rest is copy from this page. */
+const proofColumns: ProofTile[][] = [
+  [
+    { kind: 'quote' },
+    greyMemoji,
+    { kind: 'stat', value: '90%', label: 'Placement success rate.' },
+    whiteMemoji,
+  ],
+  [
+    whiteMemoji,
+    { kind: 'stat', value: '50+', label: 'Students trained so far.' },
+    greyMemoji,
+    {
+      kind: 'note',
+      title: 'Personal Feedback',
+      body: 'Receive weekly feedback on your bootcamp progress in Figma.',
+    },
+  ],
+  [
+    {
+      kind: 'note',
+      title: 'Career Mentorship',
+      body: 'Gain career mentorship from Abhishek and the community of 50+ students.',
+    },
+    whiteMemoji,
+    {
+      kind: 'note',
+      title: 'Cohort Based Learning',
+      body: 'Stay motivated in cohort of like-minded designer around the world.',
+    },
+    greyMemoji,
+  ],
+]
+
+function ProofTileContent({ tile }: { tile: ProofTile }) {
+  if (tile.kind === 'memoji') {
+    return (
+      <img
+        src={`/case-study-1/proof-memoji-${tile.tone}.png`}
+        alt=""
+        width={146}
+        height={176}
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+  if (tile.kind === 'quote') {
+    return (
+      <>
+        <span className="cs1-proof-person">
+          <img
+            src="/case-study-1/proof-kirti-avatar.png"
+            alt=""
+            width={56}
+            height={56}
+            loading="lazy"
+            decoding="async"
+          />
+          <span>
+            <span className="cs1-proof-name">Kirti Bisht</span>
+            <span className="cs1-proof-handle">@TCS</span>
+          </span>
+        </span>
+        <span className="cs1-proof-body">
+          Don’t take it from me: @reflectnotes is magic/
+        </span>
+      </>
+    )
+  }
+  if (tile.kind === 'stat') {
+    return (
+      <>
+        <span className="cs1-proof-value">{tile.value}</span>
+        <span className="cs1-proof-body">{tile.label}</span>
+      </>
+    )
+  }
+  return (
+    <>
+      <span className="cs1-proof-name">{tile.title}</span>
+      <span className="cs1-proof-body">{tile.body}</span>
+    </>
+  )
+}
+
+function ProofWall() {
+  return (
+    <div className="cs1-strategy-stage cs1-proof">
+      {proofColumns.map((column, columnIndex) => (
+        <div key={columnIndex} className="cs1-proof-column">
+          <div className="cs1-proof-track">
+            {[0, 1].map((copy) => (
+              <ul key={copy} className="cs1-proof-set" aria-hidden={copy === 1}>
+                {column.map((tile, tileIndex) => (
+                  <li
+                    key={tileIndex}
+                    className={
+                      tile.kind === 'memoji'
+                        ? `cs1-proof-tile is-memoji is-${tile.tone}`
+                        : 'cs1-proof-tile'
+                    }
+                  >
+                    <ProofTileContent tile={tile} />
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function StrategyFeatures() {
   return (
     <section className="cs1-strategy" aria-labelledby="strategy-title">
@@ -728,10 +995,10 @@ function StrategyFeatures() {
 
       <figure className="cs1-strategy-stage">
         <img
-          src="/case-study-1/strategy-pricing.png"
+          src="/case-study-1/strategy-pricing-plans.png"
           alt="Two pricing cards for Gen Alpha Academy Full Course, showing ₹13,500 and ₹62,500 one-time plans with enroll and feature lists."
-          width={1116}
-          height={656}
+          width={1078}
+          height={622}
           loading="lazy"
           decoding="async"
         />
@@ -745,16 +1012,7 @@ function StrategyFeatures() {
         </p>
       </div>
 
-      <figure className="cs1-strategy-stage">
-        <img
-          src="/case-study-1/strategy-proof.png"
-          alt="Staggered proof cards with Kirti Bisht testimonials and student memoji portraits."
-          width={1116}
-          height={656}
-          loading="lazy"
-          decoding="async"
-        />
-      </figure>
+      <ProofWall />
 
       <div className="cs1-strategy-split">
         <p>Proof Section</p>
@@ -1046,7 +1304,9 @@ export function CaseStudy1() {
               designers with mentorship, community, and technical skills.
             </p>
           </div>
-          <CoursePreview />
+          <div className="cs1-strategy-stage cs1-modules-stage">
+            <CourseModulesBoard />
+          </div>
           <div className="cs1-owner-split">
             <p>Product Strategy</p>
             <p>

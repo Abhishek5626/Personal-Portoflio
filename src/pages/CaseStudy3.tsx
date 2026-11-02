@@ -1,5 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import type {
+  CSSProperties,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
+} from 'react'
 import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import './case-study.css'
 
@@ -105,6 +109,26 @@ function Split({
   )
 }
 
+function CaptionRow({
+  columns,
+  left,
+  right,
+}: {
+  columns: string
+  left: ReactNode
+  right: ReactNode
+}) {
+  return (
+    <div
+      className="deliverable-row"
+      style={{ '--caption-columns': columns } as CSSProperties}
+    >
+      <p className="deliverable">{left}</p>
+      <p className="deliverable">{right}</p>
+    </div>
+  )
+}
+
 const BODY = 242
 const GRAVITY = 1400
 
@@ -120,9 +144,9 @@ function restingPieces(width: number, height: number): Piece[] {
   const stacked = height >= BODY * 2
   if (stacked) {
     return [
-      { label: 'Success Metrics', x: 0, y: height - BODY * 2, vx: 0, vy: 0 },
+      { label: 'Vision Statement', x: 0, y: height - BODY * 2, vx: 0, vy: 0 },
       {
-        label: 'Vision Statement',
+        label: 'Success Metrics',
         x: Math.min(102, Math.max(0, width - BODY)),
         y: height - BODY,
         vx: 0,
@@ -131,9 +155,9 @@ function restingPieces(width: number, height: number): Piece[] {
     ]
   }
   return [
-    { label: 'Success Metrics', x: -16, y: height - BODY, vx: 0, vy: 0 },
+    { label: 'Vision Statement', x: -16, y: height - BODY, vx: 0, vy: 0 },
     {
-      label: 'Vision Statement',
+      label: 'Success Metrics',
       x: 157,
       y: height - BODY,
       vx: 0,
@@ -2574,10 +2598,6 @@ export function CaseStudy3() {
               The project started with a kickoff workshop to align the business,
               tech, and design teams.
             </p>
-            <p>
-              We defined the vision, success metrics, and constraints. The key
-              questions were:
-            </p>
           </Split>
           <div className="stage-row">
             <div className="question-stack">
@@ -2589,9 +2609,11 @@ export function CaseStudy3() {
             </div>
             <DiscoveryBoard />
           </div>
-          <p className="deliverable">
-            Deliverables: Vision statement, success metrics, stakeholder map.
-          </p>
+          <CaptionRow
+            columns="716fr 382fr"
+            left="We defined the vision, success metrics, and constraints. The key questions were:"
+            right="Deliverables: Vision statement, success metrics, stakeholder map."
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="persona-title">
@@ -2634,10 +2656,11 @@ export function CaseStudy3() {
               </div>
             </div>
           </div>
-          <p className="deliverable">
-            Deliverables: Persona profiles and empathy maps
-          </p>
-          <p className="deliverable">Questions and User Persona</p>
+          <CaptionRow
+            columns="405fr 693fr"
+            left="Deliverables: Persona profiles and empathy maps"
+            right="Questions and User Persona"
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="asis-title">
@@ -2697,6 +2720,7 @@ export function CaseStudy3() {
             </div>
             </div>
           </div>
+          <p className="deliverable journey-caption">Mapping the As-Is Journey</p>
           <DeliverableCircles />
           <p className="deliverable">
             Deliverables: As-Is Journey Maps and Annotated Pain Points.
@@ -2738,9 +2762,11 @@ export function CaseStudy3() {
             </div>
             <ResearchCircles />
           </div>
-          <p className="deliverable">
-            Deliverables: Observation Notes and Competitor Benchmarking Deck.
-          </p>
+          <CaptionRow
+            columns="634fr 464fr"
+            left="Indirect Similar Pattern Flow Mapping"
+            right="Deliverables: Observation Notes and Competitor Benchmarking Deck."
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="insights-title">
@@ -2749,10 +2775,18 @@ export function CaseStudy3() {
               After synthesizing all the research, we found a few core pain
               points driving most of the inefficiencies:
             </p>
-            <p>Communication gaps between teams caused long approval cycles.</p>
-            <p>Communication gaps between teams caused long approval cycles.</p>
-            <p>Communication gaps between teams caused long approval cycles.</p>
-            <p>Communication gaps between teams caused long approval cycles.</p>
+            <p className="pain-line">
+              Communication gaps between teams caused long approval cycles.
+            </p>
+            <p className="pain-line">
+              Communication gaps between teams caused long approval cycles.
+            </p>
+            <p className="pain-line">
+              Communication gaps between teams caused long approval cycles.
+            </p>
+            <p className="pain-line">
+              Communication gaps between teams caused long approval cycles.
+            </p>
           </Split>
           <div className="stage-row">
             <InsightsCircles />
@@ -2765,12 +2799,11 @@ export function CaseStudy3() {
               <p className="tool-used">Tools Used</p>
             </div>
           </div>
-          <p className="deliverable">
-            Tools used to Conduct Research and Documentation
-          </p>
-          <p className="deliverable">
-            Deliverables: Affinity Diagrams and Insights Summary.
-          </p>
+          <CaptionRow
+            columns="426fr 672fr"
+            left="Deliverables: Affinity Diagrams and Insights Summary."
+            right="Tools used to Conduct Research and Documentation"
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="use-title">
@@ -2790,10 +2823,11 @@ export function CaseStudy3() {
             </div>
             <UseCaseCircles />
           </div>
-          <p className="deliverable">High Level Use Cases</p>
-          <p className="deliverable">
-            Deliverables: Use Case Catalog and Prioritized Task List.
-          </p>
+          <CaptionRow
+            columns="646fr 452fr"
+            left="High Level Use Cases"
+            right="Deliverables: Use Case Catalog and Prioritized Task List."
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="tobe-title">
@@ -2869,10 +2903,11 @@ export function CaseStudy3() {
             </div>
             <MvpCircles />
           </div>
-          <p className="deliverable">MVP Scoping</p>
-          <p className="deliverable">
-            Deliverables: MVP Feature List and Prioritization Matrix.
-          </p>
+          <CaptionRow
+            columns="725fr 373fr"
+            left="MVP Scoping"
+            right="Deliverables: MVP Feature List and Prioritization Matrix."
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="ia-title">
@@ -2914,9 +2949,11 @@ export function CaseStudy3() {
               </div>
             </div>
           </div>
-          <p className="deliverable">
-            Deliverables: Sitemap Diagram and IA Documentation.
-          </p>
+          <CaptionRow
+            columns="420fr 678fr"
+            left="Deliverables: Sitemap Diagram and IA Documentation."
+            right="Information Architecture"
+          />
         </section>
 
         <section className="cs-section" aria-labelledby="learn-title">
@@ -2952,8 +2989,9 @@ export function CaseStudy3() {
           <div className="next-copy">
             <h2 id="request-title">Request a Case Study</h2>
             <p>
-              Want to learn more about this project? Get in touch to request a
-              case study.
+              Want to learn more about this project?
+              <br />
+              Get in touch to request a case study.
             </p>
             <button className="touch" type="button">
               Get in Touch
@@ -2986,9 +3024,13 @@ export function CaseStudy3() {
           </li>
           <li>Mail</li>
         </ul>
-        <p className="partner">Looking for a Partner,</p>
+        <p className="partner">
+          Looking for a <em>Partner,</em>
+        </p>
         <p className="partner">Not just another freelancer</p>
-        <p className="connected">14k+ already Connected</p>
+        <p className="connected">
+          <a href={linkedInUrl}>14k+ already Connected</a>
+        </p>
         <div className="profile-row">
           {profiles.map((src) => (
             <img key={src} src={src} alt="" />

@@ -1232,10 +1232,6 @@
   background: var(--theme-surface-raised);
 }
 
-.cs2 .cs2-stage:has(.cs2-app-tall) {
-  min-height: 442px;
-}
-
 .cs2 .cs2-frames-pair {
   display: flex;
   gap: 22px;
@@ -1349,10 +1345,6 @@
   color: #b8b8b8;
 }
 
-.cs2 .cs2-app-wide {
-  width: 328px;
-}
-
 .cs2 .cs2-app-tall {
   width: 328px;
   height: 378px;
@@ -1360,23 +1352,8 @@
 
 .cs2 .cs2-app p,
 .cs2 .cs2-streak p,
-.cs2 .cs2-reward p,
-.cs2 .cs2-board {
+.cs2 .cs2-reward p {
   margin: 0;
-}
-
-.cs2 .cs2-app-brand {
-  color: #fff;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 12px;
-}
-
-.cs2 .cs2-app-kicker {
-  color: #eaedf0;
-  font-size: 7px;
-  font-weight: 500;
-  line-height: 12px;
 }
 
 .cs2 .cs2-app-league {
@@ -1386,33 +1363,291 @@
   line-height: 14.4px;
 }
 
-.cs2 .cs2-app-muted,
-.cs2 .cs2-board span:last-child {
+.cs2 .cs2-app-muted {
   color: #b8b8b8;
   font-size: 8px;
   font-weight: 500;
   line-height: 9.6px;
 }
 
-.cs2 .cs2-board {
+/* LMS leaderboard mock, sized from the Framer page at 1440px. */
+.cs2 .cs2-dash-frame {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(252, 252, 252, 0.12);
+}
+
+.cs2 .cs2-dash {
+  display: flex;
+  overflow: hidden;
+  border-radius: 8px;
+  color: #b8b8b8;
+  font-family: Inter, sans-serif;
+}
+
+.cs2 .cs2-dash-side {
+  display: flex;
+  flex: 0 0 150px;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 10px 6px 12px;
+  background: #2b2b2b;
+}
+
+.cs2 .cs2-dash-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: 8px;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.cs2 .cs2-dash-group {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+}
+
+.cs2 .cs2-dash-group-title {
+  padding: 2px 4px 4px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.cs2 .cs2-dash-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 7px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 9px;
+  line-height: 10px;
+}
+
+/* A faint glyph where each nav icon sits in the real product. */
+.cs2 .cs2-dash-link::after {
+  content: "";
+  width: 7px;
+  height: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 2px;
+}
+
+.cs2 .cs2-dash-link.is-active {
+  background: #1c1c1c;
+  color: #fff;
+}
+
+.cs2 .cs2-dash-update {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  margin: 4px 3px 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #404040;
+}
+
+.cs2 .cs2-dash-update-art {
+  flex: 1 0 70px;
+  background: #333;
+}
+
+.cs2 .cs2-dash-update-row {
+  display: flex;
+  align-items: center;
   gap: 6px;
+  padding: 6px;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 11px;
+}
+
+.cs2 .cs2-dash-update-button {
+  flex: 0 0 auto;
+  padding: 4px 3px;
+  border-radius: 2px;
+  background: #515151;
+  font-size: 8px;
+  line-height: 9px;
+}
+
+.cs2 .cs2-dash-settings {
+  color: #fff;
+}
+
+.cs2 .cs2-dash-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding-bottom: 18px;
+  background: #0a0a0a;
+}
+
+.cs2 .cs2-dash-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  align-self: stretch;
+  box-sizing: border-box;
+  padding: 7px 9px;
+  background: #322d36;
+}
+
+.cs2 .cs2-dash-search {
+  min-width: 0;
+  overflow: hidden;
+  color: #8a8a8a;
+  font-size: 9px;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cs2 .cs2-dash-top img {
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.cs2 .cs2-dash-league {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  align-self: stretch;
+  padding: 40px 0 28px;
+  text-align: center;
+}
+
+.cs2 .cs2-dash-league-name {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.cs2 .cs2-dash-muted {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+}
+
+.cs2 .cs2-dash-locks {
+  position: absolute;
+  top: 58px;
+  left: calc(50% + 62px);
+  display: flex;
+  gap: 22px;
+}
+
+.cs2 .cs2-board {
+  box-sizing: border-box;
+  width: min(350px, calc(100% - 24px));
+  margin: 0;
   padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
   list-style: none;
 }
 
 .cs2 .cs2-board li {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 8px;
 }
 
-.cs2 .cs2-board span:first-child {
-  color: #b8b8b8;
+.cs2 .cs2-board li + li {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.cs2 .cs2-board-face {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.cs2 .cs2-board-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.cs2 .cs2-board-xp {
+  flex: 0 0 auto;
   font-size: 10px;
   font-weight: 500;
   line-height: 12px;
+}
+
+.cs2 .cs2-dash-cta {
+  box-sizing: border-box;
+  width: min(350px, calc(100% - 24px));
+  margin-top: 14px;
+  padding: 9px;
+  border-radius: 999px;
+  background: #5526a1;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+  text-align: center;
+}
+
+@media (max-width: 1199px) {
+  .cs2 .cs2-dash-locks {
+    display: none;
+  }
+}
+
+@media (max-width: 809px) {
+  .cs2 .cs2-dash-frame {
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  /* No room for a sidebar: the leaderboard is what this screen is about. */
+  .cs2 .cs2-dash-side {
+    display: none;
+  }
+
+  .cs2 .cs2-dash-league {
+    padding: 24px 0 18px;
+  }
+
+  .cs2 .cs2-dash-muted,
+  .cs2 .cs2-board-xp {
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .cs2 .cs2-board-name {
+    font-size: 13px;
+    line-height: 16px;
+  }
+
+  .cs2 .cs2-dash-cta {
+    font-size: 12px;
+    line-height: 14px;
+  }
 }
 
 .cs2 .cs2-app-cta {
@@ -1469,59 +1704,410 @@
   font-size: 10px;
 }
 
-.cs2 .cs2-reward {
-  min-height: 401px;
-  justify-content: center;
-  padding: 32px;
+/* UX Audit Doc reward, from the Framer page. */
+.cs2 .cs2-reward-frame {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
   border-radius: 12px;
-  background: #0a0a0a;
+  background: rgba(252, 252, 252, 0.12);
+}
+
+.cs2 .cs2-reward {
+  gap: 0;
+  min-height: 377px;
+  padding: 28px 16px 24px;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 44%, rgba(160, 120, 220, 0.14) 0 11deg, transparent 11deg 26deg),
+    radial-gradient(circle at 50% 44%, #2d1c45, #130b1c 72%);
   color: #fff;
 }
 
 .cs2 .cs2-reward-title {
-  font-size: 22px;
+  font-family: "Alfa Slab One", Georgia, serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 27px;
+}
+
+.cs2 .cs2-reward-doc {
+  flex: 0 0 auto;
+  margin: 34px 0 30px;
+  filter: drop-shadow(0 0 16px rgba(170, 110, 255, 0.85));
+}
+
+.cs2 .cs2-reward-copy {
+  color: #d1cbcb;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.cs2 .cs2-reward-claim {
+  box-sizing: border-box;
+  width: min(189px, 100%);
+  margin-top: 20px !important;
+  padding: 12px;
+  border-radius: 9px;
+  background: #271950;
+  box-shadow: 0 0 0 3px #2e1d63;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+/* Courses and Showcase screens. Framer crops both to the dashboard's height. */
+.cs2 .cs2-dash.is-clipped {
+  height: 479px;
+}
+
+.cs2 .cs2-dash-page {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 16px 18px;
+}
+
+.cs2 .cs2-dash-page-title {
+  color: #fff;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 22px;
 }
 
-.cs2 .cs2-reward-free {
-  color: #d97757;
-  font-size: 18px;
-  font-weight: 600;
+.cs2 .cs2-dash-page-sub {
+  margin-top: 4px;
+  color: #bababa;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 9px;
+  line-height: 12px;
 }
 
-.cs2 .cs2-reward .cs2-app-cta {
-  width: 120px;
-  margin-top: 8px;
-}
-
-.cs2 .cs2-pills-row {
+.cs2 .cs2-dash-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 0;
+  gap: 4px;
+  margin: 10px 0 0;
   padding: 0;
   list-style: none;
 }
 
-.cs2 .cs2-pills-row li {
-  padding: 4px 8px;
-  border-radius: 461px;
-  background: #242424;
-  color: #f5f5f5;
-  font-size: 8px;
-  line-height: 10px;
+.cs2 .cs2-dash-pills li {
+  padding: 4px 6px;
+  border-radius: 99px;
+  background: #2e2e2e;
+  color: #ababab;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 12px;
 }
 
-.cs2 .cs2-course {
+.cs2 .cs2-dash-pills li.is-active {
+  background: #b8b8b8;
+  color: #292929;
+}
+
+.cs2 .cs2-dash-path-title {
+  margin-top: 16px;
+  color: #fff;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.cs2 .cs2-dash-path-sub {
+  margin-top: 4px;
+  color: #adadad;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 12px;
+}
+
+.cs2 .cs2-dash-courses {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 36px;
+  margin: 14px 0 0;
+  padding: 0 13px;
+  list-style: none;
+}
+
+.cs2 .cs2-dash-courses li {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  box-sizing: border-box;
+  padding: 6px;
+  border-radius: 8px;
+  background: #1c1c1c;
 }
 
-.cs2 .cs2-course p:first-child {
+.cs2 .cs2-dash-course-art {
+  height: 88px;
+  border-radius: 4px;
+  background: #2d2d2d;
+}
+
+.cs2 .cs2-dash-course-title {
+  margin-top: 8px;
   color: #fff;
-  font-size: 12px;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 10px;
   font-weight: 600;
+  line-height: 12px;
+}
+
+.cs2 .cs2-dash-course-body {
+  margin-top: 4px;
+  color: #898989;
+  font-size: 9px;
+  line-height: 11px;
+}
+
+.cs2 .cs2-dash-course-progress {
+  margin-top: 6px;
+  color: #6f6f6f;
+  font-family: Urbanist, Inter, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 11px;
+}
+
+.cs2 .cs2-dash-showcase {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs2 .cs2-dash-showcase li {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 263px;
+  padding: 8px;
+  border-radius: 6px;
+  background: #262626;
+}
+
+.cs2 .cs2-dash-show-preview {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  height: 134px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #000;
+}
+
+.cs2 .cs2-dash-show-welcome {
+  color: #ededed;
+  font-family: "Basement Grotesque", Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 12px;
+}
+
+.cs2 .cs2-dash-show-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.cs2 .cs2-dash-show-kicker,
+.cs2 .cs2-dash-show-title,
+.cs2 .cs2-dash-show-value,
+.cs2 .cs2-dash-show-label {
+  display: block;
+}
+
+.cs2 .cs2-dash-show-kicker {
+  color: #ababab;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.cs2 .cs2-dash-show-title {
+  margin-top: 4px;
+  color: #fff;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.cs2 .cs2-dash-show-body {
+  margin-top: 6px;
+  color: #fff;
+  font-size: 9px;
+  line-height: 14px;
+}
+
+.cs2 .cs2-dash-show-points {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.cs2 .cs2-dash-show-points > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cs2 .cs2-dash-show-coin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f3a61f;
+}
+
+.cs2 .cs2-dash-show-value {
+  color: #fff;
+  font-size: 8px;
+  line-height: 11px;
+}
+
+.cs2 .cs2-dash-show-label {
+  color: #fff;
+  font-size: 7px;
+  line-height: 9px;
+}
+
+/* Framer's panel colour; dark mode keeps the theme surface. */
+html:not([data-theme="dark"]) .cs2 .cs2-stage {
+  background: rgba(235, 235, 235, 0.79);
+}
+
+.cs2 .cs2-feature-meta-arrow {
+  display: none;
+  flex: 0 0 auto;
+  color: #595858;
+}
+
+/* Framer's Goal / Reason / Feature rows: larger labels with a down arrow. */
+@media (min-width: 1200px) {
+  .cs2 .cs2-feature-meta {
+    align-items: flex-start;
+    min-height: 0;
+    margin-bottom: -5px;
+  }
+
+  .cs2 .cs2-feature:first-of-type .cs2-feature-meta {
+    min-height: 131px;
+    margin-bottom: 0;
+  }
+
+  .cs2 .cs2-feature:last-of-type .cs2-feature-meta {
+    margin-bottom: -29px;
+  }
+
+  .cs2 .cs2-feature-meta-col {
+    gap: 0;
+  }
+
+  .cs2 .cs2-feature-meta-col p:first-child {
+    font-family: Haffer, Inter, sans-serif;
+    font-size: 14px;
+    line-height: 25.2px;
+  }
+
+  .cs2 .cs2-feature-meta-arrow {
+    display: block;
+    margin: 10px 0 51px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .cs2 .cs2-dash.is-clipped {
+    height: auto;
+  }
+
+  .cs2 .cs2-dash-courses {
+    gap: 10px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 809px) {
+  /* Framer's tighter section gaps on phones, measured at 375px. */
+  .cs2 .cs2-problems {
+    margin-top: -74px;
+  }
+
+  .cs2 .cs2-vision {
+    margin-top: -100px;
+  }
+
+  .cs2 .cs2-build {
+    margin-top: -75px;
+  }
+
+  .cs2 .cs2-system {
+    margin-top: -52px;
+  }
+
+  .cs2 .cs2-learned {
+    margin-top: -61px;
+  }
+
+  .cs2 .cs2-request {
+    margin-top: -76px;
+  }
+
+  .cs2 .cs2-reward-frame {
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .cs2 .cs2-dash-courses,
+  .cs2 .cs2-dash-showcase {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Framer also shortens these screens on phones. */
+  .cs2 .cs2-dash-courses li:nth-child(n + 3),
+  .cs2 .cs2-dash-showcase li:nth-child(even) {
+    display: none;
+  }
+
+  /* The motion phone is cropped on desktop; here it gets to be seen whole. */
+  .cs2 .cs2-dash-showcase .cs2-dash-show-preview:has(.cs2-motion) {
+    height: auto;
+  }
+
+  .cs2 .cs2-dash-page-sub,
+  .cs2 .cs2-dash-pills li,
+  .cs2 .cs2-dash-path-sub,
+  .cs2 .cs2-dash-course-body,
+  .cs2 .cs2-dash-course-progress,
+  .cs2 .cs2-dash-show-body,
+  .cs2 .cs2-dash-show-kicker,
+  .cs2 .cs2-dash-show-title,
+  .cs2 .cs2-dash-show-value {
+    font-size: 11px;
+    line-height: 15px;
+  }
+
+  .cs2 .cs2-dash-course-title,
+  .cs2 .cs2-dash-path-title {
+    font-size: 13px;
+    line-height: 17px;
+  }
+
+  .cs2 .cs2-dash-show-label {
+    font-size: 9px;
+    line-height: 12px;
+  }
 }
 
 .cs2 .cs2-strategy-copy {
@@ -1591,10 +2177,6 @@
     min-height: 0;
     padding: 12px;
     border-radius: 8px;
-  }
-
-  .cs2 .cs2-stage:has(.cs2-app-tall) {
-    min-height: 0;
   }
 
   .cs2 .cs2-frames-pair {
