@@ -588,7 +588,8 @@ const fisheyeLayout: FisheyeLayout = {
 }
 
 /**
- * Phone sheet, drawn at 393px. One 320px column in the exact top-to-bottom
+ * Phone sheet, drawn at 393px. One 361px column, centred with 16px each side
+ * and an 8px gap so both neighbours peek in equally, in the exact top-to-bottom
  * order of Figma node 92-2, repeated across the sheet with each repeat shifted
  * vertically, so every column reads in that order. Rows start 61px down so the
  * first clears the nav, yet the loop seam stays 18px. Design Strategy isn't in
@@ -598,7 +599,7 @@ const phoneFisheyeLayout: FisheyeLayout = {
   viewWidth: 393,
   rowInsetX: 16,
   staggerColumns: true,
-  width: 338,
+  width: 369,
   gutterX: 0,
   gutterY: 9,
   minScale: 0.8,
@@ -607,19 +608,19 @@ const phoneFisheyeLayout: FisheyeLayout = {
     {
       height: 3556,
       items: [
-        { item: 0, x: 16, y: 61, w: 320, h: 240 }, // 1 Hero
-        { item: 1, x: 16, y: 319, w: 320, h: 321 }, // 2 About Me
-        { item: 2, x: 16, y: 658, w: 320, h: 323 }, // 3 Designer OS
-        { item: 3, x: 16, y: 999, w: 320, h: 323 }, // 4 Gen-Z Learning Platform
-        { item: 4, x: 16, y: 1340, w: 320, h: 323 }, // 5 Enterprise QA Platform
-        { item: 5, x: 16, y: 1681, w: 320, h: 208 }, // 6 Tools
-        { item: 6, x: 16, y: 1907, w: 320, h: 158 }, // 7 Building in Code
-        { item: 7, x: 16, y: 2083, w: 320, h: 158 }, // 8 Designing AI Product
-        { item: 8, x: 16, y: 2259, w: 320, h: 158 }, // 9 Storytelling + Play
-        { item: 9, x: 16, y: 2435, w: 320, h: 212 }, // 10 Testimonial
-        { item: 10, x: 16, y: 2665, w: 320, h: 191 }, // 11 Current
-        { item: 11, x: 16, y: 2874, w: 320, h: 191 }, // 12 Music
-        { item: 12, x: 16, y: 3083, w: 320, h: 534 }, // Design Strategy
+        { item: 0, x: 16, y: 61, w: 361, h: 240 }, // 1 Hero
+        { item: 1, x: 16, y: 319, w: 361, h: 321 }, // 2 About Me
+        { item: 2, x: 16, y: 658, w: 361, h: 323 }, // 3 Designer OS
+        { item: 3, x: 16, y: 999, w: 361, h: 323 }, // 4 Gen-Z Learning Platform
+        { item: 4, x: 16, y: 1340, w: 361, h: 323 }, // 5 Enterprise QA Platform
+        { item: 5, x: 16, y: 1681, w: 361, h: 208 }, // 6 Tools
+        { item: 6, x: 16, y: 1907, w: 361, h: 158 }, // 7 Building in Code
+        { item: 7, x: 16, y: 2083, w: 361, h: 158 }, // 8 Designing AI Product
+        { item: 8, x: 16, y: 2259, w: 361, h: 158 }, // 9 Storytelling + Play
+        { item: 9, x: 16, y: 2435, w: 361, h: 212 }, // 10 Testimonial
+        { item: 10, x: 16, y: 2665, w: 361, h: 191 }, // 11 Current
+        { item: 11, x: 16, y: 2874, w: 361, h: 191 }, // 12 Music
+        { item: 12, x: 16, y: 3083, w: 361, h: 534 }, // Design Strategy
       ],
     },
   ],

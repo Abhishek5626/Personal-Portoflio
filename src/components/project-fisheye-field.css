@@ -317,6 +317,7 @@ html:has(.landing-page.is-fisheye-page) {
   }
 
   .mobile-hero .hero-role {
+    display: block;
     font-size: min(24px, 6.1vw);
     line-height: 1.29;
     white-space: nowrap;
