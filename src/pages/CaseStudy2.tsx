@@ -24,24 +24,24 @@ const problems = [
     label: 'STUDENT SET 1',
     text: 'Students who missed live lectures felt left behind.',
     panels: [
-      { src: '/case-study-2/set-1a.png', color: '#2d4354' },
-      { src: '/case-study-2/set-1b.png', color: '#e8e8e8' },
+      { src: '/case-study-2/set-1a.webp', color: '#2d4354' },
+      { src: '/case-study-2/set-1b.webp', color: '#e8e8e8' },
     ],
   },
   {
     label: 'STUDENT SET 2',
     text: 'There was no motivation',
     panels: [
-      { src: '/case-study-2/set-2a.png', color: '#4d3c2c' },
-      { src: '/case-study-2/set-2b.png', color: '#e8e8e8' },
+      { src: '/case-study-2/set-2a.webp', color: '#4d3c2c' },
+      { src: '/case-study-2/set-2b.webp', color: '#e8e8e8' },
     ],
   },
   {
     label: 'STUDENT SET 3',
     text: 'No way to view the sessions again',
     panels: [
-      { src: '/case-study-2/set-3a.png', color: '#969696' },
-      { src: '/case-study-2/set-3b.png', color: '#e8e8e8' },
+      { src: '/case-study-2/set-3a.webp', color: '#969696' },
+      { src: '/case-study-2/set-3b.webp', color: '#e8e8e8' },
     ],
   },
 ]
@@ -244,7 +244,7 @@ function ProductMock() {
         </p>
         <img
           className="cs2-ui-art"
-          src="/case-study-2/empty-courses.png"
+          src="/case-study-2/empty-courses.webp"
           width={1200}
           height={700}
           alt=""
@@ -1104,7 +1104,7 @@ export function CaseStudy2() {
               <div className="cs2-next-frame">
                 <img
                   className="cs2-next-photo"
-                  src="/case-study-2/next-design-os.png"
+                  src="/case-study-2/next-design-os.webp"
                   alt="Designer OS mark on a dark purple field with a glowing arc."
                   width={2400}
                   height={1260}

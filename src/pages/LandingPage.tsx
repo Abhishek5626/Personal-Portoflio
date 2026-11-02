@@ -357,8 +357,8 @@ function ToolGrid({ tools }: { tools: readonly LandingTool[] }) {
                     }
                     src={tool.logoSrc}
                     alt={tool.name}
-                    width={24}
-                    height={24}
+                    width={55}
+                    height={55}
                   />
                 ) : (
                   <span className="tool-name">{tool.name}</span>

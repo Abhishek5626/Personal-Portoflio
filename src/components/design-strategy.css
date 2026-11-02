@@ -100,9 +100,13 @@ html[data-theme="dark"] .design-strategy-panel {
   white-space: nowrap;
   transform-origin: left center;
   cursor: pointer;
-  will-change: transform;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* One layer per option is only worth holding while the wheel actually turns. */
+.strategy-option-list.is-turning .strategy-option {
+  will-change: transform;
 }
 
 .strategy-option:focus {

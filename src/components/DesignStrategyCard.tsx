@@ -956,6 +956,7 @@ export function DesignStrategyCard() {
 
     const tickTimer = (now: number) => {
       if (cancelled) return
+      list.classList.toggle('is-turning', animating || pointerDown)
       const paused = reduced || pointerInside || pointerDown || keyFocus || offscreen || animating
       if (!paused) timerElapsed += now - timerLast
       timerLast = now
@@ -983,6 +984,12 @@ export function DesignStrategyCard() {
     const visibility = new IntersectionObserver(([entry]) => {
       offscreen = !entry?.isIntersecting
       setSweepPaused(offscreen || pointerInside)
+      cancelAnimationFrame(timerFrame)
+      timerFrame = 0
+      if (!offscreen) {
+        timerLast = performance.now()
+        timerFrame = requestAnimationFrame(tickTimer)
+      }
     })
     visibility.observe(frame)
     timerFrame = requestAnimationFrame(tickTimer)

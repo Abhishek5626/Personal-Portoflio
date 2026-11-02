@@ -1,8 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { MouseEvent as ReactMouseEvent } from 'react'
-import { CaseStudy1 } from '../pages/CaseStudy1.tsx'
-import { CaseStudy2 } from '../pages/CaseStudy2.tsx'
-import { CaseStudy3 } from '../pages/CaseStudy3.tsx'
 import { ProgressiveBlur } from './ProgressiveBlur.tsx'
 import { ThemeToggle } from './ThemeToggle.tsx'
 import { useTheme } from '../theme.tsx'
@@ -18,9 +15,15 @@ const contentMs = 520
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
 const studies = {
-  'case-study-1': CaseStudy1,
-  'case-study-2': CaseStudy2,
-  'case-study-3': CaseStudy3,
+  'case-study-1': lazy(() =>
+    import('../pages/CaseStudy1.tsx').then((m) => ({ default: m.CaseStudy1 })),
+  ),
+  'case-study-2': lazy(() =>
+    import('../pages/CaseStudy2.tsx').then((m) => ({ default: m.CaseStudy2 })),
+  ),
+  'case-study-3': lazy(() =>
+    import('../pages/CaseStudy3.tsx').then((m) => ({ default: m.CaseStudy3 })),
+  ),
 } as const
 
 function prefersReducedMotion() {
@@ -352,7 +355,9 @@ export function ProjectDrawer({
           key={shownId}
           className={`project-drawer-content ${phaseClass} ${motionClass}`.trim()}
         >
-          <Study />
+          <Suspense fallback={null}>
+            <Study />
+          </Suspense>
         </div>
       </div>
       <ProgressiveBlur mode="absolute" />

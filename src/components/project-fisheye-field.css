@@ -115,6 +115,11 @@ html:has(.landing-page.is-fisheye-page) {
   );
 }
 
+/* Tiles sit on the page's flat colour, where a backdrop blur changes nothing. */
+.project-fisheye-plane {
+  --landing-glass-blur: none;
+}
+
 .project-fisheye-tile {
   position: absolute;
   top: 0;

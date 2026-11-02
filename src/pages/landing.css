@@ -542,9 +542,10 @@ html[data-theme="dark"] .project-card-label.is-display.is-on-light {
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 9px 7px;
-  width: 100%;
-  margin: 0;
+  gap: 10px 8px;
+  /* Figma runs the grid 12.5px from the card edge, past the 17px surface inset. */
+  width: calc(100% + 8px);
+  margin: -3px -4px 0;
   padding: 0;
   list-style: none;
 }
@@ -589,11 +590,14 @@ html[data-theme="dark"] .project-card-label.is-display.is-on-light {
   transition: background-color var(--theme-duration) var(--theme-ease);
 }
 
-/* Temporary page-level layer: logos travel from above the viewport into place. */
+/*
+  Temporary page-level layer: logos travel from above the viewport into place.
+  Below the project drawer (30), so a flight never shows over an open case study.
+*/
 .tool-flight-layer {
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 25;
   pointer-events: none;
   overflow: hidden;
 }
@@ -605,12 +609,13 @@ html[data-theme="dark"] .project-card-label.is-display.is-on-light {
   will-change: transform;
 }
 
+/* Each logo is its own rounded plate, filling the tile's face. */
 .tool-logo {
   display: block;
-  width: 40px;
-  height: 40px;
-  max-width: 72%;
-  max-height: 72%;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 20%;
   object-fit: contain;
   filter: invert(0);
   transition: filter var(--theme-duration) var(--theme-ease);

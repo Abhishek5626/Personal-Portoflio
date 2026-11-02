@@ -19,33 +19,68 @@ const track = {
   artist: "Gigi D'Agostino",
   videoId: 'uU_B9eZvc0U',
   youtubeUrl: 'https://www.youtube.com/watch?v=uU_B9eZvc0U',
+  // Shown until the player loads on first use and reports the real length.
+  durationSeconds: 230,
 }
 
-const SKIP_SECONDS = 10
-const waveHeights = [
-  3, 5, 8, 4, 7, 11, 6, 9, 4, 8, 12, 5, 7, 3, 9, 6, 11, 4, 8, 5, 10, 7, 3, 6,
-  9, 12, 5, 8, 4, 7, 11, 6, 3, 9, 5, 8, 12, 4, 7, 10, 6, 3, 8, 5, 11, 7, 4, 9,
-  6, 12, 5, 8, 3, 7, 10, 4, 6, 9, 11, 5, 8, 3, 7, 4, 10, 6, 9, 5, 12, 7, 4, 8,
-  3, 6, 11, 5, 9, 7, 4, 8, 10, 6, 3, 5, 9, 7, 4, 8, 6, 11,
-]
-const WAVE_STEP = 4.4
-const WAVE_VIEW_HEIGHT = 14
+const CONTOUR_POINTS = 192
+
+// Figma's eight-lobed art shape on a 132-unit canvas, clockwise from the top.
+function scallopPoints(radius: number) {
+  return Array.from({ length: CONTOUR_POINTS }, (_, index) => {
+    const angle = (index / CONTOUR_POINTS) * Math.PI * 2
+    const r = radius * (1 + 0.057 * Math.cos(angle * 8))
+    return [66 + r * Math.sin(angle), 66 - r * Math.cos(angle)] as const
+  })
+}
+
+function pathFrom(points: readonly (readonly [number, number])[]) {
+  return `M${points.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join('L')}Z`
+}
+
+const contour = scallopPoints(61.5)
+const contourPath = pathFrom(contour)
+const artFill = pathFrom(scallopPoints(50))
+
+// Distance along the contour at each point, ending back at the top.
+const contourLengths = contour.reduce(
+  (lengths, [x, y], index) => {
+    const [nextX, nextY] = contour[(index + 1) % CONTOUR_POINTS]!
+    lengths.push(lengths[index]! + Math.hypot(nextX - x, nextY - y))
+    return lengths
+  },
+  [0],
+)
+const contourLength = contourLengths[CONTOUR_POINTS]!
+
+function contourPoint(ratio: number) {
+  const target = ratio * contourLength
+  let index = 0
+  while (index < CONTOUR_POINTS - 1 && contourLengths[index + 1]! < target) {
+    index += 1
+  }
+  const start = contourLengths[index]!
+  const along = (target - start) / (contourLengths[index + 1]! - start)
+  const [x, y] = contour[index]!
+  const [nextX, nextY] = contour[(index + 1) % CONTOUR_POINTS]!
+  return { x: x + (nextX - x) * along, y: y + (nextY - y) * along }
+}
+
+// Each contour point sits at its own angle, so a pointer's angle finds its place.
+function contourRatioAtAngle(angle: number) {
+  const position = (((angle / (Math.PI * 2)) % 1) + 1) % 1 * CONTOUR_POINTS
+  const index = Math.floor(position)
+  const start = contourLengths[index]!
+  return (start + (contourLengths[index + 1]! - start) * (position - index)) / contourLength
+}
 
 type PlayerStatus = 'idle' | 'loading' | 'ready' | 'unavailable'
 
-function formatElapsed(seconds: number) {
+function formatTime(seconds: number) {
   const safe = Math.max(0, Math.floor(seconds))
   const mins = Math.floor(safe / 60)
   const secs = safe % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
-function formatRemaining(current: number, duration: number) {
-  if (!(duration > 0)) {
-    return '-0:00'
-  }
-  const remaining = Math.max(0, Math.ceil(duration - current))
-  return `-${formatElapsed(remaining)}`
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -76,51 +111,39 @@ function PauseBars() {
   )
 }
 
-function SkipBackIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6 6h2v12H6zM20 6l-10 6 10 6z" fill="currentColor" />
-    </svg>
-  )
-}
-
-function SkipForwardIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M16 6h2v12h-2zM4 6l10 6-10 6z" fill="currentColor" />
-    </svg>
-  )
-}
-
-function WaveformSeek({
+function ContourSeek({
   progress,
   disabled,
   labelledBy,
+  clipId,
   onSeek,
 }: {
   progress: number
   disabled: boolean
   labelledBy: string
+  clipId: string
   onSeek: (ratio: number) => void
 }) {
-  const trackRef = useRef<HTMLDivElement>(null)
+  const artRef = useRef<SVGSVGElement>(null)
   const draggingRef = useRef(false)
-  const pressProgressRef = useRef(0)
+  const lastRatioRef = useRef(0)
   const [dragging, setDragging] = useState(false)
 
-  const ratioFromClientX = (clientX: number) => {
-    const track = trackRef.current
-    if (!track) {
+  const ratioFromPointer = (clientX: number, clientY: number) => {
+    const art = artRef.current
+    if (!art) {
       return 0
     }
-    const rect = track.getBoundingClientRect()
-    if (rect.width <= 0) {
-      return 0
-    }
-    return clamp((clientX - rect.left) / rect.width, 0, 1)
+    const rect = art.getBoundingClientRect()
+    return contourRatioAtAngle(
+      Math.atan2(
+        clientX - (rect.left + rect.width / 2),
+        rect.top + rect.height / 2 - clientY,
+      ),
+    )
   }
 
-  const finishPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const finishPointer = (event: ReactPointerEvent<SVGSVGElement>) => {
     if (!draggingRef.current) {
       return
     }
@@ -131,56 +154,57 @@ function WaveformSeek({
     }
   }
 
-  const playedBars = Math.round(waveHeights.length * clamp(progress, 0, 1))
+  const played = clamp(progress, 0, 1)
+  const playhead = contourPoint(played)
 
   return (
-    <div
-      ref={trackRef}
+    <svg
+      ref={artRef}
       className={[
+        'music-card-art',
         'music-card-seek',
         dragging ? 'is-dragging' : '',
         disabled ? 'is-disabled' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      viewBox="0 0 132 132"
       role="slider"
       tabIndex={disabled ? -1 : 0}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={Math.round(clamp(progress, 0, 1) * 100)}
-      aria-valuetext={`${Math.round(clamp(progress, 0, 1) * 100)}% through the track`}
+      aria-valuenow={Math.round(played * 100)}
+      aria-valuetext={`${Math.round(played * 100)}% through the track`}
       aria-labelledby={labelledBy}
       aria-disabled={disabled || undefined}
+      data-fisheye-drag-axis="both"
       onPointerDown={(event) => {
         if (disabled || event.button !== 0) {
           return
         }
         event.preventDefault()
-        pressProgressRef.current = progress
         draggingRef.current = true
         setDragging(true)
         event.currentTarget.setPointerCapture(event.pointerId)
-        onSeek(ratioFromClientX(event.clientX))
+        lastRatioRef.current = ratioFromPointer(event.clientX, event.clientY)
+        onSeek(lastRatioRef.current)
       }}
       onPointerMove={(event) => {
         if (!draggingRef.current) {
           return
         }
-        onSeek(ratioFromClientX(event.clientX))
+        const ratio = ratioFromPointer(event.clientX, event.clientY)
+        // Crossing the top would jump between the track's start and end.
+        if (Math.abs(ratio - lastRatioRef.current) > 0.5) {
+          return
+        }
+        lastRatioRef.current = ratio
+        onSeek(ratio)
       }}
       onPointerUp={finishPointer}
       onPointerCancel={finishPointer}
-      data-fisheye-drag-axis="x"
-      onLostPointerCapture={(event) => {
-        // The page's drag took over (a vertical drag began here): undo the
-        // press-to-seek so panning never skips the track.
-        if (!draggingRef.current) {
-          return
-        }
-        onSeek(pressProgressRef.current)
-        finishPointer(event)
-      }}
-      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+      onLostPointerCapture={finishPointer}
+      onKeyDown={(event: KeyboardEvent<SVGSVGElement>) => {
         if (disabled) {
           return
         }
@@ -200,26 +224,32 @@ function WaveformSeek({
         }
       }}
     >
-      <svg
-        className="music-card-wave"
-        viewBox={`0 0 ${waveHeights.length * WAVE_STEP} ${WAVE_VIEW_HEIGHT}`}
-        height="10"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        {waveHeights.map((bar, index) => (
-          <rect
-            key={index}
-            x={index * WAVE_STEP + 2}
-            y={(WAVE_VIEW_HEIGHT - bar) / 2}
-            width="2"
-            height={bar}
-            rx="1"
-            className={index < playedBars ? 'is-played' : 'is-unplayed'}
-          />
-        ))}
-      </svg>
-    </div>
+      <clipPath id={clipId}>
+        <path d={artFill} />
+      </clipPath>
+      <path className="music-card-art-ring" d={contourPath} />
+      <image
+        href="/landing/music-cover.webp"
+        x="-20"
+        y="-146"
+        width="165"
+        height="295"
+        clipPath={`url(#${clipId})`}
+      />
+      <path
+        className="music-card-contour-played"
+        d={contourPath}
+        pathLength={1}
+        strokeDasharray={`${played} 1`}
+      />
+      <circle
+        className="music-card-playhead"
+        cx={playhead.x}
+        cy={playhead.y}
+        r="6"
+      />
+      <path className="music-card-contour-hit" d={contourPath} />
+    </svg>
   )
 }
 
@@ -228,6 +258,7 @@ export function MusicCard() {
   const hostId = `music-yt-host-${reactId.replace(/:/g, '')}`
   const titleId = `music-card-title-${reactId.replace(/:/g, '')}`
   const statusId = `music-card-status-${reactId.replace(/:/g, '')}`
+  const artClipId = `music-card-art-${reactId.replace(/\W/g, '')}`
 
   const playerRef = useRef<YouTubePlayer | null>(null)
   const shellRef = useRef<HTMLDivElement>(null)
@@ -236,10 +267,13 @@ export function MusicCard() {
   const playIntentRef = useRef(false)
   const reduceMotionRef = useRef(false)
 
-  const [status, setStatus] = useState<PlayerStatus>('loading')
+  const pendingSeekRef = useRef<number | null>(null)
+
+  const [playerWanted, setPlayerWanted] = useState(false)
+  const [status, setStatus] = useState<PlayerStatus>('idle')
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
+  const [duration, setDuration] = useState(track.durationSeconds)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const stopTicker = () => {
@@ -288,6 +322,7 @@ export function MusicCard() {
   })
 
   useEffect(() => {
+    if (!playerWanted) return
     reduceMotionRef.current = prefersReducedMotion()
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const onChange = () => {
@@ -299,9 +334,6 @@ export function MusicCard() {
     let becameReady = false
     setStatus('loading')
     setErrorMessage(null)
-    setPlaying(false)
-    setCurrentTime(0)
-    setDuration(0)
 
     let readyPoll: number | null = null
     let readyTimeout: number | null = null
@@ -346,7 +378,12 @@ export function MusicCard() {
         if (readyDuration > 0) {
           setDuration(readyDuration)
         }
-        setCurrentTime(player.getCurrentTime() || 0)
+        if (pendingSeekRef.current !== null) {
+          player.seekTo(pendingSeekRef.current, true)
+          pendingSeekRef.current = null
+        } else {
+          setCurrentTime(player.getCurrentTime() || 0)
+        }
       } catch {
         // Duration can arrive after buffering starts.
       }
@@ -474,30 +511,28 @@ export function MusicCard() {
       shell.replaceChildren()
       media.removeEventListener('change', onChange)
     }
-  }, [hostId])
+  }, [hostId, playerWanted])
 
-  const canSeek = status === 'ready' && duration > 0
+  const canSeek = status !== 'unavailable' && duration > 0
   const progress = duration > 0 ? clamp(currentTime / duration, 0, 1) : 0
 
   const seekToRatio = (ratio: number) => {
     const player = playerRef.current
-    if (!player || !(duration > 0) || status === 'unavailable') {
+    if (!(duration > 0) || status === 'unavailable') {
       return
     }
     const next = clamp(ratio, 0, 1) * duration
     setCurrentTime(next)
+    if (!player) {
+      pendingSeekRef.current = next
+      setPlayerWanted(true)
+      return
+    }
     try {
       player.seekTo(next, true)
     } catch {
       setErrorMessage('Could not seek this track.')
     }
-  }
-
-  const skipBy = (delta: number) => {
-    if (!(duration > 0)) {
-      return
-    }
-    seekToRatio(clamp((currentTime + delta) / duration, 0, 1))
   }
 
   const togglePlayback = () => {
@@ -507,6 +542,7 @@ export function MusicCard() {
     const player = playerRef.current
     if (!player) {
       playIntentRef.current = true
+      setPlayerWanted(true)
       setStatus('loading')
       return
     }
@@ -532,7 +568,7 @@ export function MusicCard() {
       <div className="music-card-surface">
         <img
           className="music-card-photo"
-          src="/landing/music-cover.png"
+          src="/landing/music-cover.webp"
           alt=""
           width={477}
           height={851}
@@ -543,77 +579,57 @@ export function MusicCard() {
           </span>
           <h2 className="music-card-label">My Fav Music</h2>
         </div>
+        <ContourSeek
+          progress={progress}
+          disabled={!canSeek}
+          labelledBy={titleId}
+          clipId={artClipId}
+          onSeek={seekToRatio}
+        />
         <div className="music-card-body">
-          <div className="music-card-track">
-            <div className="music-card-meta">
-              <p id={titleId} className="music-card-title">
-                {track.title}
-              </p>
-              <p className="music-card-artist">{track.artist}</p>
-            </div>
-            <div className="music-card-controls">
-              <button
-                type="button"
-                className="music-card-skip"
-                aria-label={`Back ${SKIP_SECONDS} seconds`}
-                disabled={!canSeek}
-                onClick={() => skipBy(-SKIP_SECONDS)}
-              >
-                <SkipBackIcon />
-              </button>
-              <button
-                type="button"
-                className="music-card-play"
-                aria-label={
-                  playing
-                    ? `Pause ${track.title} by ${track.artist}`
-                    : `Play ${track.title} by ${track.artist}`
-                }
-                aria-pressed={playing}
-                aria-describedby={statusId}
-                disabled={status === 'unavailable'}
-                onClick={togglePlayback}
-              >
-                {status === 'loading' && !playing ? (
-                  <span className="music-card-loading-dot" aria-hidden="true" />
-                ) : playing ? (
-                  <PauseBars />
-                ) : (
-                  <PlayTriangle />
-                )}
-              </button>
-              <button
-                type="button"
-                className="music-card-skip"
-                aria-label={`Forward ${SKIP_SECONDS} seconds`}
-                disabled={!canSeek}
-                onClick={() => skipBy(SKIP_SECONDS)}
-              >
-                <SkipForwardIcon />
-              </button>
-            </div>
+          <div className="music-card-times">
+            <span>{formatTime(currentTime)}</span>
+            <span className="music-card-duration">
+              {duration > 0 ? formatTime(duration) : '--:--'}
+            </span>
           </div>
-          <div className="music-card-progress">
-            <WaveformSeek
-              progress={progress}
-              disabled={!canSeek}
-              labelledBy={titleId}
-              onSeek={seekToRatio}
-            />
-            <div className="music-card-times">
-              <span>{formatElapsed(currentTime)}</span>
-              <span>{formatRemaining(currentTime, duration)}</span>
-            </div>
+          <div className="music-card-meta">
+            <p id={titleId} className="music-card-title">
+              {track.title}
+            </p>
+            <p className="music-card-artist">{track.artist}</p>
           </div>
+          {status === 'unavailable' ? null : (
+            <button
+              type="button"
+              className="music-card-play"
+              aria-label={
+                playing
+                  ? `Pause ${track.title} by ${track.artist}`
+                  : `Play ${track.title} by ${track.artist}`
+              }
+              aria-pressed={playing}
+              aria-describedby={statusId}
+              onClick={togglePlayback}
+            >
+              {status === 'loading' && !playing ? (
+                <span className="music-card-loading-dot" aria-hidden="true" />
+              ) : playing ? (
+                <PauseBars />
+              ) : (
+                <PlayTriangle />
+              )}
+            </button>
+          )}
+          {errorMessage ? (
+            <p className="music-card-error" role="status">
+              {errorMessage}{' '}
+              <a href={track.youtubeUrl} target="_blank" rel="noreferrer">
+                Open on YouTube
+              </a>
+            </p>
+          ) : null}
         </div>
-        {errorMessage ? (
-          <p className="music-card-error" role="status">
-            {errorMessage}{' '}
-            <a href={track.youtubeUrl} target="_blank" rel="noreferrer">
-              Open on YouTube
-            </a>
-          </p>
-        ) : null}
       </div>
       <div ref={shellRef} className="music-card-yt-host" aria-hidden="true" />
       <p id={statusId} className="visually-hidden" role="status">

@@ -14,34 +14,34 @@ const themes = [
     label: 'INTERVIEW THEME 1',
     text: 'Not able to track progress and dates',
     panels: [
-      { src: '/case-study-3/theme-1.png', color: '#2d4354' },
-      { src: '/case-study-3/theme-2.png', color: '#e8e8e8' },
+      { src: '/case-study-3/theme-1.webp', color: '#2d4354' },
+      { src: '/case-study-3/theme-2.webp', color: '#e8e8e8' },
     ],
   },
   {
     label: 'INTERVIEW THEME 2',
     text: 'Not able to see what is happening where',
     panels: [
-      { src: '/case-study-3/theme-3.png', color: '#4d3c2c' },
-      { src: '/case-study-3/theme-4.png', color: '#e8e8e8' },
+      { src: '/case-study-3/theme-3.webp', color: '#4d3c2c' },
+      { src: '/case-study-3/theme-4.webp', color: '#e8e8e8' },
     ],
   },
 ]
 
 const shots = [
-  '/case-study-3/research-1.png',
-  '/case-study-3/research-2.png',
-  '/case-study-3/research-3.png',
-  '/case-study-3/research-4.png',
+  '/case-study-3/research-1.webp',
+  '/case-study-3/research-2.webp',
+  '/case-study-3/research-3.webp',
+  '/case-study-3/research-4.webp',
 ]
 
 const profiles = [
-  '/case-study-3/profile-1.jpeg',
-  '/case-study-3/profile-2.jpeg',
-  '/case-study-3/profile-3.jpeg',
-  '/case-study-3/profile-4.jpeg',
+  '/case-study-3/profile-1.webp',
+  '/case-study-3/profile-2.webp',
+  '/case-study-3/profile-3.webp',
+  '/case-study-3/profile-4.webp',
   '/case-study-3/profile-5.jpeg',
-  '/case-study-3/profile-6.png',
+  '/case-study-3/profile-6.webp',
 ]
 
 const stats = [
@@ -3001,7 +3001,7 @@ export function CaseStudy3() {
             <p>Next Project</p>
             <div className="next-frame">
               <img
-                src="/case-study-3/next-project.png"
+                src="/case-study-3/next-project.webp"
                 alt="Dark learning interface labeled Edge."
               />
               <p className="next-chip">Product Design</p>
@@ -3048,7 +3048,7 @@ export function CaseStudy3() {
             alt="Illustration of a monitor on a desk."
           />
           <img className="float a" src="/case-study-3/footer-a.png" alt="" />
-          <img className="float b" src="/case-study-3/footer-b.png" alt="" />
+          <img className="float b" src="/case-study-3/footer-b.webp" alt="" />
           <img className="float c" src="/case-study-3/footer-c.png" alt="" />
         </div>
       </footer>

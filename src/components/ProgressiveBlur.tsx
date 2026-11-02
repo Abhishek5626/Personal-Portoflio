@@ -2,6 +2,8 @@ import './progressive-blur.css'
 
 /** Exponential blur ramp (Craftwork Blank), scaled to 70% intensity (−30%). */
 const BLUR_PX = [0.35, 0.7, 1.4, 2.8, 5.6, 11.2, 22.4, 44.8] as const
+/** Each band re-blurs the moving page every frame, so phones get fewer, smaller ones. */
+const PHONE_BLUR_PX = [1.4, 5.6, 22.4] as const
 
 function maskForLayer(index: number, total: number): string {
   const step = 100 / total
@@ -25,6 +27,10 @@ export function ProgressiveBlur({
   mode = 'fixed',
   className = '',
 }: ProgressiveBlurProps) {
+  const bands = window.matchMedia('(max-width: 760px)').matches
+    ? PHONE_BLUR_PX
+    : BLUR_PX
+
   return (
     <div
       className={['progressive-blur', `is-${mode}`, className]
@@ -39,8 +45,8 @@ export function ProgressiveBlur({
         data-slot="progressive-blur-edge"
         data-edge="bottom"
       >
-        {BLUR_PX.map((blur, index) => {
-          const mask = maskForLayer(index, BLUR_PX.length)
+        {bands.map((blur, index) => {
+          const mask = maskForLayer(index, bands.length)
           return (
             <div
               key={blur}

@@ -98,12 +98,12 @@ function Stars() {
 }
 
 const shades = [
-  { src: '/case-study-1/blur-chat.png', className: 'is-chat-l' },
-  { src: '/case-study-1/blur-chat.png', className: 'is-chat-r' },
+  { src: '/case-study-1/blur-chat.webp', className: 'is-chat-l' },
+  { src: '/case-study-1/blur-chat.webp', className: 'is-chat-r' },
   { src: '/case-study-1/blur-mid.png', className: 'is-mid-l' },
   { src: '/case-study-1/blur-mid.png', className: 'is-mid-r' },
-  { src: '/case-study-1/blur-note.png', className: 'is-note-l' },
-  { src: '/case-study-1/blur-note.png', className: 'is-note-r' },
+  { src: '/case-study-1/blur-note.webp', className: 'is-note-l' },
+  { src: '/case-study-1/blur-note.webp', className: 'is-note-r' },
 ]
 
 function WhyStage() {
@@ -149,12 +149,12 @@ function WhyStage() {
 
       <article className="cs1-chat">
         <header>
-          <img src="/case-study-1/avatar-shreyasi.png" alt="" />
+          <img src="/case-study-1/avatar-shreyasi.webp" alt="" />
           <p>Shreyasi</p>
           <WinIcons />
         </header>
         <div className="cs1-msg">
-          <img src="/case-study-1/avatar-shreyasi.png" alt="" />
+          <img src="/case-study-1/avatar-shreyasi.webp" alt="" />
           <div>
             <p className="cs1-who">
               Shreyasi <time>10:31 PM</time>
@@ -166,7 +166,7 @@ function WhyStage() {
           </div>
         </div>
         <div className="cs1-msg">
-          <img src="/case-study-1/avatar-abhishek.png" alt="" />
+          <img src="/case-study-1/avatar-abhishek.webp" alt="" />
           <div>
             <p className="cs1-who">
               Abhishek <time>10:31 PM</time>
@@ -181,12 +181,12 @@ function WhyStage() {
 
       <article className="cs1-post">
         <header>
-          <img src="/case-study-1/insight.png" alt="" />
+          <img src="/case-study-1/insight.webp" alt="" />
           <p>Livia find this insightful</p>
           <WinIcons />
         </header>
         <div className="cs1-person">
-          <img src="/case-study-1/avatar-aniket.png" alt="" />
+          <img src="/case-study-1/avatar-aniket.webp" alt="" />
           <div>
             <p className="cs1-who">
               Aniket Kale <span>2nd</span>
@@ -271,18 +271,18 @@ function GlowVideo() {
 const problemCards = [
   {
     tone: '#4d3c2c',
-    faces: ['/case-study-1/insight.png', '/case-study-1/memoji-shock.png'],
+    faces: ['/case-study-1/insight.webp', '/case-study-1/memoji-shock.webp'],
   },
   { quote: 'I felt like I was paying for YouTube with a high price tag.' },
   {
     tone: '#2d4354',
-    faces: ['/case-study-1/avatar-shreyasi.png', '/case-study-1/avatar-abhishek.png'],
+    faces: ['/case-study-1/avatar-shreyasi.webp', '/case-study-1/avatar-abhishek.webp'],
   },
   { quote: 'The syllabus was outdated and felt obsolete.' },
   {
     tone: '#969696',
     soft: true,
-    faces: ['/case-study-1/memoji-gray.png', '/case-study-1/avatar-aniket.png'],
+    faces: ['/case-study-1/memoji-gray.webp', '/case-study-1/avatar-aniket.webp'],
   },
   { quote: 'The knowledge that was shared was very basic and entry level.' },
 ]
@@ -497,7 +497,7 @@ const courseModules: CourseModule[] = [
     number: '1',
     title: 'Case Study 1 – With Guidance',
     category: 'Case Study',
-    image: '/case-study-1/hub-card-case-study.png',
+    image: '/case-study-1/hub-card-case-study.webp',
     imageWidth: 536,
     imageHeight: 213,
     alt: 'Collaborative case study document with Abhishek and Shreyasii cursors.',
@@ -517,7 +517,7 @@ const courseModules: CourseModule[] = [
     number: '1',
     title: 'Stakeholder Interviews',
     category: 'UX Research',
-    image: '/case-study-1/hub-card-interviews.png',
+    image: '/case-study-1/hub-card-interviews.webp',
     imageWidth: 536,
     imageHeight: 213,
     alt: 'Video call window with stakeholder avatars for an interview session.',
@@ -527,7 +527,7 @@ const courseModules: CourseModule[] = [
     number: '1',
     title: 'UX Foundation',
     category: 'UX',
-    image: '/case-study-1/hub-card-foundation.png',
+    image: '/case-study-1/hub-card-foundation.webp',
     imageWidth: 512,
     imageHeight: 203,
     alt: 'Purple chips labeled Core Product Statement and User Personas.',
@@ -547,7 +547,7 @@ const courseModules: CourseModule[] = [
     number: '1',
     title: 'Button Components & Interaction States',
     category: 'UI',
-    image: '/case-study-1/hub-card-buttons.png',
+    image: '/case-study-1/hub-card-buttons.webp',
     imageWidth: 512,
     imageHeight: 203,
     alt: 'Primary, outlined, and text Button CTA variants on a dark field.',
@@ -675,7 +675,7 @@ function ProgramFeatures() {
       <div className="cs1-feature-stage">
         <figure className="cs1-feature-card">
           <img
-            src="/case-study-1/feature-live-figma-classes.png"
+            src="/case-study-1/feature-live-figma-classes.webp"
             alt="Live Figma Classes: presenter mosaic beside a collaborative Figma workspace with Anshika and Aniket cursors, with title and description below."
             width={1052}
             height={564}
@@ -685,7 +685,7 @@ function ProgramFeatures() {
         </figure>
         <figure className="cs1-feature-card">
           <img
-            src="/case-study-1/feature-feedback.jpg"
+            src="/case-study-1/feature-feedback.webp"
             alt="Personal Feedback card with Aniket and Abhishek Figma comments, beside Industry Expert Educator card featuring the KPMG mark."
             width={1024}
             height={364}
@@ -695,7 +695,7 @@ function ProgramFeatures() {
         </figure>
         <figure className="cs1-feature-card">
           <img
-            src="/case-study-1/feature-cohort.jpg"
+            src="/case-study-1/feature-cohort.webp"
             alt="Cohort Based Learning live-class grid and Career Mentorship calendar for Career Guidance from 4 to 6pm."
             width={1024}
             height={368}
@@ -744,7 +744,7 @@ function ProgramFeatures() {
       <div className="cs1-feature-stage">
         <figure className="cs1-feature-panel">
           <img
-            src="/case-study-1/feature-hub.jpg"
+            src="/case-study-1/feature-hub.webp"
             alt="Personal learning hub MasterClass dashboard with sidebar navigation, search, and Continue Learning empty state."
             width={968}
             height={356}
@@ -792,7 +792,7 @@ function RequestCaseStudy() {
           <div className="cs1-next-frame">
             <img
               className="cs1-next-photo"
-              src="/case-study-1/next-project.png"
+              src="/case-study-1/next-project.webp"
               alt="Gen Alpha Accelerator preview with a glowing mark on a dark purple field."
               width={1116}
               height={585}
@@ -995,7 +995,7 @@ function StrategyFeatures() {
 
       <figure className="cs1-strategy-stage">
         <img
-          src="/case-study-1/strategy-pricing-plans.png"
+          src="/case-study-1/strategy-pricing-plans.webp"
           alt="Two pricing cards for Gen Alpha Academy Full Course, showing ₹13,500 and ₹62,500 one-time plans with enroll and feature lists."
           width={1078}
           height={622}
@@ -1130,12 +1130,12 @@ export function CaseStudy1() {
               <picture className="cs1-picture">
                 <source
                   media="(max-width: 900px)"
-                  srcSet="/case-study-1/hero-ui-mobile.jpg"
+                  srcSet="/case-study-1/hero-ui-mobile.webp"
                   width={692}
                   height={816}
                 />
                 <img
-                  src="/case-study-1/hero-ui.jpg"
+                  src="/case-study-1/hero-ui.webp"
                   width={1024}
                   height={469}
                   alt="Designer OS homepage hero reading “Be an Gen Alpha Designer,” with live-class stats, Request a Callback and Download Curriculum actions, and a glowing purple portal."
@@ -1288,7 +1288,7 @@ export function CaseStudy1() {
 
           <figure className="cs1-bento-still">
             <img
-              src="/case-study-1/owner-bento.jpg"
+              src="/case-study-1/owner-bento.webp"
               alt="Product owner feature board showing 48+ comprehensive modules, exclusive community, get certified, and 12+ hands-on lessons."
               width={1024}
               height={452}

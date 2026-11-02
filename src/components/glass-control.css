@@ -27,7 +27,6 @@ html .touch,
 html .connect,
 html .tobe-pill,
 html .q-pill,
-html .music-card-skip,
 html .music-card-play,
 html .view-project-badge,
 html .work-experience-reset {
@@ -83,7 +82,6 @@ html .touch::after,
 html .connect::after,
 html .tobe-pill::after,
 html .q-pill::after,
-html .music-card-skip::after,
 html .music-card-play::after,
 html .view-project-badge::after,
 html .work-experience-reset::after {
@@ -135,7 +133,6 @@ html[data-theme="dark"] .touch::after,
 html[data-theme="dark"] .connect::after,
 html[data-theme="dark"] .tobe-pill::after,
 html[data-theme="dark"] .q-pill::after,
-html[data-theme="dark"] .music-card-skip::after,
 html[data-theme="dark"] .music-card-play::after,
 html[data-theme="dark"] .view-project-badge::after,
 html[data-theme="dark"] .work-experience-reset::after {
@@ -171,7 +168,6 @@ html[data-theme="dark"] .work-experience-reset::after {
 .connect > *,
 .tobe-pill > *,
 .q-pill > *,
-.music-card-skip > *,
 .music-card-play > *,
 .view-project-badge > *,
 .work-experience-reset > * {
@@ -207,7 +203,6 @@ html .cs1-modules-chevron,
 html .cs1-next-chip,
 html .cs2 .cs2-next-chip,
 html .next-chip,
-html .music-card-skip,
 html .music-card-play,
 html .tobe-pill {
   color: #fff;
@@ -229,7 +224,6 @@ html .q-pill {
 .touch,
 .connect,
 .tobe-pill,
-.music-card-skip:not(:disabled),
 .music-card-play:not(:disabled),
 .work-experience-reset {
   cursor: pointer;
@@ -248,7 +242,6 @@ html .q-pill {
 .touch:focus-visible,
 .connect:focus-visible,
 .tobe-pill:focus-visible,
-.music-card-skip:focus-visible,
 .music-card-play:focus-visible,
 .work-experience-reset:focus-visible {
   outline: 2px solid var(--theme-text);
@@ -266,7 +259,6 @@ html .q-pill {
 .touch:active,
 .connect:active,
 .tobe-pill:active,
-.music-card-skip:active:not(:disabled),
 .music-card-play:active:not(:disabled),
 .work-experience-reset:active {
   transform: scale(0.96);
@@ -284,7 +276,6 @@ html .q-pill {
   .touch:hover,
   .connect:hover,
   .tobe-pill:hover,
-  .music-card-skip:hover:not(:disabled),
   .music-card-play:hover:not(:disabled),
   .work-experience-reset:hover,
   .shipped-badge:hover {
@@ -328,7 +319,6 @@ html .q-pill {
   .connect,
   .tobe-pill,
   .q-pill,
-  .music-card-skip,
   .music-card-play,
   .view-project-badge,
   .work-experience-reset,
@@ -350,7 +340,6 @@ html .q-pill {
   .connect::after,
   .tobe-pill::after,
   .q-pill::after,
-  .music-card-skip::after,
   .music-card-play::after,
   .view-project-badge::after,
   .work-experience-reset::after {
@@ -368,7 +357,6 @@ html .q-pill {
   .touch:active,
   .connect:active,
   .tobe-pill:active,
-  .music-card-skip:active:not(:disabled),
   .music-card-play:active:not(:disabled),
   .work-experience-reset:active {
     transform: none;

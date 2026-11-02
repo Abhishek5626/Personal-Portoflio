@@ -2,6 +2,7 @@
   position: relative;
   z-index: 0;
   display: flex;
+  container-type: inline-size;
   min-width: 0;
   width: 100%;
   min-height: 191px;
@@ -15,12 +16,19 @@
   isolation: isolate;
 }
 
+/*
+  Figma node 138:1902 adapted to the 191px slot: heading across the top, art
+  and player side by side below. Sized off the card, which narrows with the
+  phone sheet while staying this one fixed height.
+*/
 .music-card-surface {
   position: relative;
-  display: flex;
+  display: grid;
   flex: 1;
-  flex-direction: column;
-  gap: 22px;
+  grid-template-columns: clamp(84px, 30cqi, 128px) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: clamp(12px, 6cqi, 32px);
+  row-gap: 1px;
   min-width: 0;
   padding: var(--landing-surface-pad);
   overflow: hidden;
@@ -31,21 +39,21 @@
 .music-card-photo {
   position: absolute;
   z-index: 0;
-  left: calc(50% + 0.25px);
-  top: calc(50% - 123px);
-  width: 477px;
-  height: 851px;
+  /* A blurred patch of snow left of the penguin, wider than any card. */
+  left: -80px;
+  top: -1650px;
+  width: 1400px;
+  height: 2498px;
   max-width: none;
-  translate: -50% -50%;
   object-fit: cover;
+  filter: blur(28px) brightness(0.8);
   pointer-events: none;
   user-select: none;
 }
 
 .music-card-heading,
-.music-card-body,
-.music-card-progress,
-.music-card-track {
+.music-card-art,
+.music-card-body {
   position: relative;
   z-index: 1;
 }
@@ -54,6 +62,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  grid-column: 1 / -1;
   min-height: 28px;
 }
 
@@ -89,69 +98,68 @@
   line-height: 17px;
 }
 
-.music-card-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 0;
+.music-card-art {
+  display: block;
+  align-self: center;
+  width: 100%;
+  overflow: visible;
 }
 
-.music-card-track {
+.music-card-art-ring {
+  fill: rgba(255, 255, 255, 0.16);
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.5;
+}
+
+.music-card-body {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  text-align: center;
 }
 
 .music-card-meta {
+  width: 100%;
   min-width: 0;
 }
 
 .music-card-title,
 .music-card-artist {
   margin: 0;
+  overflow: hidden;
   color: #fff;
   font-family: Inter, sans-serif;
   font-weight: 500;
   letter-spacing: -0.04em;
   line-height: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .music-card-title {
   font-size: 16px;
-  white-space: nowrap;
 }
 
 .music-card-artist {
+  margin-top: 3px;
   font-size: 12px;
 }
 
-.music-card-controls {
+html .music-card .music-card-play {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 5px;
-  height: 34px;
-}
-
-.music-card-skip,
-.music-card-play {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  width: 56px;
+  width: 34px;
   height: 34px;
   padding: 0;
-  border-radius: 10px;
-  color: #fff;
-}
-
-.music-card-skip:disabled,
-.music-card-play:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  outline-color: #fff;
 }
 
 .music-card-play-icon {
@@ -173,22 +181,11 @@
   animation: music-card-pulse 900ms ease-in-out infinite;
 }
 
-.music-card-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-}
-
+/* Only the contour takes the pointer, so the rest of the art still pans the page. */
 .music-card-seek {
-  display: block;
-  width: 100%;
-  padding: 8px 0;
-  margin: -8px 0;
-  border: 0;
-  background: transparent;
   cursor: pointer;
-  touch-action: none;
   outline: none;
+  pointer-events: none;
 }
 
 .music-card-seek:focus-visible {
@@ -205,33 +202,32 @@
   cursor: not-allowed;
 }
 
-.music-card-wave {
-  display: block;
-  width: 100%;
-  height: 10px;
-  overflow: visible;
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.55));
-  pointer-events: none;
+.music-card-contour-played {
+  fill: none;
+  stroke: #000;
+  stroke-width: 2.25;
 }
 
-.music-card-wave .is-played {
-  fill: #ffffff;
+.music-card-playhead {
+  fill: #000;
 }
 
-.music-card-wave .is-unplayed {
-  fill: rgba(255, 255, 255, 0.42);
+.music-card-seek.is-disabled .music-card-playhead {
+  display: none;
 }
 
-.music-card-seek:hover:not(.is-disabled) .is-unplayed {
-  fill: rgba(255, 255, 255, 0.58);
+.music-card-contour-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 22;
+  pointer-events: stroke;
+  touch-action: none;
 }
 
 .music-card-times {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  color: rgba(255, 255, 255, 0.78);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  color: #fff;
   font-family: Inter, sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -240,10 +236,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+.music-card-duration {
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.72);
+}
+
 .music-card-error {
   position: relative;
   z-index: 1;
-  margin: -8px 0 0;
+  margin: 0;
   color: rgba(255, 255, 255, 0.92);
   font-family: Inter, sans-serif;
   font-size: 11px;
@@ -280,28 +283,8 @@
   }
 }
 
-@media (max-width: 760px) {
-  .music-card-photo {
-    width: max(477px, 140%);
-    height: auto;
-    aspect-ratio: 477 / 851;
-  }
-}
-
-@media (max-width: 420px) {
-  .music-card-title {
-    white-space: normal;
-  }
-
-  .music-card-skip,
-  .music-card-play {
-    width: 44px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .music-card-surface,
-  .music-card-skip,
   .music-card-play {
     transition: none;
   }
@@ -311,7 +294,6 @@
     opacity: 0.8;
   }
 
-  .music-card-skip:active:not(:disabled),
   .music-card-play:active:not(:disabled) {
     transform: none;
   }

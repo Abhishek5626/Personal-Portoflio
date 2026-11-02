@@ -54,21 +54,25 @@ export const heroContent = {
  * Visible copy matches the Figma frame. Showcase crops are the image layers
  * inside each 417×360 surface (Project column, node 9:377).
  * Card 1 is a dark media surface; cards 2–3 use the light glass surface.
- * The tools list fills the Tools card (node 2:282). Swap or extend it to update the grid.
+ * The tools list fills the Tools card (node 132:1780), in the frame's order.
  */
-const claudeLogo = {
-  name: 'Claude',
-  logoSrc: '/landing/tools/claude.svg',
-  preserveColor: true,
-} as const satisfies LandingTool
-
 export const landingTools = [
-  claudeLogo,
-  claudeLogo,
-  claudeLogo,
-  claudeLogo,
-  claudeLogo,
-  claudeLogo,
+  { name: 'Claude', logoSrc: '/landing/tools/claude.webp', preserveColor: true },
+  { name: 'ChatGPT', logoSrc: '/landing/tools/chatgpt.webp', preserveColor: true },
+  { name: 'Cursor', logoSrc: '/landing/tools/cursor.webp', preserveColor: true },
+  { name: 'Figma', logoSrc: '/landing/tools/figma.webp', preserveColor: true },
+  {
+    name: 'Microsoft Dynamics 365',
+    logoSrc: '/landing/tools/dynamics-365.webp',
+    preserveColor: true,
+  },
+  { name: 'Obsidian', logoSrc: '/landing/tools/obsidian.webp', preserveColor: true },
+  { name: 'RELEX', logoSrc: '/landing/tools/relex.webp', preserveColor: true },
+  {
+    name: 'Microsoft Power Apps',
+    logoSrc: '/landing/tools/power-apps.webp',
+    preserveColor: true,
+  },
 ] as const satisfies readonly LandingTool[]
 
 export const landingCards = {
@@ -89,7 +93,6 @@ export const landingCards = {
   toolsShipped: {
     id: 'tools-shipped',
     label: 'Tools',
-    status: 'Shipped',
     surfacePadding: 14,
     tools: landingTools,
   },
@@ -108,7 +111,7 @@ export const landingCards = {
     href: '/case-study-1',
     surfacePadding: 14,
     showcaseTone: 'dark',
-    imageSrc: '/project-assets/designer-os.png',
+    imageSrc: '/project-assets/designer-os.webp',
     imageAlt: 'Violet light ring glowing across a black horizon.',
     imageFrame: {
       left: '-57.7938%',
@@ -125,7 +128,7 @@ export const landingCards = {
     href: '/case-study-2',
     surfacePadding: 14,
     showcaseTone: 'light',
-    imageSrc: '/project-assets/gen-z-learning-platform.png',
+    imageSrc: '/project-assets/gen-z-learning-platform.webp',
     imageAlt:
       'Edge learning dashboard with Home, Bookmarks, Courses, and Continue Learning.',
     imageFrame: {
@@ -144,7 +147,7 @@ export const landingCards = {
     href: '/case-study-3',
     surfacePadding: 14,
     showcaseTone: 'light',
-    imageSrc: '/project-assets/enterprise-qa-platform.png',
+    imageSrc: '/project-assets/enterprise-qa-platform.webp',
     imageAlt: 'Dark enterprise dashboard with a sidebar and a grid of panels.',
     imageFrame: {
       left: '3.8374%',
@@ -170,7 +173,7 @@ export type AboutPlace = {
 export const aboutMeCard = {
   id: 'about-me-portrait',
   label: 'About Me',
-  imageSrc: '/landing/about-me-portrait.png',
+  imageSrc: '/landing/about-me-portrait.webp',
   imageAlt:
     'Portrait on a city street, wearing sunglasses, earphones, and a dark coat.',
   imageFrame: {

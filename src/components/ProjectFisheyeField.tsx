@@ -44,6 +44,10 @@ const PHONE_REVEAL_MS = 420
 const PHONE_NAV_TOP_ZONE_PX = 8
 const PHONE_NAV_DIRECTION_PX = 8
 
+/** A tile this close to the screen is kept live, so a bulge never reveals a hole. */
+const TILE_LIVE_MARGIN_PX = 40
+/** A card mounts this far ahead of the screen, so it is ready before it shows. */
+const CARD_MOUNT_MARGIN_PX = 400
 const DRAG_CLICK_THRESHOLD_PX = 8
 const INERTIA = 0.94
 const WHEEL_SENSITIVITY = 0.42
@@ -162,6 +166,9 @@ type Placement = FisheyeRect & {
   copyY: number
 }
 
+const cardKeyOf = (placement: Placement) =>
+  `${placement.item}-${placement.copyX}-${placement.copyY}`
+
 const scaleFor = (layout: FisheyeLayout, viewW: number) =>
   clamp(
     layout.viewWidth
@@ -258,6 +265,14 @@ export function ProjectFisheyeField({
     return list
   }, [layout, copies, faces.length])
 
+  // Cards mount on first approach and stay mounted, so a playing track or a
+  // card's state survives panning away.
+  const [mountedCards, setMountedCards] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
+  // Read by the paint loop, which must not restart (and drop a drag) as cards mount.
+  const mountedCardsRef = useRef(new Set<string>())
+
   // Mount more copies before paint when the viewport outgrows the current set.
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -336,6 +351,11 @@ export function ProjectFisheyeField({
     // Common multiple of the strip loops, so wrapping the pan offset by it
     // never shifts any strip.
     const panPeriodY = periodY.reduce((a, b) => a * b, 1)
+    const tileLive: (boolean | undefined)[] = []
+    const tileSize: (string | undefined)[] = []
+    // Only cards on screen mount in the first task; the ring around them waits
+    // for idle time, so it can't delay the first paint.
+    let mountMargin = TILE_LIVE_MARGIN_PX
     let reducedMotion = false
     let frame = 0
     let previous = performance.now()
@@ -439,6 +459,7 @@ export function ProjectFisheyeField({
         : (wx: number, wy: number) =>
             warpPoint(wx, wy, halfW, halfH, aspectTerm, k)
 
+      let addedCard = false
       tiles.forEach((tile, index) => {
         const placement = placements[index]
         if (!placement) return
@@ -462,12 +483,39 @@ export function ProjectFisheyeField({
           -h + periodY[placement.strip]!,
         )
 
-        // Off-screen tiles are clipped by the root; the lens only pushes
-        // points outward, so they never warp back into view. (Hiding them
-        // would not work: some cards force `visibility: visible` inside.)
-        tile.style.width = `${w}px`
-        tile.style.height = `${h}px`
-        tile.style.visibility = 'visible'
+        const cardKey = cardKeyOf(placement)
+        if (
+          !mountedCardsRef.current.has(cardKey) &&
+          x + w > -mountMargin &&
+          x < viewW + mountMargin &&
+          y + h > -mountMargin &&
+          y < viewH + mountMargin
+        ) {
+          mountedCardsRef.current.add(cardKey)
+          addedCard = true
+        }
+
+        // The lens only pushes points outward, so an off-screen tile never
+        // warps back into view: it can skip paint and its layer entirely, and
+        // needs no writes until it returns.
+        const live =
+          x + w > -TILE_LIVE_MARGIN_PX &&
+          x < viewW + TILE_LIVE_MARGIN_PX &&
+          y + h > -TILE_LIVE_MARGIN_PX &&
+          y < viewH + TILE_LIVE_MARGIN_PX
+        if (!live && tileLive[index] === false) return
+        if (live !== tileLive[index]) {
+          tileLive[index] = live
+          tile.style.contentVisibility = live ? '' : 'hidden'
+          tile.style.willChange = live ? '' : 'auto'
+          tile.style.visibility = 'visible'
+        }
+        const size = `${w}x${h}`
+        if (size !== tileSize[index]) {
+          tileSize[index] = size
+          tile.style.width = `${w}px`
+          tile.style.height = `${h}px`
+        }
         tile.style.transform = quadMatrix(
           w,
           h,
@@ -477,6 +525,7 @@ export function ProjectFisheyeField({
           warp(x, y + h),
         )
       })
+      if (addedCard) setMountedCards(new Set(mountedCardsRef.current))
     }
 
     const panBy = (dx: number, dy: number) => {
@@ -549,6 +598,14 @@ export function ProjectFisheyeField({
       paint()
     }
 
+    const widenMounting = () => {
+      if (disposed) return
+      mountMargin = CARD_MOUNT_MARGIN_PX
+      paint()
+    }
+    if ('requestIdleCallback' in window) requestIdleCallback(widenMounting)
+    else setTimeout(widenMounting, 200)
+
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(root)
     // Position 0 is the Figma origin: block copy 0 sits at the frame gutters.
@@ -602,7 +659,8 @@ export function ProjectFisheyeField({
         // A control with its own drag (wheel, seek bar, timeline) keeps
         // gestures along its axis; anything else pans the field.
         const axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'
-        if (drag.owner?.dataset.fisheyeDragAxis === axis) {
+        const ownedAxis = drag.owner?.dataset.fisheyeDragAxis
+        if (ownedAxis === axis || ownedAxis === 'both') {
           drag.active = false
           return
         }
@@ -823,9 +881,10 @@ export function ProjectFisheyeField({
           const face = faces[placement.item]!
           const props = face.props as { id?: string }
           const copy = `${placement.copyX}-${placement.copyY}`
+          const cardKey = cardKeyOf(placement)
           return (
             <div
-              key={`${placement.item}-${copy}`}
+              key={cardKey}
               className="project-fisheye-tile"
               data-fisheye-tile=""
               data-fisheye-item={placement.item}
@@ -835,9 +894,11 @@ export function ProjectFisheyeField({
                   never touches the tile's lens transform. */}
               <div className="project-fisheye-entrance" data-entrance="">
                 {/* Copies drop the id so anchors like #about stay unique. */}
-                {copy !== '0-0' && props.id
-                  ? cloneElement(face, { id: undefined } as Partial<unknown>)
-                  : face}
+                {!mountedCards.has(cardKey)
+                  ? null
+                  : copy !== '0-0' && props.id
+                    ? cloneElement(face, { id: undefined } as Partial<unknown>)
+                    : face}
               </div>
             </div>
           )
