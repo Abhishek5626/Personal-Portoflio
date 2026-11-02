@@ -3,6 +3,7 @@ import type {
   CSSProperties,
   PointerEvent as ReactPointerEvent,
   ReactNode,
+  RefObject,
 } from 'react'
 import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import './case-study.css'
@@ -131,6 +132,76 @@ function CaptionRow({
 
 const BODY = 242
 const GRAVITY = 1400
+/** Width two pieces need side by side, before they are scaled down to a phone. */
+const PHONE_ROW_WIDTH = 540
+const PHONE_STAGE_PADDING = 16
+const PHONE_BOARDS = '(max-width: 900px)'
+
+/** Phones: pieces sit apart on the floor, instead of overlapping past the edges. */
+function restOnPhone<T extends { x: number; y: number }>(
+  pieces: T[],
+  width: number,
+  height: number,
+): T[] {
+  if (!window.matchMedia(PHONE_BOARDS).matches) return pieces
+  return pieces.map((piece, index) => ({
+    ...piece,
+    x: index === 0 ? 0 : width - BODY,
+    y: height - BODY,
+  }))
+}
+
+/** Screen pixels per board unit, since phones scale the whole board down. */
+function boardScale(board: HTMLElement | null) {
+  return board?.offsetWidth ? board.getBoundingClientRect().width / board.offsetWidth : 1
+}
+
+/**
+ * The dark stage holding draggable pieces. The physics runs on the inner layer
+ * at full size; on phones that layer is scaled to fit, so sizes, bounds and
+ * speeds all stay as they are on desktop.
+ */
+function PieceStage({
+  className,
+  boardRef,
+  children,
+}: {
+  className: string
+  boardRef: RefObject<HTMLDivElement | null>
+  children: ReactNode
+}) {
+  const stageRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const stage = stageRef.current
+    if (!stage) return
+    const phone = window.matchMedia(PHONE_BOARDS)
+    const applyScale = () => {
+      if (phone.matches) {
+        const room = stage.clientWidth - PHONE_STAGE_PADDING * 2
+        stage.style.setProperty('--piece-scale', String(Math.min(1, room / PHONE_ROW_WIDTH)))
+      } else {
+        stage.style.removeProperty('--piece-scale')
+      }
+    }
+    applyScale()
+    const observer = new ResizeObserver(applyScale)
+    observer.observe(stage)
+    phone.addEventListener('change', applyScale)
+    return () => {
+      observer.disconnect()
+      phone.removeEventListener('change', applyScale)
+    }
+  }, [])
+
+  return (
+    <div className={`dark-stage ${className}`} ref={stageRef}>
+      <div className="piece-layer" ref={boardRef}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 type Piece = {
   label: string
@@ -334,7 +405,7 @@ function DiscoveryBoard() {
       size.current = { w: width, h: height }
       if (held.current === null) {
         cancelAnimationFrame(frame.current)
-        piecesRef.current = restingPieces(width, height)
+        piecesRef.current = restOnPhone(restingPieces(width, height), width, height)
         paintAll()
       }
     }
@@ -388,8 +459,8 @@ function DiscoveryBoard() {
     origin.current = { left: rect?.left ?? 0, top: rect?.top ?? 0 }
     const piece = piecesRef.current[index]
     const point = {
-      x: event.clientX - origin.current.left,
-      y: event.clientY - origin.current.top,
+      x: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      y: (event.clientY - origin.current.top) / boardScale(boardRef.current),
     }
     held.current = index
     grab.current = {
@@ -407,8 +478,8 @@ function DiscoveryBoard() {
     if (held.current !== index) return
     const piece = piecesRef.current[index]
     const point = {
-      x: event.clientX - origin.current.left,
-      y: event.clientY - origin.current.top,
+      x: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      y: (event.clientY - origin.current.top) / boardScale(boardRef.current),
     }
     const now = performance.now()
     const dt = Math.max(16, now - grab.current.lt) / 1000
@@ -435,7 +506,7 @@ function DiscoveryBoard() {
   }
 
   return (
-    <div className="dark-stage research-side" ref={boardRef}>
+    <PieceStage className="research-side" boardRef={boardRef}>
       {piecesRef.current.map((piece, index) => (
         <button
           key={piece.label}
@@ -470,7 +541,7 @@ function DiscoveryBoard() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -630,7 +701,7 @@ function PersonaCircles() {
       if (Math.abs(width - size.current.w) < 1 && Math.abs(height - size.current.h) < 1) return
       size.current = { w: width, h: height }
       if (held.current === null) {
-        piecesRef.current = personaRest(width, height)
+        piecesRef.current = restOnPhone(personaRest(width, height), width, height)
         publish()
       }
     }
@@ -648,8 +719,8 @@ function PersonaCircles() {
   const pointInBoard = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const rect = boardRef.current?.getBoundingClientRect()
     return {
-      x: event.clientX - (rect?.left ?? 0),
-      y: event.clientY - (rect?.top ?? 0),
+      x: (event.clientX - (rect?.left ?? 0)) / boardScale(boardRef.current),
+      y: (event.clientY - (rect?.top ?? 0)) / boardScale(boardRef.current),
     }
   }
 
@@ -720,7 +791,7 @@ function PersonaCircles() {
     })
 
   return (
-    <div className="dark-stage persona-side" ref={boardRef}>
+    <PieceStage className="persona-side" boardRef={boardRef}>
       {ordered.map(({ piece, index }) => (
         <button
           key={piece.label}
@@ -757,7 +828,7 @@ function PersonaCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -840,7 +911,7 @@ function DeliverableCircles() {
       if (Math.abs(width - size.current.w) < 1 && Math.abs(height - size.current.h) < 1) return
       size.current = { w: width, h: height }
       if (held.current === null) {
-        piecesRef.current = deliverableRest(width, height)
+        piecesRef.current = restOnPhone(deliverableRest(width, height), width, height)
         publish()
       }
     }
@@ -858,8 +929,8 @@ function DeliverableCircles() {
   const pointInBoard = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const rect = boardRef.current?.getBoundingClientRect()
     return {
-      x: event.clientX - (rect?.left ?? 0),
-      y: event.clientY - (rect?.top ?? 0),
+      x: (event.clientX - (rect?.left ?? 0)) / boardScale(boardRef.current),
+      y: (event.clientY - (rect?.top ?? 0)) / boardScale(boardRef.current),
     }
   }
 
@@ -935,7 +1006,7 @@ function DeliverableCircles() {
     })
 
   return (
-    <div className="dark-stage deliverable-board" ref={boardRef}>
+    <PieceStage className="deliverable-board" boardRef={boardRef}>
       {ordered.map(({ piece, index }) => (
         <button
           key={piece.label}
@@ -968,7 +1039,7 @@ function DeliverableCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -1058,7 +1129,7 @@ function ResearchCircles() {
       size.current = { w: width, h: height }
       if (held.current === null) {
         settle.current = null
-        piecesRef.current = researchRest(width, height)
+        piecesRef.current = restOnPhone(researchRest(width, height), width, height)
         publish()
       }
     }
@@ -1076,8 +1147,8 @@ function ResearchCircles() {
   const pointInBoard = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const rect = boardRef.current?.getBoundingClientRect()
     return {
-      x: event.clientX - (rect?.left ?? 0),
-      y: event.clientY - (rect?.top ?? 0),
+      x: (event.clientX - (rect?.left ?? 0)) / boardScale(boardRef.current),
+      y: (event.clientY - (rect?.top ?? 0)) / boardScale(boardRef.current),
     }
   }
 
@@ -1184,7 +1255,7 @@ function ResearchCircles() {
     })
 
   return (
-    <div className="dark-stage comp-side research-board" ref={boardRef}>
+    <PieceStage className="comp-side research-board" boardRef={boardRef}>
       {ordered.map(({ piece, index }) => (
         <button
           key={piece.label}
@@ -1222,7 +1293,7 @@ function ResearchCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -1394,7 +1465,7 @@ function ToBeCircles() {
       if (Math.abs(width - size.current.w) < 1 && Math.abs(height - size.current.h) < 1) return
       size.current = { w: width, h: height }
       if (held.current === null) {
-        piecesRef.current = tobeRest(height)
+        piecesRef.current = restOnPhone(tobeRest(height), width, height)
         publish()
       }
     }
@@ -1412,8 +1483,8 @@ function ToBeCircles() {
   const pointInBoard = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const rect = boardRef.current?.getBoundingClientRect()
     return {
-      x: event.clientX - (rect?.left ?? 0),
-      y: event.clientY - (rect?.top ?? 0),
+      x: (event.clientX - (rect?.left ?? 0)) / boardScale(boardRef.current),
+      y: (event.clientY - (rect?.top ?? 0)) / boardScale(boardRef.current),
     }
   }
 
@@ -1497,7 +1568,7 @@ function ToBeCircles() {
     })
 
   return (
-    <div className="dark-stage tobe-side tobe-board" ref={boardRef}>
+    <PieceStage className="tobe-side tobe-board" boardRef={boardRef}>
       {ordered.map(({ piece, index }) => (
         <button
           key={piece.label}
@@ -1534,7 +1605,7 @@ function ToBeCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -1559,7 +1630,9 @@ function InsightsCircles() {
   useEffect(() => {
     const board = boardRef.current
     if (!board) return
-    const points = insightRest(board.clientHeight < 300).map((point) => ({ ...point }))
+    const rest = () =>
+      restOnPhone(insightRest(board.clientHeight < 300), board.clientWidth, board.clientHeight)
+    const points = rest().map((point) => ({ ...point }))
     const stops: Array<() => void> = []
     let held = -1
     let pointerId = -1
@@ -1589,7 +1662,7 @@ function InsightsCircles() {
 
     const placeRest = () => {
       if (moved || held !== -1) return
-      insightRest(board.clientHeight < 300).forEach((point, index) => {
+      rest().forEach((point, index) => {
         points[index].x = point.x
         points[index].y = point.y
         paint(index)
@@ -1604,15 +1677,17 @@ function InsightsCircles() {
         if (event.pointerType === 'mouse' && event.button !== 0) return
         held = index
         pointerId = event.pointerId
-        originX = event.clientX - points[index].x
-        originY = event.clientY - points[index].y
+        const scale = boardScale(board)
+        originX = event.clientX / scale - points[index].x
+        originY = event.clientY / scale - points[index].y
         piece.classList.add('is-held')
         piece.setPointerCapture(event.pointerId)
       }
 
       const onMove = (event: PointerEvent) => {
         if (held !== index || event.pointerId !== pointerId) return
-        const next = clamp(index, event.clientX - originX, event.clientY - originY)
+        const scale = boardScale(board)
+        const next = clamp(index, event.clientX / scale - originX, event.clientY / scale - originY)
         points[index].x = next.x
         points[index].y = next.y
         moved = true
@@ -1670,7 +1745,7 @@ function InsightsCircles() {
   }, [])
 
   return (
-    <div className="dark-stage pain-side insights-board" ref={boardRef}>
+    <PieceStage className="pain-side insights-board" boardRef={boardRef}>
       {insightLabels.map((label, index) => (
         <button
           key={label}
@@ -1688,7 +1763,7 @@ function InsightsCircles() {
           {label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -1792,7 +1867,7 @@ function UseCaseCircles() {
       size.current = { w: width, h: height }
       if (held.current === null) {
         cancelAnimationFrame(frame.current)
-        piecesRef.current = useCaseRest(height)
+        piecesRef.current = restOnPhone(useCaseRest(height), width, height)
         paintAll()
       }
     }
@@ -1849,8 +1924,8 @@ function UseCaseCircles() {
     const piece = piecesRef.current[index]
     held.current = index
     grab.current = {
-      lx: event.clientX - origin.current.left,
-      ly: event.clientY - origin.current.top,
+      lx: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      ly: (event.clientY - origin.current.top) / boardScale(boardRef.current),
       lt: performance.now(),
     }
     piece.vx = 0
@@ -1865,8 +1940,8 @@ function UseCaseCircles() {
     if (held.current !== index) return
     const piece = piecesRef.current[index]
     const point = {
-      x: event.clientX - origin.current.left,
-      y: event.clientY - origin.current.top,
+      x: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      y: (event.clientY - origin.current.top) / boardScale(boardRef.current),
     }
     const now = performance.now()
     const dt = Math.max(16, now - grab.current.lt) / 1000
@@ -1900,7 +1975,7 @@ function UseCaseCircles() {
   }
 
   return (
-    <div className="dark-stage use-side use-board" ref={boardRef}>
+    <PieceStage className="use-side use-board" boardRef={boardRef}>
       {piecesRef.current.map((piece, index) => (
         <button
           key={piece.label}
@@ -1936,7 +2011,7 @@ function UseCaseCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -2040,7 +2115,7 @@ function MvpCircles() {
       size.current = { w: width, h: height }
       if (held.current === null) {
         cancelAnimationFrame(frame.current)
-        piecesRef.current = mvpRest(height)
+        piecesRef.current = restOnPhone(mvpRest(height), width, height)
         paintAll()
       }
     }
@@ -2097,8 +2172,8 @@ function MvpCircles() {
     const piece = piecesRef.current[index]
     held.current = index
     grab.current = {
-      lx: event.clientX - origin.current.left,
-      ly: event.clientY - origin.current.top,
+      lx: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      ly: (event.clientY - origin.current.top) / boardScale(boardRef.current),
       lt: performance.now(),
     }
     piece.vx = 0
@@ -2113,8 +2188,8 @@ function MvpCircles() {
     if (held.current !== index) return
     const piece = piecesRef.current[index]
     const point = {
-      x: event.clientX - origin.current.left,
-      y: event.clientY - origin.current.top,
+      x: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      y: (event.clientY - origin.current.top) / boardScale(boardRef.current),
     }
     const now = performance.now()
     const dt = Math.max(16, now - grab.current.lt) / 1000
@@ -2148,7 +2223,7 @@ function MvpCircles() {
   }
 
   return (
-    <div className="dark-stage mvp-circles" ref={boardRef}>
+    <PieceStage className="mvp-circles" boardRef={boardRef}>
       {piecesRef.current.map((piece, index) => (
         <button
           key={piece.label}
@@ -2184,7 +2259,7 @@ function MvpCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
@@ -2288,7 +2363,7 @@ function IaCircles() {
       size.current = { w: width, h: height }
       if (held.current === null) {
         cancelAnimationFrame(frame.current)
-        piecesRef.current = iaRest(height)
+        piecesRef.current = restOnPhone(iaRest(height), width, height)
         paintAll()
       }
     }
@@ -2345,8 +2420,8 @@ function IaCircles() {
     const piece = piecesRef.current[index]
     held.current = index
     grab.current = {
-      lx: event.clientX - origin.current.left,
-      ly: event.clientY - origin.current.top,
+      lx: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      ly: (event.clientY - origin.current.top) / boardScale(boardRef.current),
       lt: performance.now(),
     }
     piece.vx = 0
@@ -2361,8 +2436,8 @@ function IaCircles() {
     if (held.current !== index) return
     const piece = piecesRef.current[index]
     const point = {
-      x: event.clientX - origin.current.left,
-      y: event.clientY - origin.current.top,
+      x: (event.clientX - origin.current.left) / boardScale(boardRef.current),
+      y: (event.clientY - origin.current.top) / boardScale(boardRef.current),
     }
     const now = performance.now()
     const dt = Math.max(16, now - grab.current.lt) / 1000
@@ -2396,7 +2471,7 @@ function IaCircles() {
   }
 
   return (
-    <div className="dark-stage ia-circles" ref={boardRef}>
+    <PieceStage className="ia-circles" boardRef={boardRef}>
       {piecesRef.current.map((piece, index) => (
         <button
           key={piece.label}
@@ -2432,7 +2507,7 @@ function IaCircles() {
           {piece.label}
         </button>
       ))}
-    </div>
+    </PieceStage>
   )
 }
 
