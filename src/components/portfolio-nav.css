@@ -342,28 +342,57 @@ html[data-theme="dark"] .portfolio-nav {
     --nav-card-h: 205px;
     --nav-card-gap: 18px;
     --nav-card-pad: 12px 14px;
+    --nav-top-zone: calc(max(16px, env(safe-area-inset-top)) + 54px);
   }
 
   html:not(:has(.project-drawer)) .portfolio-nav-bar {
     top: 0;
-    bottom: auto;
-    flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-    max-height: 100dvh;
     padding: max(16px, env(safe-area-inset-top))
       max(16px, env(safe-area-inset-right)) 16px
       max(16px, env(safe-area-inset-left));
   }
 
-  /* The cards outgrow the screen, so the list scrolls; the inset keeps focus rings. */
+  /* The cards outgrow the screen, so the whole screen scrolls under the controls. */
   html:not(:has(.project-drawer)) .portfolio-nav-panel {
-    align-self: stretch;
-    margin: -4px;
-    padding: 4px;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    box-sizing: border-box;
+    padding: var(--nav-top-zone) max(16px, env(safe-area-inset-right))
+      calc(16px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     overflow-y: auto;
     overscroll-behavior: contain;
+    scroll-padding-block: var(--nav-top-zone) 16px;
     scrollbar-width: none;
+    touch-action: pan-y;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--nav-top-zone));
+    mask-image: linear-gradient(to bottom, transparent, #000 var(--nav-top-zone));
+  }
+
+  /* The shared bottom-edge blur, flipped to sit behind the top controls. */
+  .portfolio-nav-top-blur {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--nav-circle-duration) ease,
+      visibility var(--nav-circle-duration);
+  }
+
+  .portfolio-nav.is-open .portfolio-nav-top-blur {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .portfolio-nav-top-blur.is-absolute .progressive-blur-edge {
+    top: 0;
+    bottom: auto;
+    height: var(--nav-top-zone);
+    transform: scaleY(-1);
+  }
+
+  html:not(:has(.project-drawer)) .portfolio-nav-toggle {
+    z-index: 3;
   }
 
   html:not(:has(.project-drawer)) .portfolio-nav-list {

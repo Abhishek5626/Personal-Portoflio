@@ -146,6 +146,8 @@ export type FisheyeLayout = {
   viewWidth?: number
   /** Left inset of the first column, in design px (phone reveal target). */
   rowInsetX: number
+  /** Shift each horizontal copy vertically, so repeated columns don't line up. */
+  staggerColumns?: boolean
   /** Narrowest / widest horizontal scale applied to x positions and widths. */
   minScale: number
   maxScale: number
@@ -411,6 +413,11 @@ export function ProjectFisheyeField({
       else delete html.dataset.mobileNav
     }
 
+    const columnShift = (placement: Placement) =>
+      layout.staggerColumns
+        ? (placement.copyX * periodY[placement.strip]!) / copies.x
+        : 0
+
     const paint = () => {
       const k = reducedMotion ? 0 : LENS_STRENGTH
       const halfW = viewW * 0.5
@@ -449,7 +456,8 @@ export function ProjectFisheyeField({
           position.y +
             layout.gutterY +
             placement.y +
-            placement.copyY * stripPeriods[placement.strip]!,
+            placement.copyY * stripPeriods[placement.strip]! -
+            columnShift(placement),
           -h,
           -h + periodY[placement.strip]!,
         )
@@ -742,7 +750,8 @@ export function ProjectFisheyeField({
         position.y +
           layout.gutterY +
           placement.y +
-          placement.copyY * stripPeriods[placement.strip]!,
+          placement.copyY * stripPeriods[placement.strip]! -
+          columnShift(placement),
         -placement.h,
         -placement.h + periodY[placement.strip]!,
       )

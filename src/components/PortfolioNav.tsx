@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import type { ProjectId } from './useProjectDrawer.ts'
 import { howIWorkContent } from './howIWorkContent.ts'
 import { portfolioNavItems, type PortfolioNavItem } from './navContent.ts'
+import { ProgressiveBlur } from './ProgressiveBlur.tsx'
 import './portfolio-nav.css'
 
 type PortfolioNavProps = {
@@ -118,12 +119,26 @@ export function PortfolioNav({
           </span>
         </button>
 
+        {onHowIWork ? (
+          <ProgressiveBlur mode="absolute" className="portfolio-nav-top-blur" />
+        ) : null}
+
         <nav
           id="portfolio-nav-panel"
           className="portfolio-nav-panel"
           aria-labelledby={titleId}
           aria-hidden={!open}
           {...(!open ? { inert: true } : {})}
+          // The phone panel covers the scrim, so its empty space must close too.
+          onClick={(event) => {
+            if (
+              onHowIWork &&
+              event.target instanceof Element &&
+              !event.target.closest('.portfolio-nav-card')
+            ) {
+              closeMenu()
+            }
+          }}
         >
           <p id={titleId} className="visually-hidden">
             Site navigation

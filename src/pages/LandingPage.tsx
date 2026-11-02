@@ -588,46 +588,38 @@ const fisheyeLayout: FisheyeLayout = {
 }
 
 /**
- * Phone sheet, drawn at 393px: three 320px columns with 18px gaps, so about
- * 39px of the next column shows. Heights are the Figma mobile frame's. Item
- * numbers follow the field's child order, which is the Figma card order. Rows
- * start 61px down so the first clears the nav, yet the loop seam stays 18px.
+ * Phone sheet, drawn at 393px. One 320px column in the exact top-to-bottom
+ * order of Figma node 92-2, repeated across the sheet with each repeat shifted
+ * vertically, so every column reads in that order. Rows start 61px down so the
+ * first clears the nav, yet the loop seam stays 18px. Design Strategy isn't in
+ * the frame; it sits last so it never interrupts the Figma sequence.
  */
 const phoneFisheyeLayout: FisheyeLayout = {
   viewWidth: 393,
   rowInsetX: 16,
-  width: 1014,
+  staggerColumns: true,
+  width: 338,
   gutterX: 0,
   gutterY: 9,
   minScale: 0.8,
   maxScale: 1.45,
   strips: [
     {
-      height: 1261,
+      height: 3556,
       items: [
-        { item: 0, x: 16, y: 61, w: 320, h: 240 },
-        { item: 1, x: 16, y: 319, w: 320, h: 321 },
-        { item: 2, x: 16, y: 658, w: 320, h: 323 },
-        { item: 3, x: 16, y: 999, w: 320, h: 323 },
-      ],
-    },
-    {
-      height: 1101,
-      items: [
-        { item: 4, x: 354, y: 61, w: 320, h: 323 },
-        { item: 5, x: 354, y: 402, w: 320, h: 534 },
-        { item: 6, x: 354, y: 954, w: 320, h: 208 },
-      ],
-    },
-    {
-      height: 1158,
-      items: [
-        { item: 7, x: 692, y: 61, w: 320, h: 158 },
-        { item: 8, x: 692, y: 237, w: 320, h: 158 },
-        { item: 9, x: 692, y: 413, w: 320, h: 158 },
-        { item: 10, x: 692, y: 589, w: 320, h: 212 },
-        { item: 11, x: 692, y: 819, w: 320, h: 191 },
-        { item: 12, x: 692, y: 1028, w: 320, h: 191 },
+        { item: 0, x: 16, y: 61, w: 320, h: 240 }, // 1 Hero
+        { item: 1, x: 16, y: 319, w: 320, h: 321 }, // 2 About Me
+        { item: 2, x: 16, y: 658, w: 320, h: 323 }, // 3 Designer OS
+        { item: 3, x: 16, y: 999, w: 320, h: 323 }, // 4 Gen-Z Learning Platform
+        { item: 4, x: 16, y: 1340, w: 320, h: 323 }, // 5 Enterprise QA Platform
+        { item: 5, x: 16, y: 1681, w: 320, h: 208 }, // 6 Tools
+        { item: 6, x: 16, y: 1907, w: 320, h: 158 }, // 7 Building in Code
+        { item: 7, x: 16, y: 2083, w: 320, h: 158 }, // 8 Designing AI Product
+        { item: 8, x: 16, y: 2259, w: 320, h: 158 }, // 9 Storytelling + Play
+        { item: 9, x: 16, y: 2435, w: 320, h: 212 }, // 10 Testimonial
+        { item: 10, x: 16, y: 2665, w: 320, h: 191 }, // 11 Current
+        { item: 11, x: 16, y: 2874, w: 320, h: 191 }, // 12 Music
+        { item: 12, x: 16, y: 3083, w: 320, h: 534 }, // Design Strategy
       ],
     },
   ],
@@ -1176,8 +1168,8 @@ function HoverCard({
 
 /*
   Phone layout, Figma "Portfolio 2026" node 92-2 (iPhone 16, 393px): the same
-  cards in the Figma order, read column by column on a two-axis fisheye sheet
-  that loops every way, with the menu top-left and the toggle top-right.
+  cards in the Figma order down every column of a two-axis fisheye sheet that
+  loops every way, with the menu top-left and the toggle top-right.
 */
 const mobileLayoutQuery = '(max-width: 760px)'
 
@@ -1339,7 +1331,6 @@ export function LandingPage() {
               activeProject={projectId}
               onOpenProject={openProject}
             />
-            <DesignStrategyCard />
             <ProjectCard card={landingCards.toolsShipped} />
             <ProjectCard card={landingCards.buildingInCode} />
             <ProjectCard card={landingCards.designingAiProduct} />
@@ -1347,6 +1338,7 @@ export function LandingPage() {
             <TestimonialCard />
             <WorkExperienceCard />
             <MusicCard />
+            <DesignStrategyCard />
           </ProjectFisheyeField>
         </main>
         ) : (
