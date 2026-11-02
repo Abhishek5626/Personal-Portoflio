@@ -1134,6 +1134,97 @@
   height: auto;
 }
 
+/* Framer's module panel, between Product Vision and Product Strategy. */
+.cs1-course-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  box-sizing: border-box;
+  padding: 32px;
+}
+
+.cs1-course-tabs {
+  display: flex;
+  gap: 10px;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cs1-course-tab {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border-radius: 8px;
+  color: #7a7a7a;
+  font: 500 15px/18px Inter, sans-serif;
+  letter-spacing: -0.6px;
+}
+
+.cs1-course-tab.is-active {
+  background: #5e5e5e;
+  color: #fff;
+}
+
+.cs1-course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  width: 100%;
+}
+
+.cs1-course-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 207px;
+  box-sizing: border-box;
+  padding: 14px;
+  border-radius: 12px;
+  background: #0b031a;
+}
+
+.cs1-course-media {
+  display: grid;
+  flex: 1 1 119px;
+  place-items: center;
+  border-radius: 8px;
+  background: #100917;
+}
+
+.cs1-course-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cs1-course-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs1-course-label {
+  color: #9ba1a5;
+  font: 500 14px/21px Satoshi, Inter, sans-serif;
+}
+
+.cs1-course-title {
+  color: #fff;
+  font: 500 17px/27px Inter, sans-serif;
+  letter-spacing: -0.68px;
+}
+
+.cs1-course-chevron {
+  display: block;
+  flex: 0 0 auto;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
 .cs1-modules-stage {
   padding: 32px;
   background: rgba(235, 235, 235, 0.79);
@@ -2003,6 +2094,11 @@ html[data-theme='dark'] .cs1-results-body > p {
     margin-top: var(--cs1-caption-gap);
   }
 
+  /* Framer sits Product Strategy 20px under the panel. */
+  .cs1 .cs1-owner > .cs1-course-preview + .cs1-owner-split {
+    margin-top: 20px;
+  }
+
   .cs1 .cs1-program {
     gap: 0;
   }
@@ -2678,9 +2774,40 @@ html[data-theme='dark'] .cs1-results-body > p {
   }
 }
 
+@media (max-width: 900px) {
+  .cs1-course-preview {
+    padding: 16px;
+  }
+
+  .cs1-course-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cs1-course-tab {
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  .cs1-course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
 @media (max-width: 560px) {
   .cs1-modules-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Framer also shows three cards at this size. */
+  .cs1-course-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cs1-course-card:nth-child(n + 4) {
+    display: none;
   }
 }
 

@@ -468,6 +468,64 @@ function MapChevron({ direction }: { direction: 'up' | 'down' | 'right' }) {
   )
 }
 
+const coursePreviewTabs = [
+  'UX',
+  'UI',
+  'Design System',
+  'Career',
+  'AI',
+  'Masterclass',
+] as const
+
+/** A static mockup, as on the Framer page: its tabs don't switch the cards. */
+function CoursePreview() {
+  return (
+    <figure
+      className="cs1-strategy-stage cs1-course-preview"
+      role="img"
+      aria-label="Course dashboard with category tabs for UX, UI, Design System, Career, AI and Masterclass above a grid of Module 1, UX Workflow cards."
+    >
+      <span className="cs1-course-tabs">
+        {coursePreviewTabs.map((tab, index) => (
+          <span
+            key={tab}
+            className={index === 0 ? 'cs1-course-tab is-active' : 'cs1-course-tab'}
+          >
+            {tab}
+          </span>
+        ))}
+      </span>
+      <span className="cs1-course-grid">
+        {Array.from({ length: 6 }, (_, index) => (
+          <span key={index} className="cs1-course-card">
+            <span className="cs1-course-media">
+              <svg width="50" height="50" viewBox="0 0 40 40" fill="none">
+                <circle cx="20.24" cy="19.76" r="19.38" fill="#2D2D2D" stroke="#525252" strokeWidth="0.76" />
+                <path d="M12.64 12.16a3.8 3.8 0 0 1 3.8-3.8h3.8v7.6h-3.8a3.8 3.8 0 0 1-3.8-3.8Z" fill="#F24E1E" />
+                <path d="M20.24 8.36h3.8a3.8 3.8 0 0 1 0 7.6h-3.8v-7.6Z" fill="#FF7262" />
+                <path d="M12.64 19.76a3.8 3.8 0 0 1 3.8-3.8h3.8v7.6h-3.8a3.8 3.8 0 0 1-3.8-3.8Z" fill="#A259FF" />
+                <circle cx="24.04" cy="19.76" r="3.8" fill="#1ABCFE" />
+                <path d="M16.44 31.16a3.8 3.8 0 0 0 3.8-3.8v-3.8h-3.8a3.8 3.8 0 0 0 0 7.6Z" fill="#0ACF83" />
+              </svg>
+            </span>
+            <span className="cs1-course-meta">
+              <span className="cs1-course-copy">
+                <span className="cs1-course-label">Module 1</span>
+                <span className="cs1-course-title">UX Workflow</span>
+              </span>
+              <span className="cs1-course-chevron">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M15.25 10.75 12 14.25l-3.25-3.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </span>
+          </span>
+        ))}
+      </span>
+    </figure>
+  )
+}
+
 function ProgramFeatures() {
   return (
     <section className="cs1-program" aria-label="Program features">
@@ -649,207 +707,6 @@ function ResultsNextSteps() {
   )
 }
 
-const moduleFilters = [
-  'All',
-  'UX Research',
-  'Case Study',
-  'AI',
-  'Design System',
-  'UI',
-  'UX',
-] as const
-
-type ModuleFilter = (typeof moduleFilters)[number]
-
-type CourseModule = {
-  id: string
-  number: string
-  title: string
-  category: Exclude<ModuleFilter, 'All'>
-  image: string
-  imageWidth: number
-  imageHeight: number
-  alt: string
-}
-
-const courseModules: CourseModule[] = [
-  {
-    id: 'case-study-1',
-    number: '1',
-    title: 'Case Study 1 – With Guidance',
-    category: 'Case Study',
-    image: '/case-study-1/hub-card-case-study.png',
-    imageWidth: 536,
-    imageHeight: 213,
-    alt: 'Collaborative case study document with Abhishek and Shreyasii cursors.',
-  },
-  {
-    id: 'chatgpt',
-    number: '1',
-    title: 'AI Research with ChatGPT',
-    category: 'AI',
-    image: '/case-study-1/hub-card-chatgpt.png',
-    imageWidth: 536,
-    imageHeight: 213,
-    alt: 'ChatGPT prompt card asking for a four-week UX research plan.',
-  },
-  {
-    id: 'interviews',
-    number: '1',
-    title: 'Stakeholder Interviews',
-    category: 'UX Research',
-    image: '/case-study-1/hub-card-interviews.png',
-    imageWidth: 536,
-    imageHeight: 213,
-    alt: 'Video call window with stakeholder avatars for an interview session.',
-  },
-  {
-    id: 'foundation',
-    number: '1',
-    title: 'UX Foundation',
-    category: 'UX',
-    image: '/case-study-1/hub-card-foundation.png',
-    imageWidth: 512,
-    imageHeight: 203,
-    alt: 'Purple chips labeled Core Product Statement and User Personas.',
-  },
-  {
-    id: 'design-system',
-    number: '1',
-    title: 'Building an MVP Design System',
-    category: 'Design System',
-    image: '/case-study-1/hub-card-design-system.jpg',
-    imageWidth: 512,
-    imageHeight: 203,
-    alt: 'Design system canvas with tooltip, status, and pagination components.',
-  },
-  {
-    id: 'buttons',
-    number: '1',
-    title: 'Button Components & Interaction States',
-    category: 'UI',
-    image: '/case-study-1/hub-card-buttons.png',
-    imageWidth: 512,
-    imageHeight: 203,
-    alt: 'Primary, outlined, and text Button CTA variants on a dark field.',
-  },
-]
-
-const modulesPageSize = 6
-
-function CourseModulesBoard() {
-  const [filter, setFilter] = useState<ModuleFilter>('All')
-  const [visibleCount, setVisibleCount] = useState(modulesPageSize)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-
-  const filtered =
-    filter === 'All'
-      ? courseModules
-      : courseModules.filter((module) => module.category === filter)
-  const visible = filtered.slice(0, visibleCount)
-  const canLoadMore = visibleCount < filtered.length
-
-  useEffect(() => {
-    setVisibleCount(modulesPageSize)
-    setExpandedId(null)
-  }, [filter])
-
-  return (
-    <div className="cs1-modules" aria-label="Course modules">
-      <div
-        className="cs1-modules-filters"
-        role="tablist"
-        aria-label="Module categories"
-      >
-        {moduleFilters.map((item) => {
-          const selected = filter === item
-          return (
-            <button
-              key={item}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              className={
-                selected
-                  ? 'cs1-modules-filter is-active'
-                  : 'cs1-modules-filter'
-              }
-              onClick={() => setFilter(item)}
-            >
-              {item}
-            </button>
-          )
-        })}
-      </div>
-
-      <ul className="cs1-modules-grid">
-        {visible.map((module) => {
-          const expanded = expandedId === module.id
-          return (
-            <li key={module.id} className="cs1-modules-card">
-              <div className="cs1-modules-media">
-                <img
-                  src={module.image}
-                  alt={module.alt}
-                  width={module.imageWidth}
-                  height={module.imageHeight}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="cs1-modules-meta">
-                <div className="cs1-modules-copy">
-                  <p className="cs1-modules-number">{module.number}</p>
-                  <h3 className="cs1-modules-title">{module.title}</h3>
-                  {expanded ? (
-                    <p className="cs1-modules-category">{module.category}</p>
-                  ) : null}
-                </div>
-                <button
-                  type="button"
-                  className={
-                    expanded
-                      ? 'cs1-modules-chevron is-open'
-                      : 'cs1-modules-chevron'
-                  }
-                  aria-expanded={expanded}
-                  aria-label={
-                    expanded
-                      ? `Hide category for ${module.title}`
-                      : `Show category for ${module.title}`
-                  }
-                  onClick={() =>
-                    setExpandedId(expanded ? null : module.id)
-                  }
-                >
-                  <span aria-hidden="true" />
-                </button>
-              </div>
-            </li>
-          )
-        })}
-      </ul>
-
-      {filtered.length === 0 ? (
-        <p className="cs1-modules-empty">No modules in this category yet.</p>
-      ) : null}
-
-      <button
-        type="button"
-        className="cs1-modules-more"
-        disabled={!canLoadMore}
-        aria-disabled={!canLoadMore}
-        onClick={() => {
-          if (!canLoadMore) return
-          setVisibleCount((count) => count + modulesPageSize)
-        }}
-      >
-        Load More
-      </button>
-    </div>
-  )
-}
-
 function StrategyFeatures() {
   return (
     <section className="cs1-strategy" aria-labelledby="strategy-title">
@@ -879,10 +736,6 @@ function StrategyFeatures() {
           decoding="async"
         />
       </figure>
-
-      <div className="cs1-strategy-stage cs1-modules-stage">
-        <CourseModulesBoard />
-      </div>
 
       <div className="cs1-strategy-split">
         <p>Course Modules Section</p>
@@ -1193,6 +1046,7 @@ export function CaseStudy1() {
               designers with mentorship, community, and technical skills.
             </p>
           </div>
+          <CoursePreview />
           <div className="cs1-owner-split">
             <p>Product Strategy</p>
             <p>
