@@ -95,11 +95,6 @@ export function startPageLoader(root: HTMLElement) {
     }
     loader.remove()
     delete html.dataset.loader
-    try {
-      sessionStorage.setItem('page-loader-seen', '1')
-    } catch {
-      // Without storage the loader simply shows again next load.
-    }
     finish()
   }
 
