@@ -327,14 +327,14 @@ html:has(.landing-page.is-fisheye-page) {
   }
 
   /*
-    The real toggle, scaled as one piece to the frame's 38px height. It sits
-    under the open menu's scrim (60), so the two never overlap.
+    The real toggle, scaled as one piece to the frame's 38px height. It stays
+    above the open menu's scrim (60), as in Figma node 106-774.
   */
   .mobile-theme-toggle {
     position: fixed;
     top: max(16px, env(safe-area-inset-top));
     right: max(16px, env(safe-area-inset-right));
-    z-index: 50;
+    z-index: 61;
     width: 68px;
     height: 38px;
     margin: 0;

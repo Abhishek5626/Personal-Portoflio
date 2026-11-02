@@ -16,6 +16,7 @@ import { TestimonialCard } from '../components/TestimonialCard.tsx'
 import { WorkExperienceCard } from '../components/WorkExperienceCard.tsx'
 import { PortfolioNav } from '../components/PortfolioNav.tsx'
 import { ProgressiveBlur } from '../components/ProgressiveBlur.tsx'
+import { HowIWorkDialog } from '../components/HowIWorkDialog.tsx'
 import { ProjectDrawer } from '../components/ProjectDrawer.tsx'
 import {
   projectFromHash,
@@ -1240,6 +1241,7 @@ export function LandingPage() {
   const markEntranceDone = useCallback(() => setEntranceDone(true), [])
   useCardEntrance(pageRef, markEntranceDone)
   const isMobile = useMobileLayout()
+  const [howIWorkOpener, setHowIWorkOpener] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     if (drawerPresent) return
@@ -1317,7 +1319,10 @@ export function LandingPage() {
           >
             <MobileHero />
             <div id="about">
-              <AboutMeCard content={aboutMeCard} />
+              <AboutMeCard
+                content={aboutMeCard}
+                onHowIWork={setHowIWorkOpener}
+              />
             </div>
             <ProjectCard
               card={landingCards.titleColumnTop}
@@ -1392,7 +1397,14 @@ export function LandingPage() {
       <ProjectPointerBadge />
       {!drawerPresent ? <ProgressiveBlur mode="fixed" /> : null}
       {isMobile && !drawerPresent ? <MobileThemeToggle /> : null}
+      {howIWorkOpener ? (
+        <HowIWorkDialog
+          opener={howIWorkOpener}
+          onClose={() => setHowIWorkOpener(null)}
+        />
+      ) : null}
       <PortfolioNav
+        onHowIWork={isMobile && !drawerPresent ? setHowIWorkOpener : undefined}
         activeProject={projectId}
         onOpenProject={open}
         onCloseProject={close}

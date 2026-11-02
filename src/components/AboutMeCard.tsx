@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { ReactNode } from 'react'
 import type { AboutPlaceId } from '../pages/landingContent.ts'
+import { howIWorkContent } from './howIWorkContent.ts'
 
 export type AboutMeCardContent = {
   label: string
@@ -18,7 +19,7 @@ export type AboutMeCardContent = {
   }>
 }
 
-function ApertureMark() {
+export function ApertureMark() {
   return (
     <span className="project-card-icon" aria-hidden="true">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -95,7 +96,14 @@ function PlaceMark({ id, label }: { id: AboutPlaceId; label: string }) {
   )
 }
 
-export function AboutMeCard({ content }: { content: AboutMeCardContent }) {
+export function AboutMeCard({
+  content,
+  onHowIWork,
+}: {
+  content: AboutMeCardContent
+  /** Phone layout only (Figma node 106-1100). */
+  onHowIWork?: (opener: HTMLElement) => void
+}) {
   return (
     <article className="about-me-card" data-hover-tile="" data-repel="">
       <div className="about-me-surface">
@@ -104,6 +112,15 @@ export function AboutMeCard({ content }: { content: AboutMeCardContent }) {
             <ApertureMark />
             {content.label}
           </span>
+          {onHowIWork ? (
+            <button
+              type="button"
+              className="about-me-how-i-work"
+              onClick={(event) => onHowIWork(event.currentTarget)}
+            >
+              {howIWorkContent.title}
+            </button>
+          ) : null}
         </span>
         <span className="about-me-photo">
           <img

@@ -11,24 +11,31 @@
 }
 
 .portfolio-nav {
-  --nav-tile: #262626;
-  --nav-tile-hover: #303030;
-  --nav-tile-active: #3a3a3a;
-  --nav-ink: #ffffff;
+  --nav-tile: #f0f1f6;
+  --nav-tile-hover: #f3f4f8;
+  --nav-tile-chip: var(--theme-surface);
+  --nav-card-edge: rgb(255 255 255 / 0.7);
+  --nav-noise: 0.14;
   /* Framer springs: cards duration 1 / bounce 0.2; circle duration 0.4 / bounce 0.2 */
   --nav-card-ease: cubic-bezier(0.22, 1.4, 0.36, 1);
   --nav-card-duration: 1s;
   --nav-circle-ease: cubic-bezier(0.22, 1.35, 0.36, 1);
   --nav-circle-duration: 0.4s;
-  --nav-scrim: rgba(18, 18, 18, 0.93);
-  /* Measured from Unusual Navi desktop open (1280×800) */
+  --nav-scrim: color-mix(in srgb, var(--theme-border-strong) 62%, transparent);
   --nav-bar-pad: 44px;
-  --nav-bar-gap: 24px;
-  --nav-card-gap: 12px;
-  --nav-card-w: 150px;
-  --nav-card-h: 180px;
-  --nav-card-pad: 20px;
-  --nav-card-radius: 16px;
+  --nav-toggle-w: 38px;
+  /* Figma "Desktop - 2": 194×207 cards, 18px apart, shrinking to fit. */
+  --nav-bar-gap: 18px;
+  --nav-card-gap: 18px;
+  --nav-card-w: min(
+    194px,
+    calc(
+      (100vw - var(--nav-bar-pad) * 2 - var(--nav-toggle-w) - var(--nav-bar-gap) - var(--nav-card-gap) * 3) / 4
+    )
+  );
+  --nav-card-h: calc(var(--nav-card-w) * 207 / 194);
+  --nav-card-pad: 12px 13px;
+  --nav-card-radius: 8px;
 
   position: fixed;
   inset: 0;
@@ -36,12 +43,21 @@
   pointer-events: none;
 }
 
+html[data-theme="dark"] .portfolio-nav {
+  --nav-tile: var(--theme-surface);
+  --nav-tile-hover: var(--theme-border);
+  --nav-tile-chip: var(--theme-chip);
+  --nav-card-edge: var(--theme-border);
+  --nav-noise: 0.1;
+  --nav-scrim: color-mix(in srgb, var(--theme-page) 62%, transparent);
+}
+
 .portfolio-nav-scrim {
   position: absolute;
   inset: 0;
-  background: rgba(18, 18, 18, 0);
-  backdrop-filter: blur(0);
-  -webkit-backdrop-filter: blur(0);
+  background: transparent;
+  backdrop-filter: blur(0) saturate(1);
+  -webkit-backdrop-filter: blur(0) saturate(1);
   opacity: 0;
   transition:
     background-color var(--nav-card-duration) var(--nav-card-ease),
@@ -53,8 +69,8 @@
 
 .portfolio-nav.is-open .portfolio-nav-scrim {
   background: var(--nav-scrim);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(25px) saturate(1.3);
+  -webkit-backdrop-filter: blur(25px) saturate(1.3);
   opacity: 1;
   pointer-events: auto;
 }
@@ -183,6 +199,8 @@
 }
 
 .portfolio-nav-card {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -192,16 +210,28 @@
   height: var(--nav-card-h);
   margin: 0;
   padding: var(--nav-card-pad);
-  border: 0;
+  border: 1px solid var(--nav-card-edge);
   border-radius: var(--nav-card-radius);
   background: var(--nav-tile);
-  color: var(--nav-ink);
+  color: var(--theme-text);
   text-align: left;
   cursor: pointer;
   outline: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   transition: background-color 220ms ease, transform 220ms var(--nav-card-ease);
+}
+
+/* Static film grain, kept under the card's content and out of hit-testing. */
+.portfolio-nav-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: var(--nav-noise);
+  pointer-events: none;
 }
 
 .portfolio-nav-card:hover {
@@ -214,74 +244,68 @@
 }
 
 .portfolio-nav-card.is-active {
-  background: var(--nav-tile-active);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+  border-color: var(--theme-text-muted);
 }
 
 .portfolio-nav-card:focus-visible {
-  box-shadow:
-    0 0 0 2px #000,
-    0 0 0 4px #fff;
+  outline: 2px solid var(--theme-text);
+  outline-offset: 2px;
 }
 
 .portfolio-nav-card-icon {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  color: inherit;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--nav-tile-chip);
+  color: var(--theme-text-muted);
+  font-family: Inter, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .portfolio-nav-card-label {
   max-width: 100%;
-  font-family: Inter, sans-serif;
-  font-size: 1.35rem;
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-family: "Aeonik Pro", Inter, sans-serif;
+  color: color-mix(in srgb, var(--theme-text) 85%, transparent);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.2;
   text-wrap: balance;
 }
 
-/* Scale the horizontal row down before it would clip */
+/* The row's cards shrink with the screen before it would clip. */
 @media (max-width: 900px) {
   .portfolio-nav {
     --nav-bar-pad: 28px;
-    --nav-bar-gap: 16px;
-    --nav-card-gap: 10px;
-    --nav-card-w: 120px;
-    --nav-card-h: 144px;
-    --nav-card-pad: 16px;
-    --nav-card-radius: 14px;
-  }
-
-  .portfolio-nav-card-label {
-    font-size: 1.1rem;
   }
 }
 
+/* Phones: a 2x2 grid, since four cards in a row can't fit their labels. */
 @media (max-width: 640px) {
   .portfolio-nav {
     --nav-bar-pad: 16px;
     --nav-bar-gap: 10px;
     --nav-card-gap: 8px;
-    --nav-card-w: min(72px, calc((100vw - 36px - 10px - 32px - 24px) / 4));
-    --nav-card-h: calc(var(--nav-card-w) * 1.2);
+    --nav-card-w: min(
+      194px,
+      calc(
+        (100vw - var(--nav-bar-pad) * 2 - var(--nav-toggle-w) - var(--nav-bar-gap) - var(--nav-card-gap)) / 2
+      )
+    );
     --nav-card-pad: 10px;
-    --nav-card-radius: 12px;
   }
 
-  .portfolio-nav-card-icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .portfolio-nav-card-icon svg {
-    width: 16px;
-    height: 16px;
+  .portfolio-nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
   }
 
   .portfolio-nav-card-label {
-    font-size: 0.72rem;
+    font-size: 15px;
   }
 }
 
@@ -300,7 +324,9 @@
     transform: none;
   }
 
-  .portfolio-nav-toggle:active .portfolio-nav-toggle-face {
+  .portfolio-nav-toggle:active .portfolio-nav-toggle-face,
+  .portfolio-nav-card:hover,
+  .portfolio-nav-card:active {
     transform: none;
   }
 }
@@ -310,13 +336,43 @@
   away on downward scroll. The case-study drawer keeps the bottom dock.
 */
 @media (max-width: 760px) {
+  /* Figma node 106-774: full-width 205px cards under the plus, 18px apart. */
+  html:not(:has(.project-drawer)) .portfolio-nav {
+    --nav-card-w: 100%;
+    --nav-card-h: 205px;
+    --nav-card-gap: 18px;
+    --nav-card-pad: 12px 14px;
+  }
+
   html:not(:has(.project-drawer)) .portfolio-nav-bar {
     top: 0;
     bottom: auto;
+    flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
+    max-height: 100dvh;
     padding: max(16px, env(safe-area-inset-top))
       max(16px, env(safe-area-inset-right)) 16px
       max(16px, env(safe-area-inset-left));
+  }
+
+  /* The cards outgrow the screen, so the list scrolls; the inset keeps focus rings. */
+  html:not(:has(.project-drawer)) .portfolio-nav-panel {
+    align-self: stretch;
+    margin: -4px;
+    padding: 4px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  html:not(:has(.project-drawer)) .portfolio-nav-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html:not(:has(.project-drawer)) .portfolio-nav-card-label {
+    font-size: 22px;
   }
 
   html:not(:has(.project-drawer)) .portfolio-nav-toggle,
@@ -357,6 +413,7 @@
 @media (width > 760px) {
   .portfolio-nav {
     --nav-bar-pad: 32px;
+    --nav-toggle-w: 46.8px;
   }
 
   .portfolio-nav-toggle,

@@ -790,6 +790,31 @@ html:not([data-theme="dark"]) .about-me-card .project-card-icon {
   background: var(--landing-glass-fill), var(--theme-chip);
 }
 
+/* Phone layout only, Figma node 106-1100. */
+.about-me-how-i-work {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #2a45c8;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html[data-theme="dark"] .about-me-how-i-work {
+  color: #8ea2ff;
+}
+
+.about-me-how-i-work::after {
+  content: "";
+  position: absolute;
+  inset: -10px -8px;
+}
+
 .about-me-photo {
   position: relative;
   display: block;
