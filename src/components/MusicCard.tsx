@@ -19,59 +19,57 @@ const track = {
   artist: "Gigi D'Agostino",
   videoId: 'uU_B9eZvc0U',
   youtubeUrl: 'https://www.youtube.com/watch?v=uU_B9eZvc0U',
+  artwork: '/landing/music-cover.webp',
   // Shown until the player loads on first use and reports the real length.
   durationSeconds: 230,
 }
 
-const CONTOUR_POINTS = 192
+const SKIP_SECONDS = 10
 
-// Figma's eight-lobed art shape on a 132-unit canvas, clockwise from the top.
-function scallopPoints(radius: number) {
-  return Array.from({ length: CONTOUR_POINTS }, (_, index) => {
-    const angle = (index / CONTOUR_POINTS) * Math.PI * 2
-    const r = radius * (1 + 0.057 * Math.cos(angle * 8))
-    return [66 + r * Math.sin(angle), 66 - r * Math.cos(angle)] as const
+let artworkHue: Promise<{ hue: number; saturation: number } | null> | null = null
+
+/** The artwork's most colourful average, shared by every copy of the card. */
+function readArtworkHue() {
+  artworkHue ??= new Promise((resolve) => {
+    const image = new Image()
+    image.onerror = () => resolve(null)
+    image.onload = () => {
+      try {
+        const size = 16
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        const context = canvas.getContext('2d', { willReadFrequently: true })
+        if (!context) return resolve(null)
+        context.drawImage(image, 0, 0, size, size)
+        const { data } = context.getImageData(0, 0, size, size)
+        let red = 0
+        let green = 0
+        let blue = 0
+        let weight = 0
+        for (let index = 0; index < data.length; index += 4) {
+          const [r, g, b] = [data[index]!, data[index + 1]!, data[index + 2]!]
+          const chroma = Math.max(r, g, b) - Math.min(r, g, b)
+          red += r * chroma
+          green += g * chroma
+          blue += b * chroma
+          weight += chroma
+        }
+        if (weight === 0) return resolve(null)
+        const [r, g, b] = [red / weight, green / weight, blue / weight]
+        const max = Math.max(r, g, b)
+        const chroma = max - Math.min(r, g, b)
+        if (chroma === 0) return resolve(null)
+        const sector =
+          max === r ? ((g - b) / chroma + 6) % 6 : max === g ? (b - r) / chroma + 2 : (r - g) / chroma + 4
+        resolve({ hue: Math.round(sector * 60), saturation: Math.round((chroma / max) * 100) })
+      } catch {
+        resolve(null)
+      }
+    }
+    image.src = track.artwork
   })
-}
-
-function pathFrom(points: readonly (readonly [number, number])[]) {
-  return `M${points.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join('L')}Z`
-}
-
-const contour = scallopPoints(61.5)
-const contourPath = pathFrom(contour)
-const artFill = pathFrom(scallopPoints(50))
-
-// Distance along the contour at each point, ending back at the top.
-const contourLengths = contour.reduce(
-  (lengths, [x, y], index) => {
-    const [nextX, nextY] = contour[(index + 1) % CONTOUR_POINTS]!
-    lengths.push(lengths[index]! + Math.hypot(nextX - x, nextY - y))
-    return lengths
-  },
-  [0],
-)
-const contourLength = contourLengths[CONTOUR_POINTS]!
-
-function contourPoint(ratio: number) {
-  const target = ratio * contourLength
-  let index = 0
-  while (index < CONTOUR_POINTS - 1 && contourLengths[index + 1]! < target) {
-    index += 1
-  }
-  const start = contourLengths[index]!
-  const along = (target - start) / (contourLengths[index + 1]! - start)
-  const [x, y] = contour[index]!
-  const [nextX, nextY] = contour[(index + 1) % CONTOUR_POINTS]!
-  return { x: x + (nextX - x) * along, y: y + (nextY - y) * along }
-}
-
-// Each contour point sits at its own angle, so a pointer's angle finds its place.
-function contourRatioAtAngle(angle: number) {
-  const position = (((angle / (Math.PI * 2)) % 1) + 1) % 1 * CONTOUR_POINTS
-  const index = Math.floor(position)
-  const start = contourLengths[index]!
-  return (start + (contourLengths[index + 1]! - start) * (position - index)) / contourLength
+  return artworkHue
 }
 
 type PlayerStatus = 'idle' | 'loading' | 'ready' | 'unavailable'
@@ -111,39 +109,49 @@ function PauseBars() {
   )
 }
 
-function ContourSeek({
+function SkipBackIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6h2v12H6zM20 6l-10 6 10 6z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function SkipForwardIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M16 6h2v12h-2zM4 6l10 6-10 6z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function ProgressSeek({
   progress,
+  playing,
   disabled,
   labelledBy,
-  clipId,
   onSeek,
 }: {
   progress: number
+  playing: boolean
   disabled: boolean
   labelledBy: string
-  clipId: string
   onSeek: (ratio: number) => void
 }) {
-  const artRef = useRef<SVGSVGElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
   const draggingRef = useRef(false)
-  const lastRatioRef = useRef(0)
+  const pressProgressRef = useRef(0)
   const [dragging, setDragging] = useState(false)
 
-  const ratioFromPointer = (clientX: number, clientY: number) => {
-    const art = artRef.current
-    if (!art) {
+  const ratioFromClientX = (clientX: number) => {
+    const rect = trackRef.current?.getBoundingClientRect()
+    if (!rect || rect.width <= 0) {
       return 0
     }
-    const rect = art.getBoundingClientRect()
-    return contourRatioAtAngle(
-      Math.atan2(
-        clientX - (rect.left + rect.width / 2),
-        rect.top + rect.height / 2 - clientY,
-      ),
-    )
+    return clamp((clientX - rect.left) / rect.width, 0, 1)
   }
 
-  const finishPointer = (event: ReactPointerEvent<SVGSVGElement>) => {
+  const finishPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!draggingRef.current) {
       return
     }
@@ -155,20 +163,19 @@ function ContourSeek({
   }
 
   const played = clamp(progress, 0, 1)
-  const playhead = contourPoint(played)
+  const percent = `${played * 100}%`
 
   return (
-    <svg
-      ref={artRef}
+    <div
+      ref={trackRef}
       className={[
-        'music-card-art',
         'music-card-seek',
         dragging ? 'is-dragging' : '',
+        playing ? 'is-playing' : '',
         disabled ? 'is-disabled' : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      viewBox="0 0 132 132"
       role="slider"
       tabIndex={disabled ? -1 : 0}
       aria-valuemin={0}
@@ -177,34 +184,35 @@ function ContourSeek({
       aria-valuetext={`${Math.round(played * 100)}% through the track`}
       aria-labelledby={labelledBy}
       aria-disabled={disabled || undefined}
-      data-fisheye-drag-axis="both"
+      data-fisheye-drag-axis="x"
       onPointerDown={(event) => {
         if (disabled || event.button !== 0) {
           return
         }
         event.preventDefault()
+        pressProgressRef.current = progress
         draggingRef.current = true
         setDragging(true)
         event.currentTarget.setPointerCapture(event.pointerId)
-        lastRatioRef.current = ratioFromPointer(event.clientX, event.clientY)
-        onSeek(lastRatioRef.current)
+        onSeek(ratioFromClientX(event.clientX))
       }}
       onPointerMove={(event) => {
-        if (!draggingRef.current) {
-          return
+        if (draggingRef.current) {
+          onSeek(ratioFromClientX(event.clientX))
         }
-        const ratio = ratioFromPointer(event.clientX, event.clientY)
-        // Crossing the top would jump between the track's start and end.
-        if (Math.abs(ratio - lastRatioRef.current) > 0.5) {
-          return
-        }
-        lastRatioRef.current = ratio
-        onSeek(ratio)
       }}
       onPointerUp={finishPointer}
       onPointerCancel={finishPointer}
-      onLostPointerCapture={finishPointer}
-      onKeyDown={(event: KeyboardEvent<SVGSVGElement>) => {
+      onLostPointerCapture={(event) => {
+        // The page's drag took over (a vertical drag began here): undo the
+        // press-to-seek so panning never skips the track.
+        if (!draggingRef.current) {
+          return
+        }
+        onSeek(pressProgressRef.current)
+        finishPointer(event)
+      }}
+      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
         if (disabled) {
           return
         }
@@ -224,32 +232,12 @@ function ContourSeek({
         }
       }}
     >
-      <clipPath id={clipId}>
-        <path d={artFill} />
-      </clipPath>
-      <path className="music-card-art-ring" d={contourPath} />
-      <image
-        href="/landing/music-cover.webp"
-        x="-20"
-        y="-146"
-        width="165"
-        height="295"
-        clipPath={`url(#${clipId})`}
-      />
-      <path
-        className="music-card-contour-played"
-        d={contourPath}
-        pathLength={1}
-        strokeDasharray={`${played} 1`}
-      />
-      <circle
-        className="music-card-playhead"
-        cx={playhead.x}
-        cy={playhead.y}
-        r="6"
-      />
-      <path className="music-card-contour-hit" d={contourPath} />
-    </svg>
+      <span className="music-card-line" aria-hidden="true">
+        <span className="music-card-wave" style={{ width: percent }} />
+        <span className="music-card-rest" style={{ left: percent }} />
+        <span className="music-card-thumb" style={{ left: percent }} />
+      </span>
+    </div>
   )
 }
 
@@ -258,8 +246,8 @@ export function MusicCard() {
   const hostId = `music-yt-host-${reactId.replace(/:/g, '')}`
   const titleId = `music-card-title-${reactId.replace(/:/g, '')}`
   const statusId = `music-card-status-${reactId.replace(/:/g, '')}`
-  const artClipId = `music-card-art-${reactId.replace(/\W/g, '')}`
 
+  const cardRef = useRef<HTMLElement>(null)
   const playerRef = useRef<YouTubePlayer | null>(null)
   const shellRef = useRef<HTMLDivElement>(null)
   const tickerRef = useRef<number | null>(null)
@@ -320,6 +308,21 @@ export function MusicCard() {
     }
     tick()
   })
+
+  useEffect(() => {
+    let current = true
+    void readArtworkHue().then((color) => {
+      const card = cardRef.current
+      if (!current || !color || !card) return
+      // Fixed lightness keeps the dark icon on the accent readable for any artwork.
+      const saturation = clamp(color.saturation, 25, 60)
+      card.style.setProperty('--music-accent', `hsl(${color.hue} ${saturation}% 80%)`)
+      card.style.setProperty('--music-accent-ink', `hsl(${color.hue} ${saturation}% 14%)`)
+    })
+    return () => {
+      current = false
+    }
+  }, [])
 
   useEffect(() => {
     if (!playerWanted) return
@@ -535,6 +538,12 @@ export function MusicCard() {
     }
   }
 
+  const skipBy = (seconds: number) => {
+    if (duration > 0) {
+      seekToRatio((currentTime + seconds) / duration)
+    }
+  }
+
   const togglePlayback = () => {
     if (status === 'unavailable') {
       return
@@ -564,35 +573,29 @@ export function MusicCard() {
   }
 
   return (
-    <article className="music-card" data-hover-tile="" data-repel="">
+    <article ref={cardRef} className="music-card" data-hover-tile="" data-repel="">
       <div className="music-card-surface">
         <img
-          className="music-card-photo"
-          src="/landing/music-cover.webp"
+          className="music-card-art"
+          src={track.artwork}
           alt=""
-          width={477}
-          height={851}
+          width={335}
+          height={597}
+          decoding="async"
         />
         <div className="music-card-heading">
           <span className="music-card-icon" aria-hidden="true">
             <img src="/landing/music-aperture.svg" alt="" width={14} height={14} />
           </span>
           <h2 className="music-card-label">My Fav Music</h2>
-        </div>
-        <ContourSeek
-          progress={progress}
-          disabled={!canSeek}
-          labelledBy={titleId}
-          clipId={artClipId}
-          onSeek={seekToRatio}
-        />
-        <div className="music-card-body">
           <div className="music-card-times">
             <span>{formatTime(currentTime)}</span>
             <span className="music-card-duration">
               {duration > 0 ? formatTime(duration) : '--:--'}
             </span>
           </div>
+        </div>
+        <div className="music-card-track">
           <div className="music-card-meta">
             <p id={titleId} className="music-card-title">
               {track.title}
@@ -621,15 +624,44 @@ export function MusicCard() {
               )}
             </button>
           )}
-          {errorMessage ? (
-            <p className="music-card-error" role="status">
-              {errorMessage}{' '}
-              <a href={track.youtubeUrl} target="_blank" rel="noreferrer">
-                Open on YouTube
-              </a>
-            </p>
-          ) : null}
         </div>
+        {errorMessage ? (
+          <p className="music-card-error" role="status">
+            {errorMessage}{' '}
+            <a href={track.youtubeUrl} target="_blank" rel="noreferrer">
+              Open on YouTube
+            </a>
+          </p>
+        ) : null}
+        {status === 'unavailable' ? null : (
+          <div className="music-card-controls">
+            <button
+              type="button"
+              className="music-card-skip"
+              aria-label={`Back ${SKIP_SECONDS} seconds`}
+              disabled={!canSeek}
+              onClick={() => skipBy(-SKIP_SECONDS)}
+            >
+              <SkipBackIcon />
+            </button>
+            <ProgressSeek
+              progress={progress}
+              playing={playing}
+              disabled={!canSeek}
+              labelledBy={titleId}
+              onSeek={seekToRatio}
+            />
+            <button
+              type="button"
+              className="music-card-skip"
+              aria-label={`Forward ${SKIP_SECONDS} seconds`}
+              disabled={!canSeek}
+              onClick={() => skipBy(SKIP_SECONDS)}
+            >
+              <SkipForwardIcon />
+            </button>
+          </div>
+        )}
       </div>
       <div ref={shellRef} className="music-card-yt-host" aria-hidden="true" />
       <p id={statusId} className="visually-hidden" role="status">

@@ -554,6 +554,8 @@ html[data-theme="dark"] .project-card-label.is-display.is-on-light {
   display: flex;
   aspect-ratio: 1;
   min-width: 0;
+  /* Otherwise a browser may grow the square to fit the logo inside it. */
+  min-height: 0;
   padding: 1px;
   border: 1px solid var(--landing-glass-border);
   border-radius: 8px;

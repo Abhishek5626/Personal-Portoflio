@@ -1,3 +1,12 @@
+/* Body copy sits a step under the headings, so the hierarchy reads at a glance. */
+.cs1 {
+  --cs1-body: #3d3d3d;
+}
+
+html[data-theme="dark"] .cs1 {
+  --cs1-body: #c9c9c9;
+}
+
 .cs1 a:focus-visible,
 .cs1 button:focus-visible {
   outline: 2px solid var(--theme-accent);
@@ -58,7 +67,7 @@
 .cs1-title-row p {
   width: 255px;
   flex: 0 0 255px;
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-size: 15px;
   font-weight: 400;
   line-height: 25.5px;
@@ -126,7 +135,7 @@
   width: 509px;
   max-width: 100%;
   margin: 0;
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-family: Inter, sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -303,7 +312,7 @@
 
 .cs1-why-copy p {
   margin: 0;
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-family: Inter, sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -694,7 +703,7 @@
 }
 
 .cs1-problem-copy p {
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-size: 15px;
   font-weight: 400;
   line-height: 25.5px;
@@ -840,14 +849,14 @@
 .cs1-journey-side p,
 .cs1-issue-title {
   margin: 0;
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-size: 15px;
   font-weight: 400;
   line-height: 25.5px;
   letter-spacing: -0.3px;
 }
 
-.cs1-kicker {
+.cs1-journey-side .cs1-kicker {
   margin: 0;
   color: #fa2911;
   font-size: 15px;
@@ -856,8 +865,8 @@
   letter-spacing: -0.3px;
 }
 
-.cs1-issue-title {
-  color: #6e6e6e;
+.cs1-journey-side .cs1-issue-title {
+  color: var(--theme-text-muted);
 }
 
 .cs1-personas {
@@ -1085,7 +1094,7 @@
 
 .cs1-strategy-intro > p:not(.cs1-strategy-eyebrow):not(.cs1-strategy-feature),
 .cs1-strategy-split p:last-child {
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-family: Inter, sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -1525,6 +1534,11 @@
   object-position: center;
 }
 
+/* Phones only: the wide board is too small to read, so its panels are sharper images. */
+.cs1-bento-grid {
+  display: none;
+}
+
 .cs1-program-phase {
   display: flex;
   align-items: flex-start;
@@ -1568,7 +1582,7 @@
 
 .cs1-program-phase-copy > p:last-child,
 .cs1-program-phase.is-flip > p:last-child {
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-family: Inter, sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -1850,7 +1864,7 @@ html[data-theme='dark'] .cs1-results-body > p {
 
 .cs1-owner-head p,
 .cs1-owner-split p:last-child {
-  color: var(--theme-text);
+  color: var(--cs1-body);
   font-family: Inter, sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -2846,5 +2860,367 @@ html[data-theme='dark'] .cs1-results-body > p {
   .cs1-reel-track,
   .cs1-owner-track {
     animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  /* The cover image already holds the portal, so the video would sit unseen behind it. */
+  .cs1-glow {
+    display: none;
+  }
+
+  .cs1-owner-head h2 {
+    white-space: nowrap;
+  }
+
+  .cs1-owner-break,
+  .cs1-bento-still .cs1-bento-wide {
+    display: none;
+  }
+
+  .cs1-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .cs1-bento-grid img {
+    border-radius: 6px;
+  }
+}
+
+.cs1 .cs1-phone-only,
+.cs1-phone-footer {
+  display: none;
+}
+
+/* Phones follow the Framer reference's order, type and colours. */
+@media (max-width: 900px) {
+  .cs1 {
+    --cs1-title: #3b3b3b;
+    --cs1-heading: #171717;
+    --cs1-strong: #292929;
+  }
+
+  html[data-theme="dark"] .cs1 {
+    --cs1-title: var(--theme-text);
+    --cs1-heading: var(--theme-text);
+    --cs1-strong: var(--theme-text);
+  }
+
+  .cs1 .cs1-phone-only {
+    display: block;
+  }
+
+  .cs1 .cs1-desktop-only {
+    display: none;
+  }
+
+  .cs1 .cs1-phone-card {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+  }
+
+  /* Cover */
+  .cs1-frame {
+    border: 1px solid var(--theme-border);
+    background: var(--theme-surface);
+  }
+
+  .cs1-title-row h1 {
+    color: var(--cs1-title);
+  }
+
+  /* Project details */
+  .cs1-facts dt {
+    color: #a3a3a3;
+  }
+
+  .cs1-facts dd {
+    color: var(--cs1-body);
+  }
+
+  .cs1 .cs1-chips {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cs1 .cs1-chips li {
+    flex: none;
+  }
+
+  .cs1-stat-label,
+  .cs1-stat-value {
+    color: var(--cs1-strong);
+  }
+
+  /* Section headings */
+  .cs1-why-head h2,
+  .cs1-problem-head h2,
+  .cs1-journey-head h2,
+  .cs1-owner-head h2,
+  .cs1-strategy-head h2,
+  .cs1-results-head h2,
+  .cs1-request-text h2 {
+    color: var(--cs1-heading);
+    letter-spacing: -0.6px;
+  }
+
+  /* The reactions sit along the review card's bottom edge. */
+  .cs1 .cs1-float.is-a,
+  .cs1 .cs1-float.is-b {
+    top: auto;
+    bottom: -6px;
+    font-size: 34px;
+  }
+
+  .cs1 .cs1-float.is-a {
+    left: 16px;
+  }
+
+  .cs1 .cs1-float.is-b {
+    left: auto;
+    right: 16px;
+  }
+
+  /* Journey map: the column's full width, scaled to whatever that is. */
+  .cs1-board-frame {
+    height: auto;
+    aspect-ratio: 1116 / 740;
+    container-type: inline-size;
+  }
+
+  .cs1 .cs1-board {
+    left: 0;
+    margin-left: 0;
+    transform-origin: top left;
+    transform: scale(calc(100cqi / 1116px));
+  }
+
+  .cs1 .cs1-journey-side .cs1-kicker,
+  .cs1 .cs1-journey-side .cs1-issue-title {
+    font-size: 14px;
+    line-height: 25.2px;
+    letter-spacing: -0.28px;
+  }
+
+  /* Product Owner: vision, its panels, strategy, the board, then the roadmap. */
+  .cs1 .cs1-owner {
+    gap: 26px;
+  }
+
+  .cs1-owner-head {
+    order: 1;
+  }
+
+  .cs1-owner-vision {
+    order: 2;
+  }
+
+  .cs1 .cs1-bento-still {
+    order: 3;
+    margin-top: -6px;
+    border-radius: 12px;
+    background: rgba(235, 235, 235, 0.79);
+  }
+
+  .cs1-owner-strategy {
+    order: 4;
+  }
+
+  .cs1-modules-stage {
+    order: 5;
+    margin-top: -6px;
+  }
+
+  .cs1-program {
+    order: 6;
+  }
+
+  html[data-theme="dark"] .cs1 .cs1-bento-still {
+    background: var(--theme-surface);
+  }
+
+  .cs1 .cs1-bento-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .cs1 .cs1-bento-grid img {
+    border-radius: 12px;
+  }
+
+  .cs1 .cs1-owner-split p:last-child {
+    font-size: 14px;
+    line-height: 25.2px;
+    letter-spacing: -0.28px;
+  }
+
+  .cs1-owner-split p:first-child {
+    color: #707070;
+  }
+
+  html[data-theme="dark"] .cs1-owner-split p:first-child {
+    color: var(--theme-text-muted);
+  }
+
+  /* Roadmap: each phase row leads its own media. */
+  .cs1-program > :nth-child(2) { order: 1; }
+  .cs1-program > :nth-child(1) { order: 2; }
+  .cs1-program > :nth-child(4) { order: 3; }
+  .cs1-program > :nth-child(3) { order: 4; }
+  .cs1-program > :nth-child(6) { order: 5; }
+  .cs1-program > :nth-child(5) { order: 6; }
+
+  .cs1 .cs1-program {
+    gap: 16px;
+    margin-top: 6px;
+  }
+
+  .cs1-program-phase-title {
+    display: none;
+  }
+
+  .cs1 .cs1-program-phase,
+  .cs1 .cs1-program-phase.is-flip {
+    display: grid;
+    grid-template-columns: 131px minmax(0, 1fr);
+    align-items: start;
+    gap: 0;
+  }
+
+  .cs1 .cs1-program-phase-copy {
+    display: contents;
+  }
+
+  .cs1 .cs1-program-phase .cs1-program-phase-label {
+    justify-self: start;
+    width: auto;
+    padding: 2px 4px;
+    border-radius: 2px;
+    background: rgba(235, 235, 235, 0.79);
+    font-size: 12px;
+    line-height: 16.8px;
+    letter-spacing: -0.24px;
+  }
+
+  html[data-theme="dark"] .cs1 .cs1-program-phase .cs1-program-phase-label {
+    background: var(--theme-surface);
+  }
+
+  .cs1 .cs1-program-phase p:last-child {
+    width: auto;
+  }
+
+  /* The live and feature cards stand on the page; other media sits in a stage. */
+  .cs1-program > :nth-child(1) {
+    gap: 10px;
+    padding: 0;
+    background: none;
+  }
+
+  .cs1-program > :nth-child(3),
+  .cs1-program > :nth-child(5) {
+    padding: 12px;
+  }
+
+  .cs1 .cs1-feature-panel {
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .cs1 .cs1-feature-panel img {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+  }
+
+  .cs1 .cs1-feature-caption {
+    padding: 6px 18px 18px;
+  }
+
+  .cs1-program > :nth-child(3) .cs1-feature-caption h3 {
+    font-size: 17px;
+    line-height: 27px;
+    letter-spacing: -0.68px;
+  }
+
+  .cs1-program > :nth-child(3) .cs1-feature-caption p {
+    font-size: 15px;
+    line-height: 24px;
+  }
+
+  .cs1-program > :nth-child(5) .cs1-feature-caption h3 {
+    font-size: 14px;
+    line-height: 27px;
+    letter-spacing: -0.56px;
+  }
+
+  .cs1-program > :nth-child(5) .cs1-feature-caption p {
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: -0.24px;
+  }
+
+  /* Features */
+  .cs1 .cs1-strategy-intro > .cs1-strategy-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16.8px;
+    letter-spacing: -0.24px;
+  }
+
+  .cs1 .cs1-pricing-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 12px;
+  }
+
+  .cs1 .cs1-proof-name {
+    font-size: 14px;
+    letter-spacing: -0.56px;
+  }
+
+  .cs1 .cs1-proof-body {
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: -0.24px;
+  }
+
+  /* Next project */
+  .cs1 .cs1-next-kicker {
+    font-size: 20px;
+    line-height: 34px;
+    letter-spacing: -0.4px;
+  }
+
+  .cs1 .cs1-next-titles h3 {
+    color: var(--cs1-heading);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 25.2px;
+    letter-spacing: -0.28px;
+  }
+
+  .cs1 .cs1-next-titles p {
+    font-size: 14px;
+    line-height: 25.2px;
+    letter-spacing: -0.28px;
+  }
+
+  .cs1-phone-footer {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    margin: 58px auto 0;
+    padding: 0 16px 48px;
   }
 }

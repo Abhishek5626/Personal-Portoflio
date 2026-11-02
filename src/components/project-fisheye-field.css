@@ -155,6 +155,11 @@ html:has(.landing-page.is-fisheye-page) {
   animation: project-fisheye-entrance-failsafe 0s linear 4s forwards;
 }
 
+/* The stall timer only starts counting once the first-load screen has gone. */
+html[data-loader] .is-entrance-pending .project-fisheye-entrance {
+  animation: none;
+}
+
 @keyframes project-fisheye-entrance-failsafe {
   to {
     opacity: 1;
@@ -288,9 +293,9 @@ html:has(.landing-page.is-fisheye-page) {
     line-height: 34px;
   }
 
-  /* Logos keep the frame's size when the card widens on larger phones. */
+  /* Capped so two rows leave the same 16px under the logos as at the sides. */
   .is-mobile-stack .project-fisheye-tile .tool-grid {
-    grid-template-columns: repeat(4, minmax(0, 67px));
+    grid-template-columns: repeat(4, minmax(0, 64px));
     justify-content: space-between;
   }
 

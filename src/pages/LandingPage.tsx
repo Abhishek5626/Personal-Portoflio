@@ -8,6 +8,7 @@ import {
 } from 'react'
 import type { CSSProperties, MouseEvent, ReactNode, RefObject } from 'react'
 import { createPortal } from 'react-dom'
+import { pageLoaderDone, startPageLoader } from '../pageLoader.ts'
 import { AboutMeCard } from '../components/AboutMeCard.tsx'
 import { DesignStrategyCard } from '../components/DesignStrategyCard.tsx'
 import { ShippedBadge } from '../components/ShippedBadge.tsx'
@@ -904,91 +905,105 @@ function useCardEntrance(
     const root = rootRef.current
     if (!root) return
 
-    const stage = root.closest<HTMLElement>('.landing-stage')
-    const reducedMotion = window.matchMedia(reducedMotionQuery)
-    const viewW = window.innerWidth
-    const viewH = window.innerHeight
-    // Only cards on screen at load swoop; off-screen copies just appear.
-    const tiles = Array.from(
-      root.querySelectorAll<HTMLElement>('[data-entrance]'),
-    ).filter((el) => {
-      const rect = el.getBoundingClientRect()
-      return (
-        rect.right > 0 && rect.bottom > 0 && rect.left < viewW && rect.top < viewH
+    const runEntrance = () => {
+      const stage = root.closest<HTMLElement>('.landing-stage')
+      const reducedMotion = window.matchMedia(reducedMotionQuery)
+      const viewW = window.innerWidth
+      const viewH = window.innerHeight
+      // Only cards on screen at load swoop; off-screen copies just appear.
+      const tiles = Array.from(
+        root.querySelectorAll<HTMLElement>('[data-entrance]'),
+      ).filter((el) => {
+        const rect = el.getBoundingClientRect()
+        return (
+          rect.right > 0 && rect.bottom > 0 && rect.left < viewW && rect.top < viewH
+        )
+      })
+
+      const markDone = () => {
+        root.classList.remove('is-entrance-pending')
+        root.classList.add('is-entrance-done')
+        stage?.classList.remove('is-entrance-pending')
+        onDone()
+      }
+
+      // Windows "Animation effects" off → prefers-reduced-motion: reduce → skip swoop.
+      if (reducedMotion.matches || tiles.length === 0) {
+        markDone()
+        return
+      }
+
+      const cx = viewW / 2
+      const cy = viewH / 2
+      const narrow = window.innerWidth < 768
+      const factor = narrow ? 0.55 : entranceOffsetFactor
+      const maxTravel = narrow
+        ? Math.min(window.innerWidth, window.innerHeight) * 0.55
+        : Math.max(window.innerWidth, window.innerHeight) * 0.7
+      const minTravel = narrow ? 96 : 160
+
+      root.classList.remove('is-entrance-done')
+      root.classList.add('is-entrance-pending')
+      stage?.classList.add('is-entrance-pending')
+
+      const animations: Animation[] = tiles.map((el, index) => {
+        const rect = el.getBoundingClientRect()
+        const [ox, oy] = entranceOffset(rect, cx, cy, factor, maxTravel, minTravel)
+        el.getAnimations().forEach((anim) => anim.cancel())
+        return el.animate(
+          [
+            { transform: `translate3d(${ox}px, ${oy}px, 0)`, opacity: 0 },
+            { transform: 'translate3d(0px, 0px, 0)', opacity: 1 },
+          ],
+          {
+            duration: entranceDurationMs,
+            delay: entranceBaseDelayMs + index * entranceStaggerMs,
+            easing: entranceEasing,
+            fill: 'both',
+          },
+        )
+      })
+
+      let cancelled = false
+      const finish = () => {
+        if (cancelled) return
+        cancelled = true
+        window.clearTimeout(failsafe)
+        // Final keyframe is identity, so cancelling lands exactly in place.
+        for (const anim of animations) anim.cancel()
+        markDone()
+      }
+      // Never leave cards hidden if an animation stalls (e.g. a hidden tab).
+      const failsafe = window.setTimeout(
+        finish,
+        entranceBaseDelayMs +
+          tiles.length * entranceStaggerMs +
+          entranceDurationMs +
+          800,
       )
+      void Promise.all(
+        animations.map((anim) => anim.finished.catch(() => undefined)),
+      ).then(finish)
+
+      return () => {
+        // Strict Mode remount: cancel and let the next run replay from hidden
+        // (the pending class keeps the final layout from flashing early).
+        cancelled = true
+        window.clearTimeout(failsafe)
+        for (const anim of animations) anim.cancel()
+      }
+    }
+
+    // The loader goes first; the cards start swooping only once it has gone.
+    startPageLoader(root)
+    let stopEntrance: (() => void) | undefined
+    let disposed = false
+    void pageLoaderDone.then(() => {
+      if (!disposed) stopEntrance = runEntrance()
     })
-
-    const markDone = () => {
-      root.classList.remove('is-entrance-pending')
-      root.classList.add('is-entrance-done')
-      stage?.classList.remove('is-entrance-pending')
-      onDone()
-    }
-
-    // Windows "Animation effects" off → prefers-reduced-motion: reduce → skip swoop.
-    if (reducedMotion.matches || tiles.length === 0) {
-      markDone()
-      return
-    }
-
-    const cx = viewW / 2
-    const cy = viewH / 2
-    const narrow = window.innerWidth < 768
-    const factor = narrow ? 0.55 : entranceOffsetFactor
-    const maxTravel = narrow
-      ? Math.min(window.innerWidth, window.innerHeight) * 0.55
-      : Math.max(window.innerWidth, window.innerHeight) * 0.7
-    const minTravel = narrow ? 96 : 160
-
-    root.classList.remove('is-entrance-done')
-    root.classList.add('is-entrance-pending')
-    stage?.classList.add('is-entrance-pending')
-
-    const animations: Animation[] = tiles.map((el, index) => {
-      const rect = el.getBoundingClientRect()
-      const [ox, oy] = entranceOffset(rect, cx, cy, factor, maxTravel, minTravel)
-      el.getAnimations().forEach((anim) => anim.cancel())
-      return el.animate(
-        [
-          { transform: `translate3d(${ox}px, ${oy}px, 0)`, opacity: 0 },
-          { transform: 'translate3d(0px, 0px, 0)', opacity: 1 },
-        ],
-        {
-          duration: entranceDurationMs,
-          delay: entranceBaseDelayMs + index * entranceStaggerMs,
-          easing: entranceEasing,
-          fill: 'both',
-        },
-      )
-    })
-
-    let cancelled = false
-    const finish = () => {
-      if (cancelled) return
-      cancelled = true
-      window.clearTimeout(failsafe)
-      // Final keyframe is identity, so cancelling lands exactly in place.
-      for (const anim of animations) anim.cancel()
-      markDone()
-    }
-    // Never leave cards hidden if an animation stalls (e.g. a hidden tab).
-    const failsafe = window.setTimeout(
-      finish,
-      entranceBaseDelayMs +
-        tiles.length * entranceStaggerMs +
-        entranceDurationMs +
-        800,
-    )
-    void Promise.all(
-      animations.map((anim) => anim.finished.catch(() => undefined)),
-    ).then(finish)
-
     return () => {
-      // Strict Mode remount: cancel and let the next run replay from hidden
-      // (the pending class keeps the final layout from flashing early).
-      cancelled = true
-      window.clearTimeout(failsafe)
-      for (const anim of animations) anim.cancel()
+      disposed = true
+      stopEntrance?.()
     }
   }, [rootRef, onDone])
 }

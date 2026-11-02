@@ -1,8 +1,10 @@
 .music-card {
+  /* Replaced at runtime by a colour read from the artwork. */
+  --music-accent: #b9c4e6;
+  --music-accent-ink: #171c2e;
   position: relative;
   z-index: 0;
   display: flex;
-  container-type: inline-size;
   min-width: 0;
   width: 100%;
   min-height: 191px;
@@ -16,44 +18,52 @@
   isolation: isolate;
 }
 
-/*
-  Figma node 138:1902 adapted to the 191px slot: heading across the top, art
-  and player side by side below. Sized off the card, which narrows with the
-  phone sheet while staying this one fixed height.
-*/
 .music-card-surface {
   position: relative;
-  display: grid;
+  display: flex;
   flex: 1;
-  grid-template-columns: clamp(84px, 30cqi, 128px) minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
-  column-gap: clamp(12px, 6cqi, 32px);
-  row-gap: 1px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
   min-width: 0;
   padding: var(--landing-surface-pad);
   overflow: hidden;
   border-radius: 18px;
-  background: var(--landing-glass-fill);
+  background: #272d42;
 }
 
-.music-card-photo {
+/* The penguin's stretch of the portrait cover, darkened where text sits. */
+.music-card-art {
   position: absolute;
   z-index: 0;
-  /* A blurred patch of snow left of the penguin, wider than any card. */
-  left: -80px;
-  top: -1650px;
-  width: 1400px;
-  height: 2498px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   max-width: none;
   object-fit: cover;
-  filter: blur(28px) brightness(0.8);
+  object-position: 50% 88%;
   pointer-events: none;
   user-select: none;
 }
 
+.music-card-surface::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.2) 45%,
+    rgba(0, 0, 0, 0.62)
+  );
+  pointer-events: none;
+}
+
 .music-card-heading,
-.music-card-art,
-.music-card-body {
+.music-card-track,
+.music-card-controls,
+.music-card-error {
   position: relative;
   z-index: 1;
 }
@@ -62,7 +72,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  grid-column: 1 / -1;
   min-height: 28px;
 }
 
@@ -96,33 +105,40 @@
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 17px;
+  white-space: nowrap;
 }
 
-.music-card-art {
-  display: block;
-  align-self: center;
-  width: 100%;
-  overflow: visible;
-}
-
-.music-card-art-ring {
-  fill: rgba(255, 255, 255, 0.16);
-  stroke: rgba(255, 255, 255, 0.55);
-  stroke-width: 1.5;
-}
-
-.music-card-body {
+.music-card-times {
   display: flex;
-  flex-direction: column;
+  flex: none;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 0;
-  text-align: center;
+  margin-left: auto;
+  color: #fff;
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.music-card-duration {
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.music-card-track {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
 }
 
 .music-card-meta {
-  width: 100%;
+  flex: 1;
   min-width: 0;
 }
 
@@ -136,6 +152,7 @@
   letter-spacing: -0.04em;
   line-height: normal;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   white-space: nowrap;
 }
 
@@ -144,7 +161,7 @@
 }
 
 .music-card-artist {
-  margin-top: 3px;
+  margin-top: 2px;
   font-size: 12px;
 }
 
@@ -153,12 +170,12 @@ html .music-card .music-card-play {
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 56px;
+  height: 40px;
   padding: 0;
-  border-radius: 50%;
-  background: #fff;
-  color: #111;
+  border-radius: 12px;
+  background: var(--music-accent);
+  color: var(--music-accent-ink);
   outline-color: #fff;
 }
 
@@ -181,17 +198,48 @@ html .music-card .music-card-play {
   animation: music-card-pulse 900ms ease-in-out infinite;
 }
 
-/* Only the contour takes the pointer, so the rest of the art still pans the page. */
-.music-card-seek {
-  cursor: pointer;
-  outline: none;
-  pointer-events: none;
+.music-card-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 -6px -6px;
 }
 
+.music-card-skip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.music-card-skip:focus-visible,
 .music-card-seek:focus-visible {
   outline: 2px solid #fff;
-  outline-offset: 4px;
+  outline-offset: 2px;
+}
+
+.music-card-skip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* A 32px target around a thin line; sideways drags seek, vertical ones pan. */
+.music-card-seek {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 0;
   border-radius: 6px;
+  cursor: pointer;
+  touch-action: pan-y;
 }
 
 .music-card-seek.is-dragging {
@@ -202,50 +250,45 @@ html .music-card .music-card-play {
   cursor: not-allowed;
 }
 
-.music-card-contour-played {
-  fill: none;
-  stroke: #000;
-  stroke-width: 2.25;
+.music-card-line {
+  position: relative;
+  display: block;
+  height: 10px;
 }
 
-.music-card-playhead {
-  fill: #000;
+.music-card-wave {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--music-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10'%3E%3Cpath d='M0 5Q6 0 12 5T24 5' fill='none' stroke='%23000' stroke-width='2.5'/%3E%3C/svg%3E") 0 0 / 24px 10px repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10'%3E%3Cpath d='M0 5Q6 0 12 5T24 5' fill='none' stroke='%23000' stroke-width='2.5'/%3E%3C/svg%3E") 0 0 / 24px 10px repeat-x;
 }
 
-.music-card-seek.is-disabled .music-card-playhead {
-  display: none;
+.music-card-seek.is-playing .music-card-wave {
+  animation: music-card-wave 1.6s linear infinite;
 }
 
-.music-card-contour-hit {
-  fill: none;
-  stroke: transparent;
-  stroke-width: 22;
-  pointer-events: stroke;
-  touch-action: none;
+.music-card-rest {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.45);
 }
 
-.music-card-times {
-  display: flex;
-  align-items: center;
-  color: #fff;
-  font-family: Inter, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 15px;
-  font-variant-numeric: tabular-nums;
-}
-
-.music-card-duration {
-  margin-left: 6px;
-  padding-left: 6px;
-  border-left: 1px solid rgba(255, 255, 255, 0.5);
-  color: rgba(255, 255, 255, 0.72);
+.music-card-thumb {
+  position: absolute;
+  top: -3px;
+  width: 5px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--music-accent);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
+  translate: -50% 0;
 }
 
 .music-card-error {
-  position: relative;
-  z-index: 1;
   margin: 0;
   color: rgba(255, 255, 255, 0.92);
   font-family: Inter, sans-serif;
@@ -271,6 +314,13 @@ html .music-card .music-card-play {
   overflow: hidden;
 }
 
+@keyframes music-card-wave {
+  to {
+    -webkit-mask-position: 24px 0;
+    mask-position: 24px 0;
+  }
+}
+
 @keyframes music-card-pulse {
   0%,
   100% {
@@ -289,7 +339,8 @@ html .music-card .music-card-play {
     transition: none;
   }
 
-  .music-card-loading-dot {
+  .music-card-loading-dot,
+  .music-card-seek.is-playing .music-card-wave {
     animation: none;
     opacity: 0.8;
   }

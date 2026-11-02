@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ShippedBadge } from '../components/ShippedBadge.tsx'
+import { CaseStudyFooter } from '../components/CaseStudyFooter.tsx'
 import './case-study.css'
 import './case-study-1.css'
 
@@ -362,6 +363,26 @@ function ProblemReel() {
   )
 }
 
+const ownerPanels = [
+  { src: '/case-study-1/owner-community.webp', alt: 'Exclusive community.' },
+  { src: '/case-study-1/owner-modules.webp', alt: '48+ comprehensive modules.' },
+  { src: '/case-study-1/owner-certified.webp', alt: 'Get certified: build the skills you need to deep dive practical courses.' },
+  { src: '/case-study-1/owner-lessons.webp', alt: '12+ hands on lessons, learn by designing.' },
+]
+
+const phoneProgramCards = [
+  { src: '/case-study-1/phone-live.webp', width: 716, height: 1388, alt: 'Live Figma classes: presenter video grid above Figma mobile app screens.' },
+  { src: '/case-study-1/phone-feedback.webp', width: 716, height: 714, alt: 'Personal Feedback: receive weekly feedback on your bootcamp progress in Figma.' },
+  { src: '/case-study-1/phone-cohort.webp', width: 716, height: 714, alt: 'Cohort Based Learning: stay motivated in cohort of like-minded designer around the world.' },
+  { src: '/case-study-1/phone-mentor.webp', width: 716, height: 714, alt: 'Career Mentorship: gain career mentorship from Abhishek and the community of 50+ students.' },
+  { src: '/case-study-1/phone-expert.webp', width: 716, height: 762, alt: 'Industry Expert Educator: learn live from Industry Expert Designer working in KPMG.' },
+]
+
+const phonePricing = [
+  { src: '/case-study-1/phone-price-course.webp', alt: 'Gen Alpha Academy Full Course, ₹13,500 one time payment: PAUx Academy full course, community access, certification and 5 personal sessions with the mentor.' },
+  { src: '/case-study-1/phone-price-mentorship.webp', alt: 'Full Course + Personal Mentorship, ₹60,000 one time payment: PAUx Academy full course, community access, certification and 5 personal sessions with the mentor.' },
+]
+
 const journeyIssues = [
   {
     title: 'Low awareness of what good UX education looks like',
@@ -673,7 +694,19 @@ function ProgramFeatures() {
   return (
     <section className="cs1-program" aria-label="Program features">
       <div className="cs1-feature-stage">
-        <figure className="cs1-feature-card">
+        {phoneProgramCards.map((card) => (
+          <img
+            key={card.src}
+            className="cs1-phone-only cs1-phone-card"
+            src={card.src}
+            alt={card.alt}
+            width={card.width}
+            height={card.height}
+            loading="lazy"
+            decoding="async"
+          />
+        ))}
+        <figure className="cs1-feature-card cs1-desktop-only">
           <img
             src="/case-study-1/feature-live-figma-classes.webp"
             alt="Live Figma Classes: presenter mosaic beside a collaborative Figma workspace with Anshika and Aniket cursors, with title and description below."
@@ -683,7 +716,7 @@ function ProgramFeatures() {
             decoding="async"
           />
         </figure>
-        <figure className="cs1-feature-card">
+        <figure className="cs1-feature-card cs1-desktop-only">
           <img
             src="/case-study-1/feature-feedback.webp"
             alt="Personal Feedback card with Aniket and Abhishek Figma comments, beside Industry Expert Educator card featuring the KPMG mark."
@@ -693,7 +726,7 @@ function ProgramFeatures() {
             decoding="async"
           />
         </figure>
-        <figure className="cs1-feature-card">
+        <figure className="cs1-feature-card cs1-desktop-only">
           <img
             src="/case-study-1/feature-cohort.webp"
             alt="Cohort Based Learning live-class grid and Career Mentorship calendar for Career Guidance from 4 to 6pm."
@@ -715,14 +748,22 @@ function ProgramFeatures() {
 
       <div className="cs1-feature-stage">
         <figure className="cs1-feature-panel">
-          <img
-            src="/case-study-1/feature-coding-strip.jpg"
-            alt="HTML, CSS, and React logos on a dark purple coding strip."
-            width={1024}
-            height={193}
-            loading="lazy"
-            decoding="async"
-          />
+          <picture>
+            <source
+              media="(max-width: 900px)"
+              srcSet="/case-study-1/phone-coding.webp"
+              width={668}
+              height={776}
+            />
+            <img
+              src="/case-study-1/feature-coding-strip.jpg"
+              alt="HTML, CSS, and React logos on a dark purple coding strip."
+              width={1024}
+              height={193}
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <figcaption className="cs1-feature-caption">
             <h3>Core Coding Sessions</h3>
             <p>
@@ -743,14 +784,22 @@ function ProgramFeatures() {
 
       <div className="cs1-feature-stage">
         <figure className="cs1-feature-panel">
-          <img
-            src="/case-study-1/feature-hub.webp"
-            alt="Personal learning hub MasterClass dashboard with sidebar navigation, search, and Continue Learning empty state."
-            width={968}
-            height={356}
-            loading="lazy"
-            decoding="async"
-          />
+          <picture>
+            <source
+              media="(max-width: 900px)"
+              srcSet="/case-study-1/phone-hub.webp"
+              width={668}
+              height={280}
+            />
+            <img
+              src="/case-study-1/feature-hub.webp"
+              alt="Personal learning hub MasterClass dashboard with sidebar navigation, search, and Continue Learning empty state."
+              width={968}
+              height={356}
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <figcaption className="cs1-feature-caption">
             <h3>Your Personal Learning Hub</h3>
             <p>
@@ -993,8 +1042,21 @@ function StrategyFeatures() {
         </div>
       </div>
 
-      <figure className="cs1-strategy-stage">
+      <figure className="cs1-strategy-stage cs1-pricing-stage">
+        {phonePricing.map((plan) => (
+          <img
+            key={plan.src}
+            className="cs1-phone-only cs1-phone-card"
+            src={plan.src}
+            alt={plan.alt}
+            width={668}
+            height={888}
+            loading="lazy"
+            decoding="async"
+          />
+        ))}
         <img
+          className="cs1-desktop-only"
           src="/case-study-1/strategy-pricing-plans.webp"
           alt="Two pricing cards for Gen Alpha Academy Full Course, showing ₹13,500 and ₹62,500 one-time plans with enroll and feature lists."
           width={1078}
@@ -1130,9 +1192,9 @@ export function CaseStudy1() {
               <picture className="cs1-picture">
                 <source
                   media="(max-width: 900px)"
-                  srcSet="/case-study-1/hero-ui-mobile.webp"
-                  width={692}
-                  height={816}
+                  srcSet="/case-study-1/cover-mobile.webp"
+                  width={1038}
+                  height={1224}
                 />
                 <img
                   src="/case-study-1/hero-ui.webp"
@@ -1276,8 +1338,7 @@ export function CaseStudy1() {
           <div className="cs1-owner-head">
             <h2 id="owner-title">
               Thinking Like a
-              <br />
-              Product Owner
+              <br className="cs1-owner-break" /> Product Owner
             </h2>
             <p>
               At this point I stopped thinking like &quot;just a designer&quot; and
@@ -1288,6 +1349,7 @@ export function CaseStudy1() {
 
           <figure className="cs1-bento-still">
             <img
+              className="cs1-bento-wide"
               src="/case-study-1/owner-bento.webp"
               alt="Product owner feature board showing 48+ comprehensive modules, exclusive community, get certified, and 12+ hands-on lessons."
               width={1024}
@@ -1295,9 +1357,22 @@ export function CaseStudy1() {
               loading="lazy"
               decoding="async"
             />
+            <div className="cs1-bento-grid">
+              {ownerPanels.map((panel) => (
+                <img
+                  key={panel.src}
+                  src={panel.src}
+                  alt={panel.alt}
+                  width={660}
+                  height={454}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ))}
+            </div>
           </figure>
 
-          <div className="cs1-owner-split">
+          <div className="cs1-owner-split cs1-owner-vision">
             <p>Product Vision</p>
             <p>
               A program that transforms motivated learners into job-ready
@@ -1307,7 +1382,7 @@ export function CaseStudy1() {
           <div className="cs1-strategy-stage cs1-modules-stage">
             <CourseModulesBoard />
           </div>
-          <div className="cs1-owner-split">
+          <div className="cs1-owner-split cs1-owner-strategy">
             <p>Product Strategy</p>
             <p>
               Focus on student needs (mentorship, community, technical edge),
@@ -1323,6 +1398,7 @@ export function CaseStudy1() {
         <ResultsNextSteps />
         <RequestCaseStudy />
       </main>
+      <CaseStudyFooter className="cs-footer cs1-phone-footer" />
     </div>
   )
 }

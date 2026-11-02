@@ -659,8 +659,7 @@ export function ProjectFisheyeField({
         // A control with its own drag (wheel, seek bar, timeline) keeps
         // gestures along its axis; anything else pans the field.
         const axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'
-        const ownedAxis = drag.owner?.dataset.fisheyeDragAxis
-        if (ownedAxis === axis || ownedAxis === 'both') {
+        if (drag.owner?.dataset.fisheyeDragAxis === axis) {
           drag.active = false
           return
         }
