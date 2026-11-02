@@ -265,3 +265,120 @@ html:has(.landing-page.is-fisheye-page) {
     transform: none !important;
   }
 }
+
+/*
+  Phone layout (Figma node 92-2): the same field as desktop, laid out as a
+  two-axis sheet of columns. Card heights are the frame's; hero text scales
+  with the screen so its line breaks hold on narrower phones.
+*/
+@media (max-width: 760px) {
+  /* Statement cards set their desktop height inline; the tile decides here. */
+  .is-mobile-stack .project-fisheye-tile .project-card {
+    height: 100% !important;
+  }
+
+  .is-mobile-stack .project-fisheye-tile .project-card-statement {
+    max-width: 150px;
+    font-size: 30px;
+    line-height: 34px;
+  }
+
+  /* Logos keep the frame's size when the card widens on larger phones. */
+  .is-mobile-stack .project-fisheye-tile .tool-grid {
+    grid-template-columns: repeat(4, minmax(0, 67px));
+    justify-content: space-between;
+  }
+
+  /* The frame's 212px testimonial has room for one more line than desktop. */
+  .is-mobile-stack .project-fisheye-tile .testimonial-quote p {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  .mobile-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-hero .hero-headline,
+  .mobile-hero .hero-role {
+    display: inline;
+  }
+
+  .mobile-hero .hero-headline {
+    font-size: min(38px, 9.67vw);
+    line-height: 1.29;
+  }
+
+  .mobile-hero .hero-role {
+    font-size: min(24px, 6.1vw);
+    line-height: 1.29;
+    white-space: nowrap;
+  }
+
+  .mobile-hero .hero-role-design {
+    font-family: "PP Mori", "Aeonik Pro", Inter, sans-serif;
+    font-style: normal;
+  }
+
+  .mobile-hero .hero-summary {
+    line-height: 20px;
+  }
+
+  /*
+    The real toggle, scaled as one piece to the frame's 38px height. It sits
+    under the open menu's scrim (60), so the two never overlap.
+  */
+  .mobile-theme-toggle {
+    position: fixed;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 50;
+    width: 68px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Comfortable tap target without changing the drawn size. */
+  .mobile-theme-toggle::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+  }
+
+  .mobile-theme-toggle .theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: scale(0.6786);
+    transform-origin: top right;
+  }
+
+  .mobile-theme-toggle:focus-visible {
+    outline: 2px solid var(--theme-text);
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  html[data-mobile-nav='hidden'] .mobile-theme-toggle:not(:focus-visible) {
+    transform: translate3d(
+      0,
+      calc(-100% - max(16px, env(safe-area-inset-top)) - 8px),
+      0
+    );
+  }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .mobile-theme-toggle {
+    transition: none;
+  }
+}

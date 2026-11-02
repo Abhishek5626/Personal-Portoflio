@@ -120,9 +120,14 @@ export function PortfolioNav({
     if (destination.kind === 'section') {
       onCloseProject?.()
       requestAnimationFrame(() => {
-        document
-          .getElementById(destination.sectionId)
-          ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        const section = document.getElementById(destination.sectionId)
+        // The phone column pans itself and cancels this; otherwise scroll.
+        const unhandled = section?.dispatchEvent(
+          new Event('fisheye-reveal', { bubbles: true, cancelable: true }),
+        )
+        if (unhandled) {
+          section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
       })
       return
     }

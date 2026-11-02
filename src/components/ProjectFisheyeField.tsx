@@ -33,7 +33,16 @@ import './project-fisheye-field.css'
 /** Componentry / Craftwork default. */
 const REFERENCE_LENS_STRENGTH = 0.24
 /** Exactly 50% of the reference effect. */
-const LENS_STRENGTH = REFERENCE_LENS_STRENGTH * 0.5
+export const LENS_STRENGTH = REFERENCE_LENS_STRENGTH * 0.5
+/** Phones: half again, as a local bulge around the finger or pointer. */
+const PHONE_LENS_STRENGTH = LENS_STRENGTH * 0.5
+/** Bulge radius, as a share of the screen width. */
+const PHONE_LENS_SIGMA = 0.4
+/** How quickly the bulge follows the finger, in ms. */
+const PHONE_LENS_EASE_MS = 90
+const PHONE_REVEAL_MS = 420
+const PHONE_NAV_TOP_ZONE_PX = 8
+const PHONE_NAV_DIRECTION_PX = 8
 
 const DRAG_CLICK_THRESHOLD_PX = 8
 const INERTIA = 0.94
@@ -42,7 +51,7 @@ const WHEEL_SENSITIVITY = 0.42
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value))
 
-const wrapInto = (value: number, min: number, max: number) => {
+export const wrapInto = (value: number, min: number, max: number) => {
   const span = max - min
   if (span <= 0) return value
   return min + ((((value - min) % span) + span) % span)
@@ -82,7 +91,7 @@ const warpPoint = (
 }
 
 /** matrix3d that maps a w×h box onto the quad tl, tr, br, bl. */
-const quadMatrix = (
+export const quadMatrix = (
   w: number,
   h: number,
   [x0, y0]: [number, number],
@@ -129,6 +138,14 @@ export type FisheyeLayout = {
   width: number
   gutterX: number
   gutterY: number
+  /**
+   * Screen width the rects were drawn for. When set, scale follows the screen
+   * (so a sheet wider than the screen keeps its proportions) instead of
+   * fitting the whole block into it.
+   */
+  viewWidth?: number
+  /** Left inset of the first column, in design px (phone reveal target). */
+  rowInsetX: number
   /** Narrowest / widest horizontal scale applied to x positions and widths. */
   minScale: number
   maxScale: number
@@ -145,7 +162,9 @@ type Placement = FisheyeRect & {
 
 const scaleFor = (layout: FisheyeLayout, viewW: number) =>
   clamp(
-    (viewW - layout.gutterX * 2) / layout.width,
+    layout.viewWidth
+      ? viewW / layout.viewWidth
+      : (viewW - layout.gutterX * 2) / layout.width,
     layout.minScale,
     layout.maxScale,
   )
@@ -193,6 +212,8 @@ type ProjectFisheyeFieldProps = {
   children: ReactNode
   layout: FisheyeLayout
   links?: readonly ProjectFisheyeLink[]
+  /** Phone sheet: pointer-following lens, and the nav hides as it pans. */
+  phone?: boolean
   'aria-label'?: string
 }
 
@@ -200,6 +221,7 @@ export function ProjectFisheyeField({
   children,
   layout,
   links = [],
+  phone = false,
   'aria-label': ariaLabel = 'Portfolio — drag to explore',
 }: ProjectFisheyeFieldProps) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -340,6 +362,55 @@ export function ProjectFisheyeField({
       root.style.setProperty('--fisheye-view-w', String(viewW))
     }
 
+    // Phone-only state; the desktop path never reads any of it.
+    const html = document.documentElement
+    const lens = { x: 0, y: 0, targetX: 0, targetY: 0, placed: false }
+    let travelY = 0
+    let navAnchor = 0
+    let navHidden = false
+    let glide: {
+      x: number
+      y: number
+      doneX: number
+      doneY: number
+      start: number
+    } | null = null
+
+    const centerLens = () => {
+      lens.targetX = viewW / 2
+      lens.targetY = viewH / 2
+    }
+
+    const aimLens = (event: PointerEvent) => {
+      const rect = root.getBoundingClientRect()
+      lens.targetX = event.clientX - rect.left
+      lens.targetY = event.clientY - rect.top
+    }
+
+    const lensMoving = () =>
+      Math.hypot(lens.targetX - lens.x, lens.targetY - lens.y) > 0.5
+
+    const syncNav = () => {
+      const period = periodY[0]!
+      const wrapped = wrapInto(position.y, 0, period)
+      const atTop =
+        wrapped <= PHONE_NAV_TOP_ZONE_PX ||
+        period - wrapped <= PHONE_NAV_TOP_ZONE_PX
+      let next = navHidden
+      if (atTop) {
+        next = false
+        navAnchor = travelY
+      } else if (Math.abs(travelY - navAnchor) >= PHONE_NAV_DIRECTION_PX) {
+        // Content moving up is the same as scrolling the page down.
+        next = travelY < navAnchor
+        navAnchor = travelY
+      }
+      if (next === navHidden) return
+      navHidden = next
+      if (next) html.dataset.mobileNav = 'hidden'
+      else delete html.dataset.mobileNav
+    }
+
     const paint = () => {
       const k = reducedMotion ? 0 : LENS_STRENGTH
       const halfW = viewW * 0.5
@@ -348,6 +419,18 @@ export function ProjectFisheyeField({
       const aspectTerm = aspect * aspect + 1
       // Pan is stored in design px horizontally so a resize keeps the view.
       const panX = position.x * scale
+      const bulge = reducedMotion ? 0 : PHONE_LENS_STRENGTH
+      const sigma = viewW * PHONE_LENS_SIGMA
+      const warp = phone
+        ? (wx: number, wy: number): [number, number] => {
+            const dx = wx - lens.x
+            const dy = wy - lens.y
+            const grow =
+              bulge * Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma))
+            return [wx + dx * grow, wy + dy * grow]
+          }
+        : (wx: number, wy: number) =>
+            warpPoint(wx, wy, halfW, halfH, aspectTerm, k)
 
       tiles.forEach((tile, index) => {
         const placement = placements[index]
@@ -380,10 +463,10 @@ export function ProjectFisheyeField({
         tile.style.transform = quadMatrix(
           w,
           h,
-          warpPoint(x, y, halfW, halfH, aspectTerm, k),
-          warpPoint(x + w, y, halfW, halfH, aspectTerm, k),
-          warpPoint(x + w, y + h, halfW, halfH, aspectTerm, k),
-          warpPoint(x, y + h, halfW, halfH, aspectTerm, k),
+          warp(x, y),
+          warp(x + w, y),
+          warp(x + w, y + h),
+          warp(x, y + h),
         )
       })
     }
@@ -391,11 +474,31 @@ export function ProjectFisheyeField({
     const panBy = (dx: number, dy: number) => {
       position.x += dx / scale
       position.y += dy
+      travelY += dy
     }
 
     const tick = (time: number) => {
       const delta = Math.min(32, time - previous)
       previous = time
+
+      if (phone) {
+        if (reducedMotion) {
+          lens.x = lens.targetX
+          lens.y = lens.targetY
+        } else {
+          const follow = 1 - Math.exp(-delta / PHONE_LENS_EASE_MS)
+          lens.x += (lens.targetX - lens.x) * follow
+          lens.y += (lens.targetY - lens.y) * follow
+        }
+        if (glide) {
+          const progress = clamp((time - glide.start) / PHONE_REVEAL_MS, 0, 1)
+          const eased = 1 - Math.pow(1 - progress, 3)
+          panBy(glide.x * eased - glide.doneX, glide.y * eased - glide.doneY)
+          glide.doneX = glide.x * eased
+          glide.doneY = glide.y * eased
+          if (progress >= 1) glide = null
+        }
+      }
 
       if (!drag.active && !reducedMotion) {
         panBy(velocity.x * delta, velocity.y * delta)
@@ -412,8 +515,13 @@ export function ProjectFisheyeField({
       position.y = wrapInto(position.y, 0, panPeriodY)
 
       paint()
+      if (phone) syncNav()
 
-      if (drag.active || Math.hypot(velocity.x, velocity.y) > 0.006) {
+      if (
+        drag.active ||
+        Math.hypot(velocity.x, velocity.y) > 0.006 ||
+        (phone && (glide !== null || lensMoving()))
+      ) {
         frame = requestAnimationFrame(tick)
       } else {
         velocity.x = 0
@@ -437,6 +545,11 @@ export function ProjectFisheyeField({
     resizeObserver.observe(root)
     // Position 0 is the Figma origin: block copy 0 sits at the frame gutters.
     layoutMetrics()
+    if (phone) {
+      centerLens()
+      lens.x = lens.targetX
+      lens.y = lens.targetY
+    }
     paint()
 
     const onPointerDown = (event: PointerEvent) => {
@@ -449,6 +562,10 @@ export function ProjectFisheyeField({
       drag.x = event.clientX
       drag.y = event.clientY
       drag.time = performance.now()
+      if (phone) {
+        aimLens(event)
+        glide = null
+      }
       drag.owner =
         event.target instanceof Element
           ? event.target.closest<HTMLElement>('[data-fisheye-drag-axis]')
@@ -464,6 +581,10 @@ export function ProjectFisheyeField({
     }
 
     const onPointerMove = (event: PointerEvent) => {
+      if (phone && (drag.active || event.pointerType === 'mouse')) {
+        aimLens(event)
+        requestRender()
+      }
       if (!drag.active || drag.pointerId !== event.pointerId) return
 
       if (!drag.moved) {
@@ -481,7 +602,11 @@ export function ProjectFisheyeField({
         // Taking capture also tells a control that had it to stand down.
         drag.moved = true
         root.dataset.dragging = 'true'
-        root.setPointerCapture(event.pointerId)
+        try {
+          root.setPointerCapture(event.pointerId)
+        } catch {
+          // The pointer already ended; the drag finishes on its own events.
+        }
       }
       // Drop text the press began to select before the drag was recognised.
       clearSelection()
@@ -500,6 +625,11 @@ export function ProjectFisheyeField({
     }
 
     const endDrag = (event: PointerEvent) => {
+      // A finger is gone once lifted, so its bulge eases back to the centre.
+      if (phone && event.pointerType !== 'mouse') {
+        centerLens()
+        requestRender()
+      }
       if (!drag.active || drag.pointerId !== event.pointerId) return
       drag.active = false
       root.dataset.dragging = 'false'
@@ -583,6 +713,57 @@ export function ProjectFisheyeField({
     window.addEventListener('blur', cancelDrag)
     root.addEventListener('keydown', onKeyDown)
     root.addEventListener('wheel', onWheel, { passive: false })
+
+    const onPointerLeave = () => {
+      if (drag.active) return
+      centerLens()
+      requestRender()
+    }
+
+    // Nav "About Me": the sheet pans; there is no page scroll to move.
+    const onReveal = (event: Event) => {
+      const tile =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>('[data-fisheye-tile]')
+          : null
+      const placement = tile ? placements[tiles.indexOf(tile)] : undefined
+      if (!placement) return
+      event.preventDefault()
+      const w = placement.w * scale
+      const x = wrapInto(
+        position.x * scale +
+          layout.gutterX +
+          placement.x * scale +
+          placement.copyX * blockPeriod,
+        -w,
+        -w + periodX,
+      )
+      const y = wrapInto(
+        position.y +
+          layout.gutterY +
+          placement.y +
+          placement.copyY * stripPeriods[placement.strip]!,
+        -placement.h,
+        -placement.h + periodY[placement.strip]!,
+      )
+      const toX = layout.rowInsetX * scale - x
+      const toY = layout.gutterY + layout.strips[0]!.items[0]!.y - y
+      velocity.x = 0
+      velocity.y = 0
+      if (reducedMotion) {
+        panBy(toX, toY)
+        paint()
+        syncNav()
+        return
+      }
+      glide = { x: toX, y: toY, doneX: 0, doneY: 0, start: performance.now() }
+      requestRender()
+    }
+
+    if (phone) {
+      root.addEventListener('pointerleave', onPointerLeave)
+      root.addEventListener('fisheye-reveal', onReveal)
+    }
     // Card links and images are natively draggable; the browser's own drag
     // fires pointercancel and kills the pan, so it never starts in here.
     const preventNative = (event: Event) => event.preventDefault()
@@ -605,10 +786,13 @@ export function ProjectFisheyeField({
       window.removeEventListener('blur', cancelDrag)
       root.removeEventListener('keydown', onKeyDown)
       root.removeEventListener('wheel', onWheel)
+      root.removeEventListener('pointerleave', onPointerLeave)
+      root.removeEventListener('fisheye-reveal', onReveal)
+      if (phone) delete html.dataset.mobileNav
       root.removeEventListener('dragstart', preventNative)
       root.removeEventListener('selectstart', onSelectStart)
     }
-  }, [placements, layout, copies])
+  }, [placements, layout, copies, phone])
 
   return (
     <div
@@ -618,7 +802,7 @@ export function ProjectFisheyeField({
       tabIndex={0}
       aria-label={ariaLabel}
       data-dragging="false"
-      data-lens={LENS_STRENGTH}
+      data-lens={phone ? PHONE_LENS_STRENGTH : LENS_STRENGTH}
     >
       <span className="project-fisheye-hint">
         Drag, scroll or use arrow keys to pan the whole page in any direction.

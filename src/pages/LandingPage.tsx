@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import type { CSSProperties, MouseEvent, ReactNode, RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { AboutMeCard } from '../components/AboutMeCard.tsx'
@@ -514,7 +521,7 @@ function HeroIntroduction() {
  * Hero and theme switch for assistive tech and keyboard users; the visible
  * copies live inside the aria-hidden fisheye field.
  */
-function AccessibleHero() {
+function AccessibleHero({ themeButton = true }: { themeButton?: boolean }) {
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
 
@@ -525,14 +532,16 @@ function AccessibleHero() {
         {heroContent.roleDesign} {heroContent.roleEngineer}.{' '}
         {heroContent.summary}
       </p>
-      <button
-        type="button"
-        className="skip-link"
-        aria-pressed={isDark}
-        onClick={toggleTheme}
-      >
-        {isDark ? 'Dark Mode' : heroContent.themeLabel}
-      </button>
+      {themeButton ? (
+        <button
+          type="button"
+          className="skip-link"
+          aria-pressed={isDark}
+          onClick={toggleTheme}
+        >
+          {isDark ? 'Dark Mode' : heroContent.themeLabel}
+        </button>
+      ) : null}
     </header>
   )
 }
@@ -544,6 +553,7 @@ function AccessibleHero() {
  * case-study column loop vertically on their own heights.
  */
 const fisheyeLayout: FisheyeLayout = {
+  rowInsetX: 0,
   width: 1370,
   gutterX: 35,
   gutterY: 34,
@@ -571,6 +581,52 @@ const fisheyeLayout: FisheyeLayout = {
         { item: 10, x: 947, y: 0, w: 423, h: 360 },
         { item: 11, x: 947, y: 384, w: 423, h: 360 },
         { item: 12, x: 947, y: 768, w: 423, h: 360 },
+      ],
+    },
+  ],
+}
+
+/**
+ * Phone sheet, drawn at 393px: three 320px columns with 18px gaps, so about
+ * 39px of the next column shows. Heights are the Figma mobile frame's. Item
+ * numbers follow the field's child order, which is the Figma card order. Rows
+ * start 61px down so the first clears the nav, yet the loop seam stays 18px.
+ */
+const phoneFisheyeLayout: FisheyeLayout = {
+  viewWidth: 393,
+  rowInsetX: 16,
+  width: 1014,
+  gutterX: 0,
+  gutterY: 9,
+  minScale: 0.8,
+  maxScale: 1.45,
+  strips: [
+    {
+      height: 1261,
+      items: [
+        { item: 0, x: 16, y: 61, w: 320, h: 240 },
+        { item: 1, x: 16, y: 319, w: 320, h: 321 },
+        { item: 2, x: 16, y: 658, w: 320, h: 323 },
+        { item: 3, x: 16, y: 999, w: 320, h: 323 },
+      ],
+    },
+    {
+      height: 1101,
+      items: [
+        { item: 4, x: 354, y: 61, w: 320, h: 323 },
+        { item: 5, x: 354, y: 402, w: 320, h: 534 },
+        { item: 6, x: 354, y: 954, w: 320, h: 208 },
+      ],
+    },
+    {
+      height: 1158,
+      items: [
+        { item: 7, x: 692, y: 61, w: 320, h: 158 },
+        { item: 8, x: 692, y: 237, w: 320, h: 158 },
+        { item: 9, x: 692, y: 413, w: 320, h: 158 },
+        { item: 10, x: 692, y: 589, w: 320, h: 212 },
+        { item: 11, x: 692, y: 819, w: 320, h: 191 },
+        { item: 12, x: 692, y: 1028, w: 320, h: 191 },
       ],
     },
   ],
@@ -844,7 +900,10 @@ function entranceOffset(
 const entrancePendingOnLoad = () =>
   !window.matchMedia(reducedMotionQuery).matches
 
-function useCardEntrance(rootRef: RefObject<HTMLElement | null>) {
+function useCardEntrance(
+  rootRef: RefObject<HTMLElement | null>,
+  onDone: () => void,
+) {
   // A passive effect runs after the fisheye field has painted its tiles, so
   // every card is measured at its real (lens-warped) Figma position.
   useEffect(() => {
@@ -869,6 +928,7 @@ function useCardEntrance(rootRef: RefObject<HTMLElement | null>) {
       root.classList.remove('is-entrance-pending')
       root.classList.add('is-entrance-done')
       stage?.classList.remove('is-entrance-pending')
+      onDone()
     }
 
     // Windows "Animation effects" off → prefers-reduced-motion: reduce → skip swoop.
@@ -936,7 +996,7 @@ function useCardEntrance(rootRef: RefObject<HTMLElement | null>) {
       window.clearTimeout(failsafe)
       for (const anim of animations) anim.cancel()
     }
-  }, [rootRef])
+  }, [rootRef, onDone])
 }
 
 function useTileHover(rootRef: RefObject<HTMLElement | null>) {
@@ -1113,6 +1173,58 @@ function HoverCard({
   return <article {...surfaceProps} />
 }
 
+/*
+  Phone layout, Figma "Portfolio 2026" node 92-2 (iPhone 16, 393px): the same
+  cards in the Figma order, read column by column on a two-axis fisheye sheet
+  that loops every way, with the menu top-left and the toggle top-right.
+*/
+const mobileLayoutQuery = '(max-width: 760px)'
+
+function subscribeMobileLayout(onChange: () => void) {
+  const query = window.matchMedia(mobileLayoutQuery)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+
+function useMobileLayout() {
+  return useSyncExternalStore(
+    subscribeMobileLayout,
+    () => window.matchMedia(mobileLayoutQuery).matches,
+  )
+}
+
+function MobileHero() {
+  return (
+    <header className="mobile-hero">
+      <div className="mobile-hero-title">
+        <h1 className="hero-headline">{heroContent.headline}</h1>{' '}
+        <p className="hero-role">
+          <span className="hero-role-design">{heroContent.roleDesign}</span>{' '}
+          <span className="hero-role-engineer">{heroContent.roleEngineer}</span>
+        </p>
+      </div>
+      <p className="hero-summary">{heroContent.summary}</p>
+    </header>
+  )
+}
+
+function MobileThemeToggle() {
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === 'dark'
+
+  return (
+    <button
+      type="button"
+      className="mobile-theme-toggle"
+      aria-pressed={isDark}
+      aria-label={isDark ? 'Dark Mode' : heroContent.themeLabel}
+      onClick={toggleTheme}
+    >
+      <ThemeToggleVisual />
+    </button>
+  )
+}
+
 export function LandingPage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
@@ -1122,7 +1234,12 @@ export function LandingPage() {
   )
   useTileHover(pageRef)
   const [entrancePending] = useState(entrancePendingOnLoad)
-  useCardEntrance(pageRef)
+  // Held in state so a later className change (crossing the phone breakpoint)
+  // can't bring back the hidden entrance state.
+  const [entranceDone, setEntranceDone] = useState(false)
+  const markEntranceDone = useCallback(() => setEntranceDone(true), [])
+  useCardEntrance(pageRef, markEntranceDone)
+  const isMobile = useMobileLayout()
 
   useEffect(() => {
     if (drawerPresent) return
@@ -1137,6 +1254,24 @@ export function LandingPage() {
     openerRef.current = opener
     open(id)
   }
+
+  const fieldLinks = [
+    {
+      href: landingCards.titleColumnTop.href!,
+      label: landingCards.titleColumnTop.label,
+      onOpen: (opener: HTMLAnchorElement) => openProject('case-study-1', opener),
+    },
+    {
+      href: landingCards.titleColumnMiddle.href!,
+      label: landingCards.titleColumnMiddle.label,
+      onOpen: (opener: HTMLAnchorElement) => openProject('case-study-2', opener),
+    },
+    {
+      href: landingCards.titleColumnBottom.href!,
+      label: landingCards.titleColumnBottom.label,
+      onOpen: (opener: HTMLAnchorElement) => openProject('case-study-3', opener),
+    },
+  ]
 
   return (
     <>
@@ -1155,13 +1290,61 @@ export function LandingPage() {
       </a>
       <div
         ref={pageRef}
-        className={
-          entrancePending
-            ? 'landing-page is-fisheye-page is-entrance-pending'
-            : 'landing-page is-fisheye-page'
-        }
+        className={[
+          'landing-page',
+          'is-fisheye-page',
+          isMobile ? 'is-mobile-stack' : '',
+          entranceDone
+            ? 'is-entrance-done'
+            : entrancePending
+              ? 'is-entrance-pending'
+              : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
-        <AccessibleHero />
+        <AccessibleHero themeButton={!isMobile} />
+        {isMobile ? (
+        <main
+          id={drawerPresent ? undefined : 'main'}
+          className="landing-fisheye-main"
+        >
+          <ProjectFisheyeField
+            phone
+            aria-label="Portfolio — drag in any direction to explore"
+            layout={phoneFisheyeLayout}
+            links={fieldLinks}
+          >
+            <MobileHero />
+            <div id="about">
+              <AboutMeCard content={aboutMeCard} />
+            </div>
+            <ProjectCard
+              card={landingCards.titleColumnTop}
+              activeProject={projectId}
+              onOpenProject={openProject}
+            />
+            <ProjectCard
+              card={landingCards.titleColumnMiddle}
+              activeProject={projectId}
+              onOpenProject={openProject}
+            />
+            <ProjectCard
+              card={landingCards.titleColumnBottom}
+              activeProject={projectId}
+              onOpenProject={openProject}
+            />
+            <DesignStrategyCard />
+            <ProjectCard card={landingCards.toolsShipped} />
+            <ProjectCard card={landingCards.buildingInCode} />
+            <ProjectCard card={landingCards.designingAiProduct} />
+            <ProjectCard card={landingCards.storytellingPlay} />
+            <TestimonialCard />
+            <WorkExperienceCard />
+            <MusicCard />
+          </ProjectFisheyeField>
+        </main>
+        ) : (
         <main
           id={drawerPresent ? undefined : 'main'}
           className="landing-fisheye-main"
@@ -1169,23 +1352,7 @@ export function LandingPage() {
           <ProjectFisheyeField
             aria-label="Portfolio — drag to explore"
             layout={fisheyeLayout}
-            links={[
-              {
-                href: landingCards.titleColumnTop.href!,
-                label: landingCards.titleColumnTop.label,
-                onOpen: (opener) => openProject('case-study-1', opener),
-              },
-              {
-                href: landingCards.titleColumnMiddle.href!,
-                label: landingCards.titleColumnMiddle.label,
-                onOpen: (opener) => openProject('case-study-2', opener),
-              },
-              {
-                href: landingCards.titleColumnBottom.href!,
-                label: landingCards.titleColumnBottom.label,
-                onOpen: (opener) => openProject('case-study-3', opener),
-              },
-            ]}
+            links={fieldLinks}
           >
             <div className="fisheye-hero-tile">
               <HeroIntroduction />
@@ -1218,11 +1385,13 @@ export function LandingPage() {
             />
           </ProjectFisheyeField>
         </main>
+        )}
       </div>
         </div>
       </div>
       <ProjectPointerBadge />
       {!drawerPresent ? <ProgressiveBlur mode="fixed" /> : null}
+      {isMobile && !drawerPresent ? <MobileThemeToggle /> : null}
       <PortfolioNav
         activeProject={projectId}
         onOpenProject={open}
