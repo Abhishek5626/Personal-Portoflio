@@ -1542,6 +1542,138 @@ a.cs-toc-row {
   }
 }
 
+/* Prototype */
+.cs-proto {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+}
+
+.cs-proto-phone {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 500px;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 6px solid var(--cs-heading);
+  border-radius: 28px;
+  background: var(--cs-surface);
+}
+
+.cs-proto-viewer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--cs-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-system .cs-proto-thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  border-radius: 8px;
+  list-style: none;
+}
+
+.cs-proto-thread:focus-visible,
+.cs-proto-next:focus-visible {
+  outline: 2px solid var(--cs-focus);
+  outline-offset: 2px;
+}
+
+.cs-proto-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-proto-bubble {
+  align-self: flex-start;
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--cs-chip);
+  color: var(--cs-text);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.24px;
+}
+
+.cs-proto-bubble.is-person {
+  align-self: flex-end;
+  background: var(--cs-side-a);
+  color: var(--cs-side-a-ink);
+}
+
+.cs-proto-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-proto-next {
+  flex: 1;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--cs-heading);
+  color: var(--cs-page);
+  font: 500 12px/16px Inter, sans-serif;
+  letter-spacing: -0.48px;
+  cursor: pointer;
+}
+
+.cs-show-all:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cs-proto-story {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding-top: 24px;
+}
+
+.cs-proto-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--cs-text-muted);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: -0.2px;
+  list-style: none;
+}
+
+.cs-proto-steps li {
+  padding: 4px 8px;
+  border-radius: 99px;
+  background: var(--cs-chip);
+}
+
+.cs-proto-steps .is-done {
+  background: var(--cs-after);
+  color: var(--cs-positive);
+}
+
+.cs-proto-steps .is-now {
+  background: var(--cs-heading);
+  color: var(--cs-page);
+}
+
 /* The two columns no longer fit: same break as Case Study 2. */
 @media (max-width: 1199px) {
   .cs-system {
@@ -1655,6 +1787,7 @@ a.cs-toc-row {
     grid-template-rows: none;
   }
 
+  .cs-proto,
   .cs-channels,
   .cs-checks,
   .cs-try,
@@ -1683,6 +1816,14 @@ a.cs-toc-row {
 
   .cs-path {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cs-proto-phone {
+    height: 460px;
+  }
+
+  .cs-proto-story {
+    padding-top: 0;
   }
 
   .cs-order {

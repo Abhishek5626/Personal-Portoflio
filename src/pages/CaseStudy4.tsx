@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { CaseStudy4Journeys } from './CaseStudy4Journeys.tsx'
 import { CaseStudy4Proposal } from './CaseStudy4Proposal.tsx'
+import { CaseStudy4Prototype } from './CaseStudy4Prototype.tsx'
 import { CaseStudy4Research } from './CaseStudy4Research.tsx'
 import { CaseStudy4Trust } from './CaseStudy4Trust.tsx'
 import { DecisionNote } from './caseStudyParts.tsx'
@@ -188,7 +189,7 @@ const chapters = [
   { name: 'Proposal', detail: 'One agent for the buyer, 4 for the merchant', id: 'cs-proposal' },
   { name: 'Trust', detail: 'When an agent can act on its own', id: 'cs-trust' },
   { name: 'Journeys', detail: 'The buyer’s side and the merchant’s side', id: 'cs-journeys' },
-  { name: 'Prototype' },
+  { name: 'Prototype', detail: 'One urgent order, step by step', id: 'cs-prototype' },
   { name: 'System' },
   { name: 'Vision' },
 ]
@@ -417,6 +418,8 @@ export function CaseStudy4() {
           <CaseStudy4Trust id="cs-trust" />
 
           <CaseStudy4Journeys id="cs-journeys" />
+
+          <CaseStudy4Prototype id="cs-prototype" />
         </div>
       </div>
     </div>
