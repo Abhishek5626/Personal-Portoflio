@@ -5,6 +5,7 @@ import { CaseStudy4Prototype } from './CaseStudy4Prototype.tsx'
 import { CaseStudy4Research } from './CaseStudy4Research.tsx'
 import { CaseStudy4System } from './CaseStudy4System.tsx'
 import { CaseStudy4Trust } from './CaseStudy4Trust.tsx'
+import { CaseStudy4Vision } from './CaseStudy4Vision.tsx'
 import { DecisionNote } from './caseStudyParts.tsx'
 import './case-study-system.css'
 
@@ -192,7 +193,7 @@ const chapters = [
   { name: 'Journeys', detail: 'The buyer’s side and the merchant’s side', id: 'cs-journeys' },
   { name: 'Prototype', detail: 'One urgent order, step by step', id: 'cs-prototype' },
   { name: 'System', detail: 'The design system foundation', id: 'cs-design-system' },
-  { name: 'Vision' },
+  { name: 'Vision', detail: 'Vision, team and impact', id: 'cs-vision' },
 ]
 
 export function CaseStudy4() {
@@ -423,6 +424,8 @@ export function CaseStudy4() {
           <CaseStudy4Prototype id="cs-prototype" />
 
           <CaseStudy4System id="cs-design-system" />
+
+          <CaseStudy4Vision id="cs-vision" />
         </div>
       </div>
     </div>

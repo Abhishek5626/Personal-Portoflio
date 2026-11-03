@@ -1,6 +1,6 @@
 # Case study design system
 
-Shared styles and components for case studies. Implemented so far in `src/pages/case-study-system.css`: colour tokens and the styles for Case Study 4's opening section. The rest is specification, and the three older case studies don't use it.
+Shared styles and components for case studies. Implemented in `src/pages/case-study-system.css` and used by Case Study 4. The three older case studies don't use it.
 
 ## Where each value comes from
 
