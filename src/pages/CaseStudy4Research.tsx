@@ -1,3 +1,4 @@
+import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { useId, useState } from 'react'
 import { DecisionNote, ShowAll } from './caseStudyParts.tsx'
 import { ResearchFlow } from './ResearchFlow.tsx'
@@ -70,7 +71,7 @@ export function CaseStudy4Research({ id }: { id: string }) {
     <div id={id} className="cs-chapter">
       <section className="cs-block" aria-labelledby={`${id}-title`}>
         <div className="cs-block-head">
-          <p className="cs-chapter-label">02 Research</p>
+          <span className="cs-chapter-label"><ShippedBadge>02 Research</ShippedBadge></span>
           <h2 id={`${id}-title`} className="cs-h1">
             The evidence so far, and what’s left to test.
           </h2>

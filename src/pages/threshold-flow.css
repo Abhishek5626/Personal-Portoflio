@@ -91,7 +91,7 @@
   min-width: 0;
   padding: 0 12px 0 calc(var(--tf-inset) - 1px);
   color: var(--fx-ink);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 20px;
 }
@@ -117,7 +117,7 @@
   border-radius: 50%;
   background: var(--fx-ink);
   color: var(--fx-card);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -172,7 +172,7 @@
 .tf-part {
   min-width: 0;
   color: var(--fx-ink);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: var(--tf-line);
 }
@@ -331,4 +331,9 @@
   .tf .fx-wire-ring {
     display: none;
   }
+}
+
+/* Shared pieces inside the flow, such as the play button and pills, match its 13px. */
+.cs-system .tf :is(p, span, button, h4, h5, strong, li, div) {
+  font-size: 13px;
 }

@@ -134,7 +134,7 @@ export function FirstTest() {
       <p className="ft-stop">
         <span className="fx-pill is-rule">Stop rule</span>
         <span className="ft-stop-text">
-          <strong>Below 90% agreement, the agent only asks the buyer to confirm</strong> in that category, and never orders alone.
+          Below 90% agreement, the agent only asks the buyer to confirm in that category, and never orders alone.
         </span>
       </p>
     </div>

@@ -1,55 +1,7 @@
-import { useId, useState } from 'react'
-import { DecisionNote, ShowAll } from './caseStudyParts.tsx'
+import { ShippedBadge } from '../components/ShippedBadge.tsx'
+import { DecisionNote } from './caseStudyParts.tsx'
 import { AgentFlow } from './AgentFlow.tsx'
-
-const buyerAgent = {
-  name: 'Buyer’s agent',
-  value: 'The buyer stays in control without watching every order.',
-  test: 'Tested by the workshop visits and the pilot',
-  does: 'Applies the company’s rules on who may order, the spend limit and the approver. It checks each pick against them, asks the approver when needed, and keeps the buyer’s record.',
-  worksFor: 'The buyer’s company, inside the store of the merchant offering it.',
-  channels: 'Voice, WhatsApp, email and the buyer’s webshop account.',
-  never: 'Spends over the limit without the approver, or moves the order to another merchant.',
-}
-
-const merchantAgents = [
-  {
-    name: 'Setup agent',
-    value: 'A merchant fills in one template rather than running a setup project.',
-    test: 'Tested by the replay and the days from signup to live',
-    does: 'Replays past orders and suggests a threshold for each category, 85 to start.',
-    worksFor: 'The merchant admin, during setup.',
-    channels: 'Merchant settings.',
-    never: 'Applies a setting. A person approves each one.',
-  },
-  {
-    name: 'Ordering agent',
-    value: 'The buyer gets an answer without waiting for a sales rep.',
-    test: 'Tested by the pilot’s 5-minute pass mark',
-    does: 'Identifies the car and asks one question if two versions of a part fit. Then it orders, asks the buyer to confirm, or hands over, and explains why.',
-    worksFor: 'The merchant, as its voice and chat.',
-    channels: 'Voice, WhatsApp, email and the webshop.',
-    never: 'Decides on a safety part.',
-  },
-  {
-    name: 'Fulfilment agent',
-    value: 'Nothing gets retyped, so no typing errors reach the ERP.',
-    test: 'Checked in the pilot against the ERP log',
-    does: 'Holds stock, books the van and writes the order to the ERP. During the pilot, a sales rep books the van.',
-    worksFor: 'The merchant, inside its ERP and van planning.',
-    channels: 'ERP, sales rep chat, and updates on WhatsApp or email.',
-    never: 'Changes a price outside the contract.',
-  },
-  {
-    name: 'Review agent',
-    value: 'The merchant can see, with numbers, where to trust the agent more.',
-    test: 'Tested by the override rate and the monthly threshold review',
-    does: 'Summarises each category and suggests threshold changes.',
-    worksFor: 'The merchant admin, every month.',
-    channels: 'Merchant settings and a monthly email.',
-    never: 'Applies a rule change.',
-  },
-]
+import { BuyerAgentFrame, DataDecisionsFrame, MerchantAgentsFrame, WhyDecidedFrame } from './ProposalFrames.tsx'
 
 const alwaysPerson = [
   'Safety parts: brakes, steering, airbags',
@@ -64,58 +16,19 @@ const alwaysPerson = [
 ]
 
 const roles = [
-  { name: 'Buyer', text: 'The workshop lead. Can undo for 10 minutes or until the van leaves, and can ask for a person at any step.' },
-  { name: 'Approver', text: 'The workshop owner. Signs off the exact amount over the limit.' },
-  { name: 'Merchant admin', text: 'Sets and changes the merchant’s rules. Nobody else can.' },
-  { name: 'Sales rep', text: 'Takes each case the agents shouldn’t decide, with overrides logged.' },
+  { name: 'Buyer', tone: 'buyer', text: 'The workshop lead. Can undo for 10 minutes or until the van leaves, and can ask for a person at any step.' },
+  { name: 'Approver', tone: 'buyer', text: 'The workshop owner. Signs off the exact amount over the limit.' },
+  { name: 'Merchant admin', tone: 'merchant', text: 'Sets and changes the merchant’s rules. Nobody else can.' },
+  { name: 'Sales rep', tone: 'merchant', text: 'Takes each case the agents shouldn’t decide, with overrides logged.' },
 ]
 
-type Agent = typeof buyerAgent
-
-function AgentCard({ agent, details }: { agent: Agent; details: boolean }) {
-  return (
-    <article className="cs-agent">
-      <h4 className="cs-card-label">{agent.name}</h4>
-      <div className="cs-agent-field">
-        <p className="cs-agent-label">
-          Value <span className="cs-tag cs-tag-soft">Assumption</span>
-        </p>
-        <p className="cs-h4">{agent.value}</p>
-        <p className="cs-b3 cs-source">{agent.test}</p>
-      </div>
-      <div className="cs-agent-field">
-        <p className="cs-agent-label">Does</p>
-        <p className="cs-b3">{agent.does}</p>
-      </div>
-      {details ? (
-        <>
-          <div className="cs-agent-field">
-            <p className="cs-agent-label">Works for</p>
-            <p className="cs-b3">{agent.worksFor}</p>
-          </div>
-          <div className="cs-agent-field">
-            <p className="cs-agent-label">Channels</p>
-            <p className="cs-b3">{agent.channels}</p>
-          </div>
-        </>
-      ) : null}
-      <div className="cs-agent-field cs-agent-never">
-        <p className="cs-agent-label">Never</p>
-        <p className="cs-b3">{agent.never}</p>
-      </div>
-    </article>
-  )
-}
-
 export function CaseStudy4Proposal({ id }: { id: string }) {
-  const [details, setDetails] = useState(false)
-  const agentsId = `${useId()}-agents`
 
   return (
     <div id={id} className="cs-chapter">
       <section className="cs-block" aria-labelledby={`${id}-title`}>
         <div className="cs-block-head">
-          <p className="cs-chapter-label">03 Proposal</p>
+          <span className="cs-chapter-label"><ShippedBadge>03 Proposal</ShippedBadge></span>
           <h2 id={`${id}-title`} className="cs-h1">
             One agent for the buyer, 4 for the merchant.
           </h2>
@@ -139,21 +52,7 @@ export function CaseStudy4Proposal({ id }: { id: string }) {
         </div>
         <div className="cs-block-body">
           <AgentFlow />
-          <DecisionNote decision="One job per agent.">
-            <p className="cs-b2">
-              Each agent’s limits match its job. The one talking to buyers never writes rules, and
-              the one reviewing never touches an order. The buyer’s agent never sells, and the
-              merchant’s agents never approve for the buyer. That lets each side trust its own
-              agent, and a fault stays inside one job.
-            </p>
-          </DecisionNote>
-          <DecisionNote decision="Each side gets its own agent.">
-            <p className="cs-b2">
-              The buyer’s agent follows the buyer company’s rules, and the merchant’s agents follow
-              the merchant’s. Every Saga merchant offers the buyer’s agent to its buyers by default,
-              so each order stays within both sets of rules, at the merchant’s prices.
-            </p>
-          </DecisionNote>
+          <WhyDecidedFrame />
         </div>
       </section>
 
@@ -166,9 +65,9 @@ export function CaseStudy4Proposal({ id }: { id: string }) {
             What each is worth and how that gets tested, what it does, and what it never does.
           </p>
         </div>
-        <div id={agentsId} className="cs-block-body">
+        <div className="cs-block-body">
           <p className="cs-agent-side">For the buyer</p>
-          <AgentCard agent={buyerAgent} details={details} />
+          <BuyerAgentFrame />
           <DecisionNote decision="The merchant hosts the buyer’s agent. The buyer owns its rules." assumption>
             <p className="cs-b2">
               The merchant offers the agent because Saga is the merchant’s store, and Saga pays to
@@ -187,18 +86,8 @@ export function CaseStudy4Proposal({ id }: { id: string }) {
             </p>
           </DecisionNote>
           <p className="cs-agent-side">For the merchant</p>
-          <div className="cs-agent-grid">
-            {merchantAgents.map((agent) => (
-              <AgentCard key={agent.name} agent={agent} details={details} />
-            ))}
-          </div>
+          <MerchantAgentsFrame />
         </div>
-        <ShowAll
-          open={details}
-          label="Show who each works for and where"
-          controls={agentsId}
-          onToggle={() => setDetails((open) => !open)}
-        />
       </section>
 
       <section className="cs-block" aria-labelledby={`${id}-data`}>
@@ -210,23 +99,7 @@ export function CaseStudy4Proposal({ id }: { id: string }) {
             Where things live, and where the language model stops.
           </p>
         </div>
-        <div className="cs-summary-facts cs-two-up">
-          <div className="cs-summary-fact">
-            <h4 className="cs-card-label">Data stays with the merchant</h4>
-            <p className="cs-b3">
-              Orders, stock and prices stay in the merchant’s ERP. Agents read them live and write
-              orders back through the SAP and Microsoft Dynamics connection Saga webshops already
-              use. Per-car fit data comes from a licensed catalogue.
-            </p>
-          </div>
-          <div className="cs-summary-fact">
-            <h4 className="cs-card-label">Rules decide, not the model</h4>
-            <p className="cs-b3">
-              The language model only understands the request and words the reply. Rules and a score
-              make the decision.
-            </p>
-          </div>
-        </div>
+        <DataDecisionsFrame />
       </section>
 
       <section className="cs-block" aria-labelledby={`${id}-people`}>
@@ -240,21 +113,21 @@ export function CaseStudy4Proposal({ id }: { id: string }) {
         </div>
         <div className="cs-people">
           <div className="cs-people-always">
-            <p className="cs-tag">Always a person</p>
-            <ul className="cs-always-list">
+            <p className="cs-person-pill">Always a person</p>
+            <ul className="cs-person-list">
               {alwaysPerson.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <p className="cs-small">
+            <p className="cs-person-why">
               A wrong decision here costs more than the time an agent would save.
             </p>
           </div>
           <ul className="cs-people-roles">
             {roles.map((role) => (
-              <li key={role.name} className="cs-summary-fact">
-                <h4 className="cs-card-label">{role.name}</h4>
-                <p className="cs-b3">{role.text}</p>
+              <li key={role.name} className={`cs-person-role is-${role.tone}`}>
+                <h4 className="cs-person-role-name">{role.name}</h4>
+                <p className="cs-person-role-text">{role.text}</p>
               </li>
             ))}
           </ul>

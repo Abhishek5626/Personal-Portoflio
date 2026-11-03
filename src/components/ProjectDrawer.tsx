@@ -180,6 +180,23 @@ export function ProjectDrawer({
     scrollRef.current?.scrollTo({ top: 0 })
   }, [shownId])
 
+  // Lets a page drop the bottom blur once there is nothing left to scroll under it.
+  useEffect(() => {
+    const scroller = scrollRef.current
+    if (!scroller?.firstElementChild) return
+    const update = () =>
+      scroller.classList.toggle('is-at-end', scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop < 120)
+    update()
+    scroller.addEventListener('scroll', update, { passive: true })
+    const observer = new ResizeObserver(update)
+    observer.observe(scroller.firstElementChild)
+    return () => {
+      scroller.removeEventListener('scroll', update)
+      observer.disconnect()
+    }
+    // The scroller only exists while the drawer is open, which can come after shownId is set.
+  }, [presentId, shownId])
+
   const locked = presentId !== null
   useEffect(() => {
     if (!locked) return

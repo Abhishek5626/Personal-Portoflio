@@ -71,14 +71,14 @@
   align-items: center;
   gap: 8px;
   color: var(--fx-ink);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 22px;
 }
 
 .af-does {
   color: var(--fx-ink-2);
-  font-size: 15px;
+  font-size: 13px;
   line-height: 23px;
   text-wrap: pretty;
 }
@@ -143,7 +143,7 @@ html[data-theme="dark"] .af-node.is-system {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 20px;
 }
@@ -230,4 +230,9 @@ html[data-theme="dark"] .af-node.is-system {
   .af .fx-wire-ring {
     display: none;
   }
+}
+
+/* Shared pieces inside the flow, such as the play button and pills, match its 13px. */
+.cs-system .af :is(p, span, button, h4, h5, strong, li, div) {
+  font-size: 13px;
 }

@@ -201,6 +201,7 @@ export function CaseStudy4() {
   const rootRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState('cs-research')
   useReveal(rootRef, activeId)
+  const nextChapter = chapters[chapters.findIndex(({ id }) => id === activeId) + 1]
 
   // Chapters are tabs, and a link to one that isn't rendered would change the route.
   const onChapterLink = (event: MouseEvent) => {
@@ -423,6 +424,14 @@ export function CaseStudy4() {
           {activeId === 'cs-prototype' ? <CaseStudy4Prototype id="cs-prototype" /> : null}
           {activeId === 'cs-design-system' ? <CaseStudy4System id="cs-design-system" /> : null}
           {activeId === 'cs-vision' ? <CaseStudy4Vision id="cs-vision" /> : null}
+          <nav className="cs-next" aria-label="Next chapter">
+            <a className="cs-next-button" href={nextChapter ? `#${nextChapter.id}` : '#cs-prototype'}>
+              {nextChapter ? `Next: ${nextChapter.name}` : 'Play the prototype'}
+            </a>
+            <p className="cs-next-text">
+              {nextChapter ? nextChapter.detail : 'That’s the whole case. See it run in the prototype.'}
+            </p>
+          </nav>
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
+import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { TeamMap } from './TeamMap.tsx'
 import { VisionBoard } from './VisionBoard.tsx'
+import { OutcomesFrame } from './CaseStudyFigmaFrames.tsx'
 
 const plan = [
   {
@@ -38,18 +40,12 @@ const quadrants = [
   { order: 4, title: 'Not now', scale: 'Lower impact, high effort', items: ['Negotiation and custom quotes, and no second live merchant before the pilot passes'] },
 ]
 
-const value = [
-  { side: 'For the buyer', text: 'An urgent order takes minutes rather than a phone chase, by voice, WhatsApp, email or the webshop.', measure: '5 minutes or less to order, the median' },
-  { side: 'For the merchant', text: 'Sales reps keep the hard calls and the relationship, and safety parts stay with a person. I expect urgent orders to stay rather than go to the next wholesaler.', measure: 'Workshops ordering again within 30 days' },
-  { side: 'For Saga', text: 'Each merchant becomes agent-ready. Any buyer’s agent can order within its rules, on ERP data Saga already reads, and AI tools build each channel from one design system.', measure: 'More urgent orders through the agents' },
-]
-
 export function CaseStudy4Vision({ id }: { id: string }) {
   return (
     <div id={id} className="cs-chapter">
       <section className="cs-block" aria-labelledby={`${id}-title`}>
         <div className="cs-block-head">
-          <p className="cs-chapter-label">08 Vision</p>
+          <span className="cs-chapter-label"><ShippedBadge>08 Vision</ShippedBadge></span>
           <h2 id={`${id}-title`} className="cs-h1">
             From a phone call to a full record.
           </h2>
@@ -136,24 +132,7 @@ export function CaseStudy4Vision({ id }: { id: string }) {
             Value for the buyer, the merchant and Saga, each with its own measure.
           </p>
         </div>
-        <div className="cs-summary">
-          <p className="cs-tag">North star</p>
-          <p className="cs-h3">Faster urgent orders, with no rise in wrong parts.</p>
-          <ul className="cs-checks">
-            {value.map((item) => (
-              <li key={item.side} className="cs-summary-fact">
-                <h4 className="cs-card-label">{item.side}</h4>
-                <p className="cs-b3">{item.text}</p>
-                <p className="cs-gate">{item.measure}</p>
-              </li>
-            ))}
-          </ul>
-          <p className="cs-small">
-            Measured rather than promised: the pilot reads these after 300 agent orders and their
-            return window. It stops if wrong-part returns double, and a merchant can pause any
-            category in one click.
-          </p>
-        </div>
+        <OutcomesFrame />
       </section>
 
       <section className="cs-closing" aria-labelledby={`${id}-close`}>

@@ -221,7 +221,7 @@ html[data-theme="dark"] .op-code {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 20px;
   text-wrap: balance;
@@ -320,7 +320,7 @@ html[data-theme="dark"] .op-pill.is-none {
 .op-caption-text {
   max-width: 72ch;
   color: var(--fx-ink);
-  font-size: 15px;
+  font-size: 13px;
   line-height: 23px;
   text-wrap: pretty;
 }
@@ -362,14 +362,14 @@ html[data-theme="dark"] .op-pill.is-none {
   align-items: center;
   gap: 8px;
   color: var(--fx-ink);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 23px;
 }
 
 .cs-system .op-cell-text {
   color: var(--fx-ink-2);
-  font-size: 15px;
+  font-size: 13px;
   line-height: 23px;
   text-wrap: pretty;
 }
@@ -505,7 +505,7 @@ html[data-theme="dark"] .op-pill.is-none {
     grid-area: 2 / 2;
     padding: 8px 12px 0;
     color: var(--fx-ink-2);
-    font-size: 15px;
+    font-size: 13px;
     line-height: 23px;
     text-wrap: pretty;
   }

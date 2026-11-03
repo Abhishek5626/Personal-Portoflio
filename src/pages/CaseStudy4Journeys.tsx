@@ -1,4 +1,7 @@
+import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { OrderPath } from './OrderPath.tsx'
+import { ChannelsFrame } from './CaseStudyFigmaFrames.tsx'
+import { JourneyBoard, type JourneyCard } from './JourneyBoard.tsx'
 
 type PathStep = { code: string; title: string; hint: string; text: string; person?: boolean }
 
@@ -23,24 +26,10 @@ const control = [
   { code: 'B7', title: 'Be undone', text: 'Undo lasts 10 minutes, or until the van leaves. After that, one message starts a return.' },
 ]
 
-type Card = {
-  code: string
-  title: string
-  channel: string
-  points: string[]
-  edge: string
-  test?: string
-  today?: boolean
-  links?: string[]
-  group?: string
-  bands?: boolean
-  why?: { title: string; decided: string; favour: string; watch: string }
-}
-
-const buyerCards: Card[] = [
+const buyerCards: JourneyCard[] = [
   {
-    code: 'B1', title: 'Trigger', channel: 'Voice, WhatsApp, Email',
-    points: ['Says it’s the merchant’s AI agent, then finds the car', 'The buyer’s agent checks the caller is on the company’s list'],
+    code: 'B1', title: 'Trigger', channel: 'Voice, WhatsApp, Email', bold: 1,
+    points: ['Says it is the merchant’s AI agent, then finds the car', 'The buyer’s agent checks the caller is on the company’s list'],
     edge: 'Unknown number: the approver confirms the caller', test: 'visits, voice test', links: ['M2'],
     why: {
       title: 'The order starts where the buyer already is.',
@@ -50,17 +39,17 @@ const buyerCards: Card[] = [
     },
   },
   {
-    code: 'B2', title: 'Identify part', channel: 'Voice, WhatsApp, Email',
-    points: ['If two versions fit: one question, never a form', 'Each line of a multi-part job gets its own score'],
-    edge: 'No fit data: a sales rep picks the part, as the agent never guesses', test: 'visits', links: ['M1'],
+    code: 'B2', title: 'Identify part', channel: 'Voice, WhatsApp, Email', bold: 0,
+    points: ['2 versions fit: 1 question, never a form', 'Each line of a multi-part job is scored on its own'],
+    edge: 'No fit data: a sales rep picks the part, the agent never guesses', test: 'visits', links: ['M1'],
   },
   {
-    code: 'B3', title: 'Search network', channel: 'Merchant ERP',
-    points: ['Warehouse, branch, then equivalents, live from the ERP', 'Every number shows its source and age'],
+    code: 'B3', title: 'Search network', channel: 'Merchant ERP', bold: 1,
+    points: ['Warehouse, branch, then equivalents, live from the ERP', 'Source and age on every number'],
     edge: 'ERP not reachable: a sales rep checks stock by phone', today: true, links: ['M1'],
   },
   {
-    code: 'B4', title: 'Decide', channel: 'Agent', bands: true,
+    code: 'B4', title: 'Decide', channel: 'Agent', bands: true, bold: 0,
     points: ['Hard rules first: a safety part always goes to a person', 'Then the fit score, then preference among parts that fit'],
     edge: 'Credit hold: a sales rep decides, whatever the score', test: 'replay', links: ['M2', 'M4', 'M5'],
     why: {
@@ -71,9 +60,9 @@ const buyerCards: Card[] = [
     },
   },
   {
-    code: 'B5', title: 'Approve', channel: 'WhatsApp',
-    points: ['Inside the limit: no approval needed', 'Over €300: the approver decides in one tap'],
-    edge: 'No reply in 15 minutes: a reminder, with the part still held', test: 'visits, pilot', links: ['M6'],
+    code: 'B5', title: 'Approve', channel: 'WhatsApp', bold: 1,
+    points: ['Inside the limit: no approval', 'Over €300: the approver decides in 1 tap'],
+    edge: 'No reply in 15 minutes: a reminder, the part stays held', test: 'visits, pilot', links: ['M6'],
     why: {
       title: 'The buyer’s own agent asks the approver.',
       decided: 'An urgent repair can’t wait in an inbox. The buyer’s agent sends one WhatsApp card with the exact part, price and reason, for a one-tap answer.',
@@ -82,32 +71,32 @@ const buyerCards: Card[] = [
     },
   },
   {
-    code: 'B6', title: 'Delivery', channel: 'WhatsApp, Email',
-    points: ['Stock held since the quote', 'Order in the ERP, and the van booked with its arrival time'],
+    code: 'B6', title: 'Delivery', channel: 'WhatsApp, Email', bold: 1,
+    points: ['Stock held since the quote', 'Order in the ERP, van booked with its arrival time'],
     edge: 'Van late: the buyer hears the new time first', test: 'pilot', links: ['M6'],
   },
   {
-    code: 'B7', title: 'Confirm', channel: 'Voice, WhatsApp, Email',
-    points: ['Reads back the part, price and arrival, then sends a receipt', 'Undo for 10 minutes, or until the van leaves'],
-    edge: 'Undo after the van has left: it becomes a return', test: 'pilot',
+    code: 'B7', title: 'Confirm', channel: 'Voice, WhatsApp, Email', bold: 1,
+    points: ['Reads back part, price and arrival, then a receipt', 'Undo for 10 minutes, or until the van leaves'],
+    edge: 'Undo after the van left: it becomes a return', test: 'pilot',
   },
   {
-    code: 'B8', title: 'Record and return', channel: 'Webshop, Email',
-    points: ['Each decision in the webshop log, with rule, score and source', 'A return takes one message, and only teaches preference'],
+    code: 'B8', title: 'Record and return', channel: 'Webshop, Email', bold: 0,
+    points: ['Every decision in the webshop log: rule, score, source', 'A return takes 1 message, and teaches preference only'],
     edge: 'Merchant’s mistake: a free urgent resend', test: 'pilot', links: ['M7'],
   },
 ]
 
-const merchantCards: Card[] = [
+const merchantCards: JourneyCard[] = [
   {
-    group: 'Set up once', code: 'M1', title: 'Connect', channel: 'Merchant settings',
+    group: 'Set up once', code: 'M1', title: 'Connect', channel: 'Merchant settings', bold: 1,
     points: ['ERP, catalogue and cross-references connected', 'Prices and stock read live'],
-    edge: 'No OE number or cross-reference: never ordered alone', test: 'replay', links: ['B2', 'B3'],
+    edge: 'No OE number or cross-reference: never ordered alone', test: 'replay', links: ['B2, B3'],
   },
   {
-    code: 'M2', title: 'Set rules', channel: 'Merchant settings',
-    points: ['The setup agent suggests each threshold, 85 to start, and the admin approves', 'Safety categories always go to a person'],
-    edge: 'A buyer’s company can only make the rules stricter', test: 'replay', links: ['B1', 'B4'],
+    code: 'M2', title: 'Set rules', channel: 'Merchant settings', bold: 1,
+    points: ['The setup agent suggests each threshold, 85 to start. The admin approves', 'Safety categories: always a person'],
+    edge: 'A buyer’s company can only make the rules stricter', test: 'replay', links: ['B1, B4'],
     why: {
       title: 'One template for every merchant.',
       decided: 'Each merchant fills the same template per category, and only the values change. The setup agent suggests them and the merchant admin approves.',
@@ -116,9 +105,9 @@ const merchantCards: Card[] = [
     },
   },
   {
-    code: 'M3', title: 'Test, then go live', channel: 'Merchant settings',
-    points: ['The setup agent replays past orders and shows where the rep disagreed', 'A category goes live only at 90% rep agreement'],
-    edge: 'Under 90%: adjust the threshold and replay again', test: 'replay, interviews',
+    code: 'M3', title: 'Test, then go live', channel: 'Merchant settings', bold: 1,
+    points: ['The setup agent replays past orders, and shows where the rep disagreed', 'A category goes live only at 90% rep agreement'],
+    edge: 'Under 90%: adjust the threshold, replay again', test: 'replay, interviews',
     why: {
       title: 'Replay before any real order.',
       decided: 'I don’t expect any merchant to let an agent sell on day one. Replaying past orders shows where it would be right before it touches a real one.',
@@ -127,24 +116,24 @@ const merchantCards: Card[] = [
     },
   },
   {
-    group: 'Run every day', code: 'M4', title: 'Case arrives', channel: 'Chat',
-    points: ['A hard rule or a fit below 70: one case card for a sales rep', 'No rep free: the buyer hears when, and stock stays held'],
+    group: 'Run every day', code: 'M4', title: 'Case arrives', channel: 'Chat', bold: 0,
+    points: ['A hard rule or a fit under 70: 1 case card for a sales rep', 'No rep free: the buyer hears when, stock stays held'],
     edge: 'Opening a case locks it, so 2 reps never take the same one', test: 'rep queue pilot', links: ['B4'],
   },
   {
-    code: 'M5', title: 'Review and decide', channel: 'Chat',
-    points: ['The card shows the car, why the agent stopped, and every option', '5-minute answer target, then the next rep'],
+    code: 'M5', title: 'Review and decide', channel: 'Chat', bold: 1,
+    points: ['The card shows the car, why the agent stopped, every option', '5 minute answer target, then the next rep'],
     edge: 'Part not confirmed: the rep swaps it or calls the buyer', test: 'rep queue pilot', links: ['B4'],
   },
   {
-    code: 'M6', title: 'Quote and fulfil', channel: 'Chat, ERP',
-    points: ['Quote at contract price, held for the approver over the limit', 'Stock held, van booked and order in the ERP'],
-    edge: 'Price moves after approval: the approver is asked again', test: 'pilot', links: ['B5', 'B6'],
+    code: 'M6', title: 'Quote and fulfil', channel: 'Chat, ERP', bold: 1,
+    points: ['Quote at contract price, held for the approver over the limit', 'Stock held, van booked, order in the ERP'],
+    edge: 'Price moves after approval: the approver is asked again', test: 'pilot', links: ['B5, B6'],
   },
   {
-    group: 'Review every month', code: 'M7', title: 'Review and tune', channel: 'Webshop, Email',
-    points: ['Acted, asked and handed over, with undo and return rates', 'A person changes the rules, and the agent only suggests'],
-    edge: 'Returns rise in a category: pause it in one click', test: 'pilot', links: ['B8'],
+    group: 'Review every month', code: 'M7', title: 'Review and tune', channel: 'Webshop, Email', bold: 1,
+    points: ['Acted, asked and handed over, with undo and return rates', 'A person changes rules, the agent only suggests'],
+    edge: 'Returns rise in a category: pause it in 1 click', test: 'pilot', links: ['B8'],
     why: {
       title: 'Only a person tunes the rules.',
       decided: 'A merchant lets the agent do more only after seeing it be right.',
@@ -154,82 +143,12 @@ const merchantCards: Card[] = [
   },
 ]
 
-const channels = [
-  { name: 'Voice', who: 'Buyer', text: 'Orders hands-free and hears the read-back. Calls get refined in a real workshop, with voice notes as the backup.' },
-  { name: 'WhatsApp', who: 'Buyer and approver', text: 'The approver’s one-tap approval, plus voice notes, choices, receipts and undo.' },
-  { name: 'Email', who: 'Buyer, accounts team, merchant admin', text: 'An order can start and end by email, along with invoices and the monthly review.' },
-  { name: 'Chat', who: 'Sales rep', text: 'Each handover arrives with the whole case, so the buyer never repeats anything.' },
-  { name: 'Webshop', who: 'Everyone', text: 'The record of every order, return and rule, whichever channel it started in.' },
-]
-
-function JourneyCard({ card, id }: { card: Card; id: string }) {
-  return (
-    <>
-      {card.group ? <p className="cs-journey-group">{card.group}</p> : null}
-      <article id={`${id}-${card.code}`} className="cs-agent cs-journey-card">
-        <div className="cs-journey-top">
-          <span className="cs-journey-code">{card.code}</span>
-          <h5 className="cs-card-label">{card.title}</h5>
-          <span className="cs-b3 cs-source">{card.channel}</span>
-        </div>
-        <ul className="cs-role-points cs-journey-points">
-          {card.points.map((point) => (
-            <li key={point}>{point}</li>
-          ))}
-        </ul>
-        {card.bands ? (
-          <ul className="cs-journey-bands">
-            <li className="cs-outcome is-acts">From 85: orders</li>
-            <li className="cs-outcome is-asks">From 70: asks</li>
-            <li className="cs-outcome is-hands-over">Under 70: sales rep</li>
-          </ul>
-        ) : null}
-        <p className="cs-b3 cs-journey-edge">
-          <strong>Edge case:</strong> {card.edge}
-        </p>
-        <div className="cs-journey-tags">
-          {card.today ? (
-            <span className="cs-confidence is-high">Builds on Saga today</span>
-          ) : (
-            <span className="cs-confidence">Test: {card.test}</span>
-          )}
-          {card.links?.map((code) => (
-            <a key={code} className="cs-journey-link" href={`#${id}-${code}`}>
-              {code}
-            </a>
-          ))}
-        </div>
-        {card.why ? (
-          <details className="cs-journey-why">
-            <summary>Why</summary>
-            <p className="cs-h4">{card.why.title}</p>
-            <dl className="cs-limit-list">
-              <div>
-                <dt className="cs-agent-label">Why I decided this</dt>
-                <dd className="cs-b3">{card.why.decided}</dd>
-              </div>
-              <div>
-                <dt className="cs-agent-label">In Saga’s favour</dt>
-                <dd className="cs-b3">{card.why.favour}</dd>
-              </div>
-              <div>
-                <dt className="cs-agent-label">Watch out</dt>
-                <dd className="cs-b3">{card.why.watch}</dd>
-              </div>
-            </dl>
-          </details>
-        ) : null}
-      </article>
-    </>
-  )
-}
-
 export function CaseStudy4Journeys({ id }: { id: string }) {
   return (
     <div id={id} className="cs-chapter">
       <section className="cs-block" aria-labelledby={`${id}-title`}>
         <div className="cs-block-head">
-          <p className="cs-chapter-label">05 Journeys</p>
+          <span className="cs-chapter-label"><ShippedBadge>05 Journeys</ShippedBadge></span>
           <h2 id={`${id}-title`} className="cs-h1">
             Two journeys, one order.
           </h2>
@@ -272,38 +191,7 @@ export function CaseStudy4Journeys({ id }: { id: string }) {
             of any handover.
           </p>
         </div>
-        <div className="cs-roles">
-          <div className="cs-role-side is-a">
-            <div className="cs-journey-head">
-              <p className="cs-role-label">Workshop side, B1 to B8</p>
-              <h4 className="cs-h3">Buyer journey</h4>
-              <p className="cs-b3">
-                A part fails with the car on the lift. The buyer orders by voice, WhatsApp or email,
-                with an agent of its own.
-              </p>
-            </div>
-            <div className="cs-role-cards">
-              {buyerCards.map((card) => (
-                <JourneyCard key={card.code} card={card} id={id} />
-              ))}
-            </div>
-          </div>
-          <div className="cs-role-side is-b">
-            <div className="cs-journey-head">
-              <p className="cs-role-label">Merchant side, M1 to M7</p>
-              <h4 className="cs-h3">Merchant journey</h4>
-              <p className="cs-b3">
-                The merchant sets the rules once, takes the cases the agent shouldn’t decide, and
-                tunes things each month.
-              </p>
-            </div>
-            <div className="cs-role-cards">
-              {merchantCards.map((card) => (
-                <JourneyCard key={card.code} card={card} id={id} />
-              ))}
-            </div>
-          </div>
-        </div>
+        <JourneyBoard buyer={buyerCards} merchant={merchantCards} id={id} />
       </section>
 
       <section className="cs-block" aria-labelledby={`${id}-channels`}>
@@ -317,15 +205,7 @@ export function CaseStudy4Journeys({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <ul className="cs-channels">
-            {channels.map((channel) => (
-              <li key={channel.name} className="cs-summary-fact">
-                <h4 className="cs-card-label">{channel.name}</h4>
-                <p className="cs-b3 cs-source">{channel.who}</p>
-                <p className="cs-b3">{channel.text}</p>
-              </li>
-            ))}
-          </ul>
+          <ChannelsFrame />
           <p className="cs-small cs-note-text">
             The same two journeys work for a food wholesaler. Only the trade data changes, with
             allergens and pack sizes replacing car fit.

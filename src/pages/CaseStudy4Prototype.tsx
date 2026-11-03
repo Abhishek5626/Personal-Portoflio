@@ -1,3 +1,4 @@
+import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { useEffect, useRef, useState } from 'react'
 import { VoicePath } from './VoicePath.tsx'
 
@@ -90,7 +91,7 @@ export function CaseStudy4Prototype({ id }: { id: string }) {
     <div id={id} className="cs-chapter">
       <section className="cs-block" aria-labelledby={`${id}-title`}>
         <div className="cs-block-head">
-          <p className="cs-chapter-label">06 Prototype</p>
+          <span className="cs-chapter-label"><ShippedBadge>06 Prototype</ShippedBadge></span>
           <h2 id={`${id}-title`} className="cs-h1">
             Play one urgent order.
           </h2>

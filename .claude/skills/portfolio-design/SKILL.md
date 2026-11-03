@@ -52,7 +52,7 @@ Each one came from a correction or a real defect.
    ```
    Image links in that output expire, so run the converter or download images straight after reading a frame.
    Read the output offline and keep only what you need, because these files are large. Layer names are often not the visible text, so match frames to sections using the text inside the generated code.
-2. **Check the width.** The case study column is 931px. A frame at 931 can be built to exact size. A wider one has to reflow: columns narrow and text wraps. Tell the user which is which.
+2. **Check the width.** The case study column is 931px. A frame at 931 can be built to exact size. A wider one has to reflow: columns narrow and text wraps. Tell the user which is which. Reflow keeps the arrangement: don't turn a row of 4 into a 2 × 2 grid, because the user rejected that. Use the reference's type sizes, and tighten spacing if it's needed to fit.
 3. **Choose how to build.**
    - Exact-fit or small frames: write plain TSX and CSS by hand.
    - Large static frames: `scripts/figma_to_css.py` converts Dev Mode code to TSX and plain CSS. Fixed widths flex and fixed heights become minimums.
