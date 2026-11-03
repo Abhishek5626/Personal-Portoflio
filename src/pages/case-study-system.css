@@ -89,6 +89,8 @@ html[data-theme="dark"] .cs-system {
 .cs-system h3,
 .cs-system h4,
 .cs-system table,
+.cs-system dl,
+.cs-system dd,
 .cs-system ol,
 .cs-system ul,
 .cs-system figure {
@@ -1149,6 +1151,221 @@ a.cs-toc-row {
   list-style: none;
 }
 
+/* Trust */
+.cs-outcome {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 99px;
+  background: var(--cs-note);
+  color: var(--cs-note-ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+  white-space: nowrap;
+}
+
+.cs-outcome.is-acts {
+  background: var(--cs-after);
+  color: var(--cs-positive);
+}
+
+.cs-outcome.is-hands-over {
+  background: var(--cs-side-a);
+  color: var(--cs-side-a-ink);
+}
+
+.cs-outcome.is-stops {
+  background: var(--cs-side-b);
+  color: var(--cs-side-b-ink);
+}
+
+.cs-checks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  list-style: none;
+}
+
+.cs-orders {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--cs-surface);
+  list-style: none;
+}
+
+.cs-order {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.6fr) 84px minmax(0, 2fr);
+  align-items: start;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--cs-divider);
+}
+
+.cs-order:last-child {
+  border-bottom: 0;
+}
+
+.cs-order-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cs-order .cs-outcome {
+  justify-self: start;
+}
+
+.cs-limits-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+}
+
+.cs-limit-agent,
+.cs-limit-role {
+  display: block;
+}
+
+.cs-limit-role {
+  color: var(--cs-text-muted);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.48px;
+}
+
+.cs-limit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cs-try {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 14px;
+}
+
+.cs-dial {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+.cs-dial-switch {
+  display: flex;
+  gap: 4px;
+}
+
+.cs-dial-part {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--cs-text-muted);
+  font: 500 12px/16px Inter, sans-serif;
+  letter-spacing: -0.48px;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.cs-dial-part[aria-pressed="true"] {
+  background: var(--cs-chip);
+  color: var(--cs-text);
+}
+
+.cs-dial-part:focus-visible,
+.cs-dial-slider:focus-visible,
+.cs-link:focus-visible {
+  outline: 2px solid var(--cs-focus);
+  outline-offset: 2px;
+}
+
+.cs-dial-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-dial-slider {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--cs-heading);
+  cursor: pointer;
+}
+
+.cs-dial-scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--cs-text-muted);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-dial-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+}
+
+.cs-dial-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.2fr);
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.cs-dial-option.is-picked {
+  background: var(--cs-after);
+}
+
+.cs-dial-option .cs-source {
+  text-align: right;
+}
+
+.cs-dial-result {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: -0.56px;
+}
+
+.cs-decide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+}
+
+.cs-privacy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.cs-link {
+  color: var(--cs-side-a-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-dial-part,
+  .cs-show-all {
+    transition: none;
+  }
+}
+
 /* The two columns no longer fit: same break as Case Study 2. */
 @media (max-width: 1199px) {
   .cs-system {
@@ -1258,6 +1475,8 @@ a.cs-toc-row {
     grid-template-rows: none;
   }
 
+  .cs-checks,
+  .cs-try,
   .cs-agent-map,
   .cs-route,
   .cs-agent-grid,
@@ -1279,6 +1498,37 @@ a.cs-toc-row {
   .cs-route {
     grid-auto-flow: row;
     grid-template-rows: none;
+  }
+
+  .cs-order {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cs-order-fit,
+  .cs-order-why {
+    grid-column: 1 / -1;
+    order: 1;
+  }
+
+  .cs-order-why {
+    order: 2;
+  }
+
+  .cs-limits-table {
+    display: none;
+  }
+
+  .cs-limits-cards {
+    display: flex;
+  }
+
+  .cs-dial-option {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cs-dial-option .cs-source {
+    grid-column: 1 / -1;
+    text-align: left;
   }
 
   .cs-table th,
