@@ -1,3 +1,6 @@
+import { useEffect, useRef, useState } from 'react'
+import { CaseStudy4Research } from './CaseStudy4Research.tsx'
+import { DecisionNote } from './caseStudyParts.tsx'
 import './case-study-system.css'
 
 /** The page's opening content; nothing else needs to change to replace it. */
@@ -177,8 +180,8 @@ function RouteIcon() {
 
 /** Chapters without a built section are plain text until they get one. */
 const chapters = [
-  { name: 'Situation', detail: 'Where B2B buying stands', href: '#cs-opening' },
-  { name: 'Research' },
+  { name: 'Situation', detail: 'Where B2B buying stands', id: 'cs-situation' },
+  { name: 'Research', detail: 'What I know, what to test', id: 'cs-research' },
   { name: 'Proposal' },
   { name: 'Trust' },
   { name: 'Journeys' },
@@ -188,25 +191,51 @@ const chapters = [
 ]
 
 export function CaseStudy4() {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [activeId, setActiveId] = useState<string | undefined>(chapters[0].id)
+
+  // The current chapter is the one crossing the middle of the screen.
+  useEffect(() => {
+    const root = rootRef.current?.closest('.project-drawer-scroll')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveId(entry.target.id)
+        }
+      },
+      { root, rootMargin: '-50% 0px -49% 0px' },
+    )
+    for (const { id } of chapters) {
+      const chapter = id && document.getElementById(id)
+      if (chapter) observer.observe(chapter)
+    }
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <div className="cs-system">
+    <div ref={rootRef} className="cs-system">
       <div className="cs-shell">
         <nav className="cs-toc" aria-label="Case study sections">
           <ol className="cs-toc-list">
-            {chapters.map(({ name, detail, href }, index) => {
+            {chapters.map(({ name, detail, id }, index) => {
+              const current = id === activeId
               const body = (
                 <>
                   <span className="cs-toc-number">{index + 1}</span>
                   <span className="cs-toc-text">
                     <span className="cs-toc-name">{name}</span>
-                    {detail ? <span className="cs-toc-detail">{detail}</span> : null}
+                    {current && detail ? <span className="cs-toc-detail">{detail}</span> : null}
                   </span>
                 </>
               )
               return (
-                <li key={name} className={href ? 'is-current' : undefined}>
-                  {href ? (
-                    <a className="cs-toc-row" href={href} aria-current="location">
+                <li key={name} className={current ? 'is-current' : undefined}>
+                  {id ? (
+                    <a
+                      className="cs-toc-row"
+                      href={`#${id}`}
+                      aria-current={current ? 'location' : undefined}
+                    >
                       {body}
                     </a>
                   ) : (
@@ -220,7 +249,8 @@ export function CaseStudy4() {
         </nav>
 
         <div className="cs-content">
-          <section id="cs-opening" className="cs-opening" aria-labelledby="case-title">
+          <div id="cs-situation" className="cs-chapter">
+          <section className="cs-opening" aria-labelledby="case-title">
             <header className="cs-opening-head">
               <div className="cs-opening-copy">
                 <p className="cs-status">
@@ -361,6 +391,23 @@ export function CaseStudy4() {
               ))}
             </div>
           </section>
+
+          <DecisionNote decision="The agents build on the ERP data Saga already reads.">
+            <p className="cs-b2">
+              An agent is only as good as its data and rules. Saga webshops already read live
+              stock and contract prices from SAP or Dynamics; the missing piece is per-car fit
+              data, licensed from a catalogue provider. An outside WhatsApp agent has neither the
+              live ERP data nor the merchant’s rules. Today calls and quotes happen outside Saga,
+              while with agents every decision happens on Saga and gets logged.
+            </p>
+            <p className="cs-small">
+              The SAP and Dynamics link exists in Saga today. What outside agents lack is my
+              reading, not a study.
+            </p>
+          </DecisionNote>
+          </div>
+
+          <CaseStudy4Research id="cs-research" />
         </div>
       </div>
     </div>

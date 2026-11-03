@@ -247,7 +247,7 @@ Purpose: orientation and jumping within a long page. Figma, and Observed with on
 - **States:** default, hover, current, focus.
 - **Configurable:** items, subtitles, footer link, numbered or not.
 
-> **In this repo:** case studies are routed by hash (`#/case-study-1`), but `href="#section"` is safe: `ProjectDrawer` intercepts in-page links, moves focus to the target and scrolls it into view. Scrolling happens in `.project-drawer-scroll`, not the window, and the drawer's controls need `scroll-margin-top` of 88px.
+> **In this repo:** case studies are routed by hash (`#/case-study-1`), but `href="#section"` is safe: `ProjectDrawer` intercepts in-page links, moves focus to the target and scrolls it into view. Scrolling happens in `.project-drawer-scroll`, not the window, and its 88px `scroll-padding-top` already clears the drawer's controls, so sections need no scroll margin.
 
 ### `CaseHeader`: page header
 
