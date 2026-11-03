@@ -92,6 +92,89 @@ const testCase = {
   ],
 }
 
+const urgentOrder = {
+  title: 'One urgent order',
+  summary:
+    'A Golf in bay 2 needs a new water pump today, and the car is stuck on the lift. A timing belt kit goes in as well while the engine is open. This one order runs through the whole case and the prototype.',
+  sides: [
+    {
+      title: 'The urgent order today',
+      summary:
+        'I expect most urgent orders to arrive by phone or WhatsApp rather than the webshop. Workshop visits and a 2-week call count will test that.',
+      tone: 'before',
+      timing: 'About an hour',
+      timingDetail:
+        'First call to order placed, and most of it is waiting. To be timed on 30 to 50 of the pilot merchant’s phone orders before day 1.',
+      steps: [
+        {
+          title: 'Call',
+          text: 'With greasy hands and no part number, the buyer rings the merchant. If nobody answers, I expect them to try the next wholesaler, which the workshop visits will test.',
+        },
+        {
+          title: 'Read out',
+          text: 'A sales rep reads out candidate part numbers until one matches.',
+        },
+        {
+          title: 'Check by hand',
+          text: 'The rep checks stock, branches and equivalents in the ERP while the buyer waits.',
+        },
+        {
+          title: 'Quote by email',
+          text: 'The price goes by email, so the order never passes through the webshop.',
+        },
+        {
+          title: 'Wait for sign off',
+          text: 'The approver is elsewhere. Meanwhile the car stays on the lift and the bay earns nothing.',
+        },
+      ],
+    },
+    {
+      title: 'With the agents',
+      summary: 'The same order takes minutes, not an hour.',
+      tone: 'after',
+      timing: 'Minutes',
+      timingDetail:
+        'First message to order placed. To pass, the median must be 5 minutes or less on orders needing no approval, so agents are judged on what they control. Orders waiting on an approver are timed separately, wait included.',
+      steps: [
+        {
+          title: 'Speak, type or send a photo',
+          text: 'The buyer can call, send a WhatsApp voice note or a photo of the plate, or write an email. The merchant’s agent replies straight away and identifies the car. Bays are loud, so calls get tested in a real workshop, with voice notes as the backup.',
+        },
+        {
+          title: 'Clarity first',
+          text: 'When two versions of a part fit, or a detail is missing, the agent asks one short question rather than sending a form.',
+        },
+        {
+          title: 'Live from the ERP',
+          text: 'Stock and contract price come live from the ERP, along with the van time. Every number shows its source and age. One order record keeps the webshop, WhatsApp and email in step.',
+        },
+        {
+          title: 'Act, ask or hand over',
+          text: 'The agent scores each part’s fit out of 100. At or above the merchant’s threshold, 85 to start, it orders. From 70 up to the threshold, it asks the buyer to confirm. Below 70, a sales rep decides. Safety parts always go to a person.',
+        },
+        {
+          title: 'People keep control',
+          text: 'Above the workshop’s limit, the buyer’s agent sends the exact amount to the approver, who approves or declines with one tap on their phone. The part is held meanwhile. Undo lasts 10 minutes, or until the van leaves, whichever comes first.',
+        },
+      ],
+    },
+  ],
+}
+
+function RouteIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path
+        d="M1.5 5.5 11 1 6.5 10.5 5.5 6.5 1.5 5.5Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 /** Chapters without a built section are plain text until they get one. */
 const chapters = [
   { name: 'Situation', detail: 'Where B2B buying stands', href: '#cs-opening' },
@@ -227,6 +310,55 @@ export function CaseStudy4() {
                   </ul>
                 </aside>
               </div>
+            </div>
+          </section>
+
+          <section className="cs-block" aria-labelledby="cs-urgent-order">
+            <div className="cs-block-head">
+              <h2 id="cs-urgent-order" className="cs-h2">
+                {urgentOrder.title}
+              </h2>
+              <p className="cs-b1 cs-urgent-summary">{urgentOrder.summary}</p>
+            </div>
+            <div className="cs-compare">
+              {urgentOrder.sides.map((side) => (
+                <div key={side.title} className="cs-compare-side">
+                  <div className="cs-compare-head">
+                    <span className="cs-marker" aria-hidden="true" />
+                    <h3 className="cs-step-title">{side.title}</h3>
+                    <p className="cs-small">{side.summary}</p>
+                  </div>
+                  <div className="cs-compare-timing">
+                    <div className={`cs-timing is-${side.tone}`}>
+                      <div className="cs-timing-route" aria-hidden="true">
+                        <RouteIcon />
+                        <span className="cs-timing-line" />
+                        <RouteIcon />
+                      </div>
+                      <div className="cs-timing-copy">
+                        <p className="cs-timing-label">
+                          {side.timing}
+                          <span className="cs-tag">Assumption</span>
+                        </p>
+                        <p className="cs-timing-text">{side.timingDetail}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <ol className="cs-steps">
+                    {side.steps.map((step, index) => (
+                      <li key={step.title} className="cs-step">
+                        <span className="cs-marker" aria-hidden="true">
+                          {side.tone === 'after' ? '✓' : index + 1}
+                        </span>
+                        <div className="cs-step-copy">
+                          <h4 className="cs-step-title">{step.title}</h4>
+                          <p className="cs-small">{step.text}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
             </div>
           </section>
         </div>
