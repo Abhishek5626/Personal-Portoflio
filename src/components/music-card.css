@@ -177,6 +177,9 @@ html .music-card .music-card-play {
   background: var(--music-accent);
   color: var(--music-accent-ink);
   outline-color: #fff;
+  /* Solid fill: there is nothing behind it to blur. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .music-card-play-icon {

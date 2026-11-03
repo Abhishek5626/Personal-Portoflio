@@ -299,6 +299,13 @@ html[data-loader] .is-entrance-pending .project-fisheye-entrance {
     justify-content: space-between;
   }
 
+  /* Small pills over a flat card: a blur re-run every frame of a pan shows nothing. */
+  html .is-mobile-stack .project-fisheye-tile .shipped-badge,
+  html .is-mobile-stack .project-fisheye-tile .work-experience-reset {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
   /* The frame's 212px testimonial has room for one more line than desktop. */
   .is-mobile-stack .project-fisheye-tile .testimonial-quote p {
     -webkit-line-clamp: 3;

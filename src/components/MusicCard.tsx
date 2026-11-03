@@ -25,6 +25,10 @@ const track = {
 }
 
 const SKIP_SECONDS = 10
+/** The clock shows seconds and the slider moves under a pixel per second. */
+const PROGRESS_INTERVAL_MS = 250
+/** Movement that makes a press a drag; a swipe across the slider must not seek. */
+const SEEK_DRAG_PX = 4
 
 let artworkHue: Promise<{ hue: number; saturation: number } | null> | null = null
 
@@ -85,10 +89,6 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
-function prefersReducedMotion() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
 function PlayTriangle() {
   return (
     <svg className="music-card-play-icon" width="13" height="15" viewBox="0 0 13 15" aria-hidden="true">
@@ -140,7 +140,7 @@ function ProgressSeek({
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const draggingRef = useRef(false)
-  const pressProgressRef = useRef(0)
+  const pressRef = useRef({ x: 0, moved: false })
   const [dragging, setDragging] = useState(false)
 
   const ratioFromClientX = (clientX: number) => {
@@ -190,28 +190,31 @@ function ProgressSeek({
           return
         }
         event.preventDefault()
-        pressProgressRef.current = progress
+        pressRef.current = { x: event.clientX, moved: false }
         draggingRef.current = true
         setDragging(true)
         event.currentTarget.setPointerCapture(event.pointerId)
-        onSeek(ratioFromClientX(event.clientX))
       }}
       onPointerMove={(event) => {
-        if (draggingRef.current) {
-          onSeek(ratioFromClientX(event.clientX))
-        }
-      }}
-      onPointerUp={finishPointer}
-      onPointerCancel={finishPointer}
-      onLostPointerCapture={(event) => {
-        // The page's drag took over (a vertical drag began here): undo the
-        // press-to-seek so panning never skips the track.
         if (!draggingRef.current) {
           return
         }
-        onSeek(pressProgressRef.current)
+        if (!pressRef.current.moved && Math.abs(event.clientX - pressRef.current.x) < SEEK_DRAG_PX) {
+          return
+        }
+        pressRef.current.moved = true
+        onSeek(ratioFromClientX(event.clientX))
+      }}
+      onPointerUp={(event) => {
+        // A tap seeks too, but only here: until now it could still become a pan
+        // of the page, which must never load the player or skip the track.
+        if (draggingRef.current && !pressRef.current.moved) {
+          onSeek(ratioFromClientX(event.clientX))
+        }
         finishPointer(event)
       }}
+      onPointerCancel={finishPointer}
+      onLostPointerCapture={finishPointer}
       onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
         if (disabled) {
           return
@@ -251,9 +254,7 @@ export function MusicCard() {
   const playerRef = useRef<YouTubePlayer | null>(null)
   const shellRef = useRef<HTMLDivElement>(null)
   const tickerRef = useRef<number | null>(null)
-  const tickerModeRef = useRef<'raf' | 'timeout' | null>(null)
   const playIntentRef = useRef(false)
-  const reduceMotionRef = useRef(false)
 
   const pendingSeekRef = useRef<number | null>(null)
 
@@ -268,13 +269,8 @@ export function MusicCard() {
     if (tickerRef.current === null) {
       return
     }
-    if (tickerModeRef.current === 'timeout') {
-      window.clearTimeout(tickerRef.current)
-    } else {
-      cancelAnimationFrame(tickerRef.current)
-    }
+    window.clearTimeout(tickerRef.current)
     tickerRef.current = null
-    tickerModeRef.current = null
   }
 
   const readTimes = useEffectEvent(() => {
@@ -298,13 +294,7 @@ export function MusicCard() {
     stopTicker()
     const tick = () => {
       readTimes()
-      if (reduceMotionRef.current) {
-        tickerModeRef.current = 'timeout'
-        tickerRef.current = window.setTimeout(tick, 250)
-      } else {
-        tickerModeRef.current = 'raf'
-        tickerRef.current = requestAnimationFrame(tick)
-      }
+      tickerRef.current = window.setTimeout(tick, PROGRESS_INTERVAL_MS)
     }
     tick()
   })
@@ -326,13 +316,6 @@ export function MusicCard() {
 
   useEffect(() => {
     if (!playerWanted) return
-    reduceMotionRef.current = prefersReducedMotion()
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onChange = () => {
-      reduceMotionRef.current = media.matches
-    }
-    media.addEventListener('change', onChange)
-
     let cancelled = false
     let becameReady = false
     setStatus('loading')
@@ -347,9 +330,7 @@ export function MusicCard() {
       setErrorMessage(
         'Playback is unavailable right now. Open the track on YouTube instead.',
       )
-      return () => {
-        media.removeEventListener('change', onChange)
-      }
+      return
     }
 
     shell.replaceChildren()
@@ -512,7 +493,6 @@ export function MusicCard() {
       }
       playerRef.current = null
       shell.replaceChildren()
-      media.removeEventListener('change', onChange)
     }
   }, [hostId, playerWanted])
 

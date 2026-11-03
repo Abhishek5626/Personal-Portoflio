@@ -568,7 +568,7 @@ export function DesignStrategyCard() {
           filter = blur > 0.3 ? `blur(${blur.toFixed(1)}px)` : 'none'
         }
 
-        const transform = `translate3d(${x.toFixed(2)}px, ${(y - halfLine).toFixed(2)}px, 0) rotate(${angleDeg.toFixed(2)}deg)`
+        const transform = `translate(${x.toFixed(2)}px, ${(y - halfLine).toFixed(2)}px) rotate(${angleDeg.toFixed(2)}deg)`
         const visibility = hidden ? 'hidden' : 'visible'
         const zIndex = active ? '2' : '1'
         const signature = `${transform}|${visibility}|${zIndex}|${cursor}|${fontWeight}|${color}|${opacity}|${filter}`
@@ -981,8 +981,9 @@ export function DesignStrategyCard() {
     reducedMotion.addEventListener('change', onMotion)
     const observer = new ResizeObserver(measure)
     observer.observe(frame)
+    // A neighbouring column's sliver doesn't need the wheel turning.
     const visibility = new IntersectionObserver(([entry]) => {
-      offscreen = !entry?.isIntersecting
+      offscreen = (entry?.intersectionRatio ?? 0) < 0.25
       setSweepPaused(offscreen || pointerInside)
       cancelAnimationFrame(timerFrame)
       timerFrame = 0
@@ -990,9 +991,8 @@ export function DesignStrategyCard() {
         timerLast = performance.now()
         timerFrame = requestAnimationFrame(tickTimer)
       }
-    })
+    }, { threshold: [0, 0.25] })
     visibility.observe(frame)
-    timerFrame = requestAnimationFrame(tickTimer)
 
     return () => {
       cancelled = true
