@@ -1674,6 +1674,165 @@ a.cs-toc-row {
   color: var(--cs-page);
 }
 
+/* System */
+.cs-system-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 14px;
+}
+
+.cs-system-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cs-system-column .cs-map-nodes {
+  gap: 8px;
+}
+
+.cs-test-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  list-style: none;
+}
+
+.cs-test-steps strong {
+  color: var(--cs-text);
+  font-weight: 500;
+}
+
+.cs-token-chain {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  list-style: none;
+}
+
+.cs-code {
+  color: var(--cs-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+
+.cs-token-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cs-token-swatch {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cs-brand);
+  vertical-align: -2px;
+}
+
+.cs-swatches .cs-dial-part {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cs-swatches {
+  flex-wrap: wrap;
+}
+
+.cs-brand-button,
+.cs-quiet-button {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-brand-button {
+  background: var(--cs-brand);
+  color: #fff;
+}
+
+.cs-quiet-button {
+  background: var(--cs-chip);
+  color: var(--cs-text);
+}
+
+.cs-outcome.is-closed {
+  background: var(--cs-chip);
+  color: var(--cs-text);
+}
+
+.cs-outcome.is-brand {
+  background: var(--cs-side-a);
+  color: var(--cs-side-a-ink);
+}
+
+.cs-playground {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 14px;
+}
+
+.cs-playground-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.cs-playground-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.cs-playground-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cs-playground-price {
+  flex: none;
+  text-align: right;
+}
+
+.cs-playground-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--cs-divider);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-playground-total strong {
+  color: var(--cs-heading);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cs-playground-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 /* The two columns no longer fit: same break as Case Study 2. */
 @media (max-width: 1199px) {
   .cs-system {
@@ -1787,6 +1946,10 @@ a.cs-toc-row {
     grid-template-rows: none;
   }
 
+  .cs-system-map,
+  .cs-test-steps,
+  .cs-token-chain,
+  .cs-playground,
   .cs-proto,
   .cs-channels,
   .cs-checks,

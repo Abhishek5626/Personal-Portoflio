@@ -3,6 +3,7 @@ import { CaseStudy4Journeys } from './CaseStudy4Journeys.tsx'
 import { CaseStudy4Proposal } from './CaseStudy4Proposal.tsx'
 import { CaseStudy4Prototype } from './CaseStudy4Prototype.tsx'
 import { CaseStudy4Research } from './CaseStudy4Research.tsx'
+import { CaseStudy4System } from './CaseStudy4System.tsx'
 import { CaseStudy4Trust } from './CaseStudy4Trust.tsx'
 import { DecisionNote } from './caseStudyParts.tsx'
 import './case-study-system.css'
@@ -190,7 +191,7 @@ const chapters = [
   { name: 'Trust', detail: 'When an agent can act on its own', id: 'cs-trust' },
   { name: 'Journeys', detail: 'The buyer’s side and the merchant’s side', id: 'cs-journeys' },
   { name: 'Prototype', detail: 'One urgent order, step by step', id: 'cs-prototype' },
-  { name: 'System' },
+  { name: 'System', detail: 'The design system foundation', id: 'cs-design-system' },
   { name: 'Vision' },
 ]
 
@@ -420,6 +421,8 @@ export function CaseStudy4() {
           <CaseStudy4Journeys id="cs-journeys" />
 
           <CaseStudy4Prototype id="cs-prototype" />
+
+          <CaseStudy4System id="cs-design-system" />
         </div>
       </div>
     </div>
