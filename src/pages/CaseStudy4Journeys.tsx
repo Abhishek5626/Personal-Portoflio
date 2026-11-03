@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { OrderPath } from './OrderPath.tsx'
 
 type PathStep = { code: string; title: string; hint: string; text: string; person?: boolean }
 
@@ -225,9 +225,6 @@ function JourneyCard({ card, id }: { card: Card; id: string }) {
 }
 
 export function CaseStudy4Journeys({ id }: { id: string }) {
-  const [stepIndex, setStepIndex] = useState(1)
-  const step = orderPath[stepIndex]
-
   return (
     <div id={id} className="cs-chapter">
       <section className="cs-block" aria-labelledby={`${id}-title`}>
@@ -254,50 +251,11 @@ export function CaseStudy4Journeys({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <div className="cs-summary">
-            <ol className="cs-path">
-              {orderPath.map((item, index) => (
-                <li key={item.code}>
-                  <button
-                    type="button"
-                    className={`cs-path-step is-${item.code[0] === 'B' ? 'buyer' : 'merchant'}`}
-                    aria-pressed={index === stepIndex}
-                    onClick={() => setStepIndex(index)}
-                  >
-                    <span className="cs-journey-code">
-                      {item.code}
-                      {item.person ? (
-                        <>
-                          <span aria-hidden="true"> ★</span>
-                          <span className="visually-hidden"> A person stays in control.</span>
-                        </>
-                      ) : null}
-                    </span>
-                    <span className="cs-step-title">{item.title}</span>
-                    <span className="cs-b3 cs-source">{item.hint}</span>
-                  </button>
-                </li>
-              ))}
-            </ol>
-            <p className="cs-path-caption" role="status">
-              <span className="cs-journey-code">{step.code}</span> {step.text}
-            </p>
-            <div className="cs-path-keys" aria-hidden="true">
-              <span className="cs-path-key is-buyer">Workshop side</span>
-              <span className="cs-path-key is-merchant">Merchant side</span>
-              <span>★ A person stays in control</span>
-            </div>
-          </div>
-          <ul className="cs-checks">
-            {control.map((item) => (
-              <li key={item.code} className="cs-summary-fact">
-                <h4 className="cs-card-label">
-                  {item.code}: {item.title}
-                </h4>
-                <p className="cs-b3">{item.text}</p>
-              </li>
-            ))}
-          </ul>
+          <OrderPath
+            steps={orderPath}
+            control={control}
+            summary="Inside the threshold, the agent orders alone. On a stop, a sales rep decides, and the approver signs off anything over the limit."
+          />
           <p className="cs-small cs-note-text">
             Based on the prototype’s missing-fit-data path, using its mock ERP data.
           </p>

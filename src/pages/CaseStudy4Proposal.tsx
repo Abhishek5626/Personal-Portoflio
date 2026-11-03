@@ -1,49 +1,6 @@
 import { useId, useState } from 'react'
 import { DecisionNote, ShowAll } from './caseStudyParts.tsx'
-
-const map = [
-  {
-    tone: 'a',
-    title: 'The workshop',
-    nodes: [
-      { name: 'Buyer', text: 'Workshop lead, with a Golf on the lift' },
-      { name: 'Buyer’s agent', text: 'Follows the buyer company’s rules' },
-      { name: 'Approver', text: 'Signs off anything over the limit' },
-    ],
-  },
-  {
-    tone: 'neutral',
-    title: 'The merchant’s 4 agents, on Saga',
-    nodes: [
-      { name: 'Setup agent', text: 'Turns the catalogue and past orders into rules and thresholds' },
-      { name: 'Ordering agent', text: 'Talks to the buyer and decides within the merchant’s rules' },
-      { name: 'Fulfilment agent', text: 'Holds stock, books the van and writes the order' },
-      { name: 'Review agent', text: 'Sums up the month and suggests changes' },
-    ],
-  },
-  {
-    tone: 'b',
-    title: 'The merchant',
-    nodes: [
-      { name: 'Merchant admin', text: 'The only person who changes the merchant’s rules' },
-      { name: 'Sales rep', text: 'Takes every case the agents stop on' },
-      { name: 'Merchant’s ERP', text: 'Live stock and contract prices' },
-    ],
-  },
-]
-
-const route = [
-  'The buyer asks for the part by voice, WhatsApp or email.',
-  'Each pick goes to the buyer’s agent, which checks it against the buyer company’s rules.',
-  'A part that fits and sits within both sides’ rules goes to the fulfilment agent as an order.',
-  'The fulfilment agent holds the stock, books the van and writes the order to the ERP.',
-  'Over the limit, the buyer’s agent sends the exact amount to the approver.',
-  'Below 70, or on a hard rule such as a safety part, the ordering agent stops and passes the case to a sales rep.',
-  'Every decision goes in the log for the review agent.',
-  'Each month the review agent proposes threshold changes to the setup agent.',
-  'Only the merchant admin can apply a change.',
-  'The setup agent gives the ordering agent the rules and thresholds it works within.',
-]
+import { AgentFlow } from './AgentFlow.tsx'
 
 const buyerAgent = {
   name: 'Buyer’s agent',
@@ -181,34 +138,7 @@ export function CaseStudy4Proposal({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <div className="cs-agent-map">
-            {map.map((group) => (
-              <div key={group.title} className={`cs-role-side is-${group.tone}`}>
-                <p className="cs-role-header">{group.title}</p>
-                <ul className="cs-role-cards cs-map-nodes">
-                  {group.nodes.map((node) => (
-                    <li key={node.name} className="cs-map-node">
-                      <h4 className="cs-card-label">{node.name}</h4>
-                      <p className="cs-b3">{node.text}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className="cs-summary">
-            <p className="cs-tag">How an order moves</p>
-            <ol className="cs-route">
-              {route.map((step, index) => (
-                <li key={step} className="cs-route-step">
-                  <span className="cs-marker" aria-hidden="true">
-                    {index + 1}
-                  </span>
-                  <p className="cs-b3">{step}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
+          <AgentFlow />
           <DecisionNote decision="One job per agent.">
             <p className="cs-b2">
               Each agent’s limits match its job. The one talking to buyers never writes rules, and

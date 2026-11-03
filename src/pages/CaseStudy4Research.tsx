@@ -1,12 +1,7 @@
 import { useId, useState } from 'react'
 import { DecisionNote, ShowAll } from './caseStudyParts.tsx'
-
-const flow = [
-  { title: 'What I know', value: '1', unit: 'finding', text: 'Published research and 3 informal calls', link: 'the gaps' },
-  { title: 'What I assume', value: '14', unit: 'bets', text: '3 matter most, starred', link: 'top 3 first' },
-  { title: 'What we test first', value: '90%', unit: 'rep agreement', text: 'Needed before a category goes live', link: 'what passes' },
-  { title: 'How we know', value: '300', unit: 'agent orders', text: 'Read against the pass marks' },
-]
+import { ResearchFlow } from './ResearchFlow.tsx'
+import { FirstTest } from './FirstTest.tsx'
 
 type Confidence = 'High' | 'Medium' | 'Low'
 
@@ -25,17 +20,6 @@ const assumptions: { text: string; confidence: Confidence; test: string; key?: b
   { text: '10 minutes is long enough to undo', confidence: 'Medium', test: 'Pilot, undo rate' },
   { text: 'Merchant data is clean enough to replay and match', confidence: 'Medium', test: 'Threshold replay with 3 merchants' },
   { text: 'Sales reps can reply within 5 minutes', confidence: 'Medium', test: 'Rep queue pilot' },
-]
-
-const numbers = [
-  { value: '85', suffix: '/100', title: 'The threshold', scope: 'Set per category, checked on every part', text: 'The fit score a part needs for the agent to order it alone.' },
-  { value: '90%', title: 'Rep agreement', scope: 'Per category, in replay and then live', text: 'How often the agent chose the same part as the sales rep. A category goes live only from 90%.' },
-]
-
-const firstSteps = [
-  { when: 'From week 1', title: 'Replay', text: 'Run a year of past orders through the rules, and see whether the agent picks the rep’s part.', gate: 'Moves on at 90% agreement' },
-  { when: 'Before go-live', title: 'Shadow', text: 'On live calls the agent suggests, the rep decides, and the two get compared.', gate: 'Moves on if 90% holds live' },
-  { when: 'Category by category', title: 'Go live', text: 'Only what the results support. Each category gets its own threshold, and those that pass go first.' },
 ]
 
 const studies = [
@@ -96,27 +80,7 @@ export function CaseStudy4Research({ id }: { id: string }) {
           </p>
         </div>
 
-        <div className="cs-summary">
-          <p className="cs-tag">How the research works</p>
-          <p className="cs-b2">
-            Evidence comes first, then the bets it can’t settle, then the key tests, until
-            the pilot proves the case.
-          </p>
-          <ol className="cs-flow">
-            {flow.map((step) => (
-              <li key={step.title} className="cs-flow-step">
-                <div className="cs-flow-card">
-                  <p className="cs-card-label">{step.title}</p>
-                  <p className="cs-flow-value">{step.value}</p>
-                  <p className="cs-flow-unit">{step.unit}</p>
-                  <p className="cs-b3">{step.text}</p>
-                </div>
-                {step.link ? <p className="cs-flow-link">{step.link}</p> : null}
-              </li>
-            ))}
-          </ol>
-          <p className="cs-flow-loop">What the pilot learns goes back into the bets</p>
-        </div>
+        <ResearchFlow chapterId={id} />
       </section>
 
       <section className="cs-block" aria-labelledby={`${id}-know`}>
@@ -223,44 +187,7 @@ export function CaseStudy4Research({ id }: { id: string }) {
             turns the design’s key assumption into each merchant’s own evidence.
           </p>
         </div>
-        <div className="cs-summary">
-          <p className="cs-tag">Why first</p>
-          <p className="cs-b2">
-            The threshold, starting at a fit score of 85 out of 100, carries the whole design.
-            Set too low, the Golf in bay 2 gets the wrong pump. Set too high, the agent asks
-            about parts it could have ordered itself.
-          </p>
-          <ul className="cs-numbers">
-            {numbers.map((number) => (
-              <li key={number.title} className="cs-summary-fact">
-                <p className="cs-flow-value">
-                  {number.value}
-                  {number.suffix ? <span className="cs-flow-suffix">{number.suffix}</span> : null}
-                </p>
-                <h4 className="cs-card-label">{number.title}</h4>
-                <p className="cs-b3 cs-source">{number.scope}</p>
-                <p className="cs-b3">{number.text}</p>
-              </li>
-            ))}
-          </ul>
-          <ol className="cs-first-steps">
-            {firstSteps.map((step, index) => (
-              <li key={step.title} className="cs-summary-fact">
-                <span className="cs-marker" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <p className="cs-b3 cs-source">{step.when}</p>
-                <h4 className="cs-card-label">{step.title}</h4>
-                <p className="cs-b3">{step.text}</p>
-                {step.gate ? <p className="cs-gate">{step.gate}</p> : null}
-              </li>
-            ))}
-          </ol>
-          <p className="cs-callout">
-            <strong>Stop rule.</strong> Below 90% agreement with reps, the agent only asks the
-            buyer to confirm in that category, and never orders alone.
-          </p>
-        </div>
+        <FirstTest />
       </section>
 
       <div id={plansId} className="cs-plans">

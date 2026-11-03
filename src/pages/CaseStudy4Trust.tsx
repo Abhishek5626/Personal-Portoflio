@@ -1,20 +1,7 @@
 import { useId, useState } from 'react'
+import { ThresholdFlow } from './ThresholdFlow.tsx'
 
 type Outcome = 'Acts' | 'Asks' | 'Hands over' | 'Stops'
-
-const checks = [
-  { agent: 'Ordering agent', steps: ['Hard rules', 'Threshold 85'] },
-  { agent: 'Buyer’s agent', steps: ['Limit €300'] },
-  { agent: 'Fulfilment agent', steps: ['Writes to the ERP'] },
-]
-
-const orders: { name: string; fit: string; detail: string; outcome: Outcome; why: string }[] = [
-  { name: 'Oil and air filters', fit: 'fit 100', detail: '8 parts, €96.40', outcome: 'Acts', why: 'Every check passes, so it’s ordered, with undo for 10 minutes or until the van leaves.' },
-  { name: 'Water pump and belt kit', fit: 'fit 90 and 100', detail: 'Golf in bay 2, €325.50', outcome: 'Asks', why: 'Over €300, so the part is held and the approver decides in one tap.' },
-  { name: 'Thermostat', fit: 'fit 70', detail: 'Polo, €58.20', outcome: 'Asks', why: 'Fit 70 is below 85, so the agent asks the buyer first and explains why.' },
-  { name: 'Alternator', fit: 'fit 64', detail: 'Transit, €286.00', outcome: 'Hands over', why: 'Fit 64 is below 70, so a sales rep decides.' },
-  { name: 'Front brake pads', fit: 'fit 100', detail: 'Peugeot 308, €64.20', outcome: 'Stops', why: 'A safety part, so a sales rep decides at any fit.' },
-]
 
 const limitWords = ['Act', 'Ask', 'Explain', 'Stop or fall back', 'Hand over to', 'Be undone']
 
@@ -275,27 +262,7 @@ export function CaseStudy4Trust({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <ol className="cs-checks">
-            {checks.map((group) => (
-              <li key={group.agent} className="cs-summary-fact">
-                <h4 className="cs-card-label">{group.agent}</h4>
-                <p className="cs-b3 cs-source">{group.steps.join(', then ')}</p>
-              </li>
-            ))}
-          </ol>
-          <ul className="cs-orders">
-            {orders.map((order) => (
-              <li key={order.name} className="cs-order">
-                <div className="cs-order-name">
-                  <h4 className="cs-card-label">{order.name}</h4>
-                  <p className="cs-b3 cs-source">{order.detail}</p>
-                </div>
-                <p className="cs-b3 cs-order-fit">{order.fit}</p>
-                <OutcomePill outcome={order.outcome} />
-                <p className="cs-b3 cs-order-why">{order.why}</p>
-              </li>
-            ))}
-          </ul>
+          <ThresholdFlow />
           <div className="cs-notes">
             <p className="cs-h4">
               Only an order passing every check gets ordered alone. Every other order stops, asks or

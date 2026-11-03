@@ -1,37 +1,15 @@
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { DecisionNote } from './caseStudyParts.tsx'
-
-const process = [
-  { title: 'Requirements doc', text: 'The single source of truth' },
-  { title: 'Hypothesis', text: 'A bet that a test can prove wrong' },
-  { title: 'Test', text: 'A replay, shadow mode or A/B' },
-]
-
-const layers = [
-  { title: 'Tokens', text: '47 primitives, 58 semantic, 38 roles' },
-  { title: 'Components', text: 'In code, and described by the skills' },
-  { title: 'Skills', text: '5 files, one per channel, plus a rules file' },
-]
-
-const channels = ['Webshop', 'WhatsApp', 'Email', 'Voice', 'Buyer’s and merchant’s agents', 'A new channel: 1 skill, 1 renderer']
-
-const foundations = [
-  { title: 'Checks run on every build', text: 'Scripts check the tokens and the Teams card. The design team then reviews, and I sign off.' },
-  { title: 'Any buyer’s agent gets the same rules', text: 'An outside agent first proves who it is and that the buyer’s company allows it. That check gets built after the pilot.' },
-  { title: 'It grows through data', text: 'A merchant is one colour plus its console settings, and a channel is one skill plus one renderer. So the 50th merchant needs no new design work.' },
-]
+import { SkillRun } from './SkillRun.tsx'
+import { SystemFlow } from './SystemFlow.tsx'
+import { TokenStory } from './TokenStory.tsx'
 
 const testSteps = [
   { who: 'The researcher', title: 'Hypothesis', text: 'Each hypothesis is a bet that a test can prove wrong.', example: 'At a fit score of 85 out of 100, the agent picks the rep’s part.' },
   { who: 'Researcher and engineer', title: 'Test', text: 'The agent’s rules go through a replay and then shadow mode, with A/B where traffic allows.', example: 'A year of past orders replayed from week 1, and 5 sales reps testing the case card in weeks 2 to 4.' },
   { who: 'The designers, with AI tools', title: 'Design', text: 'Designers build from the same tokens and skills, and every fit score shows its reason.' },
   { who: 'Engineer and QA', title: 'Ship', text: 'One release reaches every channel. The build runs the checks, then QA and I sign off.' },
-]
-
-const merchants = [
-  { name: 'Delta Parts', colour: '#1f4fbf' },
-  { name: 'Rijnmond Foodservice', colour: '#1b6b3a' },
 ]
 
 const swatches = [
@@ -72,7 +50,6 @@ const cardChecks = [
 const onBrand = (colour: string) => ({ '--cs-brand': colour }) as CSSProperties
 
 export function CaseStudy4System({ id }: { id: string }) {
-  const [merchant, setMerchant] = useState(merchants[0])
   const [brand, setBrand] = useState(swatches[0])
 
   return (
@@ -101,50 +78,7 @@ export function CaseStudy4System({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <div className="cs-system-map">
-            <div className="cs-system-column">
-              <p className="cs-tag cs-tag-soft">From a need</p>
-              {process.map((item) => (
-                <div key={item.title} className="cs-map-node">
-                  <h4 className="cs-card-label">{item.title}</h4>
-                  <p className="cs-b3">{item.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="cs-system-column">
-              <p className="cs-tag cs-tag-soft">Design system</p>
-              {layers.map((item, index) => (
-                <div key={item.title} className="cs-map-node">
-                  <h4 className="cs-card-label">
-                    {index + 1}. {item.title}
-                  </h4>
-                  <p className="cs-b3">{item.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="cs-system-column">
-              <p className="cs-tag cs-tag-soft">To every channel</p>
-              <ul className="cs-role-cards cs-map-nodes">
-                {channels.map((channel) => (
-                  <li key={channel} className="cs-map-node">
-                    <p className="cs-b3">{channel}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <ul className="cs-checks">
-            {foundations.map((item) => (
-              <li key={item.title} className="cs-summary-fact">
-                <h4 className="cs-card-label">{item.title}</h4>
-                <p className="cs-b3">{item.text}</p>
-              </li>
-            ))}
-          </ul>
-          <p className="cs-small cs-note-text">
-            Not yet, on purpose: a model drawing a buyer’s screen live. A reviewed renderer builds
-            each card, and the card check only reads Teams cards for now.
-          </p>
+          <SystemFlow />
           <DecisionNote decision="Source stamps in today’s webshop come first at Saga." assumption>
             <p className="cs-b2">
               Each number carries its ERP source and age, from the connection Saga webshops already
@@ -205,51 +139,7 @@ export function CaseStudy4System({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <div className="cs-summary" style={onBrand(merchant.colour)}>
-            <div className="cs-dial-switch" role="group" aria-label="Merchant">
-              {merchants.map((item) => (
-                <button
-                  key={item.name}
-                  type="button"
-                  className="cs-dial-part"
-                  aria-pressed={merchant.name === item.name}
-                  onClick={() => setMerchant(item)}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-            <ol className="cs-token-chain">
-              <li className="cs-summary-fact">
-                <p className="cs-agent-label">Primitive</p>
-                <code className="cs-code">color.brand.500</code>
-                <p className="cs-b3 cs-token-value">
-                  <span className="cs-token-swatch" aria-hidden="true" />
-                  {merchant.colour}
-                </p>
-                <p className="cs-b3 cs-source">The raw value is each merchant’s one colour.</p>
-              </li>
-              <li className="cs-summary-fact">
-                <p className="cs-agent-label">Semantic</p>
-                <code className="cs-code">surface.brand</code>
-                <p className="cs-b3 cs-source">Gives it a meaning: the brand’s surface.</p>
-              </li>
-              <li className="cs-summary-fact">
-                <p className="cs-agent-label">Role</p>
-                <code className="cs-code">action.primary-bg</code>
-                <p className="cs-b3 cs-source">Says where it acts: the main button’s fill.</p>
-              </li>
-              <li className="cs-summary-fact">
-                <p className="cs-agent-label">On screen</p>
-                <span className="cs-brand-button">Approve €325.50</span>
-                <p className="cs-b3 cs-source">The approver taps it for the Golf in bay 2, at B5.</p>
-              </li>
-            </ol>
-            <p className="cs-small">
-              Change one primitive and each role built on it follows. 6 of the 38 roles use the brand,
-              and a pale brand gets dark text, so white never falls below 4.5:1.
-            </p>
-          </div>
+          <TokenStory />
           <div className="cs-summary">
             <p className="cs-b2">
               Each agent state is a token, so every channel says the same thing, using 5 state colours.
@@ -385,20 +275,7 @@ export function CaseStudy4System({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <ol className="cs-decide cs-summary">
-            {skillParts.map((part, index) => (
-              <li key={part.title} className="cs-route-step">
-                <span className="cs-marker" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <div>
-                  <h4 className="cs-step-title">{part.title}</h4>
-                  <p className="cs-b3">{part.text}</p>
-                  <p className="cs-b3 cs-source">{part.note}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <SkillRun parts={skillParts} />
           <div className="cs-table-card">
             <table className="cs-table">
               <caption className="visually-hidden">The same script run on two Teams cards</caption>

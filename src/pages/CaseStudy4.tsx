@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, type MouseEvent } from 'react'
 import { CaseStudy4Journeys } from './CaseStudy4Journeys.tsx'
 import { CaseStudy4Proposal } from './CaseStudy4Proposal.tsx'
 import { CaseStudy4Prototype } from './CaseStudy4Prototype.tsx'
@@ -6,6 +6,7 @@ import { CaseStudy4Research } from './CaseStudy4Research.tsx'
 import { CaseStudy4System } from './CaseStudy4System.tsx'
 import { CaseStudy4Trust } from './CaseStudy4Trust.tsx'
 import { CaseStudy4Vision } from './CaseStudy4Vision.tsx'
+import { Beats, useReveal } from './caseStudyMotion.tsx'
 import { DecisionNote } from './caseStudyParts.tsx'
 import './case-study-system.css'
 
@@ -198,28 +199,20 @@ const chapters = [
 
 export function CaseStudy4() {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [activeId, setActiveId] = useState<string | undefined>(chapters[0].id)
+  const [activeId, setActiveId] = useState('cs-research')
+  useReveal(rootRef, activeId)
 
-  // The current chapter is the one crossing the middle of the screen.
-  useEffect(() => {
-    const root = rootRef.current?.closest('.project-drawer-scroll')
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveId(entry.target.id)
-        }
-      },
-      { root, rootMargin: '-50% 0px -49% 0px' },
-    )
-    for (const { id } of chapters) {
-      const chapter = id && document.getElementById(id)
-      if (chapter) observer.observe(chapter)
-    }
-    return () => observer.disconnect()
-  }, [])
+  // Chapters are tabs, and a link to one that isn't rendered would change the route.
+  const onChapterLink = (event: MouseEvent) => {
+    const href = (event.target as Element).closest('a')?.getAttribute('href')
+    if (!chapters.some(({ id }) => `#${id}` === href)) return
+    event.preventDefault()
+    setActiveId(href!.slice(1))
+    rootRef.current?.closest('.project-drawer-scroll')?.scrollTo(0, 0)
+  }
 
   return (
-    <div ref={rootRef} className="cs-system">
+    <div ref={rootRef} className="cs-system" onClick={onChapterLink}>
       <div className="cs-shell">
         <nav className="cs-toc" aria-label="Case study sections">
           <ol className="cs-toc-list">
@@ -240,7 +233,7 @@ export function CaseStudy4() {
                     <a
                       className="cs-toc-row"
                       href={`#${id}`}
-                      aria-current={current ? 'location' : undefined}
+                      aria-current={current ? 'page' : undefined}
                     >
                       {body}
                     </a>
@@ -255,6 +248,13 @@ export function CaseStudy4() {
         </nav>
 
         <div className="cs-content">
+          {/* The drawer is named by this heading, so every tab needs it. */}
+          {activeId === 'cs-situation' ? null : (
+            <h1 id="case-title" className="visually-hidden">
+              {intro.title}
+            </h1>
+          )}
+          {activeId === 'cs-situation' ? (
           <div id="cs-situation" className="cs-chapter">
           <section className="cs-opening" aria-labelledby="case-title">
             <header className="cs-opening-head">
@@ -286,17 +286,19 @@ export function CaseStudy4() {
               </h2>
               <p className="cs-b2">{northStar.lead}</p>
             </div>
-            <ul className="cs-summary-facts">
-              {northStar.facts.map((fact, index) => (
-                <li key={fact.title} className="cs-summary-fact">
-                  <span className="cs-marker" aria-hidden="true">
-                    {index + 1}
-                  </span>
-                  <h3 className="cs-card-label">{fact.title}</h3>
-                  <p className="cs-b3">{fact.text}</p>
-                </li>
-              ))}
-            </ul>
+            <Beats steps=".cs-summary-fact">
+              <ul className="cs-summary-facts">
+                {northStar.facts.map((fact, index) => (
+                  <li key={fact.title} className="cs-summary-fact">
+                    <span className="cs-marker" aria-hidden="true">
+                      {index + 1}
+                    </span>
+                    <h3 className="cs-card-label">{fact.title}</h3>
+                    <p className="cs-b3">{fact.text}</p>
+                  </li>
+                ))}
+              </ul>
+            </Beats>
           </section>
 
           <section className="cs-block" aria-labelledby="cs-test-case">
@@ -412,20 +414,15 @@ export function CaseStudy4() {
             </p>
           </DecisionNote>
           </div>
+          ) : null}
 
-          <CaseStudy4Research id="cs-research" />
-
-          <CaseStudy4Proposal id="cs-proposal" />
-
-          <CaseStudy4Trust id="cs-trust" />
-
-          <CaseStudy4Journeys id="cs-journeys" />
-
-          <CaseStudy4Prototype id="cs-prototype" />
-
-          <CaseStudy4System id="cs-design-system" />
-
-          <CaseStudy4Vision id="cs-vision" />
+          {activeId === 'cs-research' ? <CaseStudy4Research id="cs-research" /> : null}
+          {activeId === 'cs-proposal' ? <CaseStudy4Proposal id="cs-proposal" /> : null}
+          {activeId === 'cs-trust' ? <CaseStudy4Trust id="cs-trust" /> : null}
+          {activeId === 'cs-journeys' ? <CaseStudy4Journeys id="cs-journeys" /> : null}
+          {activeId === 'cs-prototype' ? <CaseStudy4Prototype id="cs-prototype" /> : null}
+          {activeId === 'cs-design-system' ? <CaseStudy4System id="cs-design-system" /> : null}
+          {activeId === 'cs-vision' ? <CaseStudy4Vision id="cs-vision" /> : null}
         </div>
       </div>
     </div>

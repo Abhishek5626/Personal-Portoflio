@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { VoicePath } from './VoicePath.tsx'
 
 type Viewer = 'Buyer' | 'Sales rep' | 'Approver'
 
@@ -72,6 +73,8 @@ const steps: Step[] = [
 
 export function CaseStudy4Prototype({ id }: { id: string }) {
   const [index, setIndex] = useState(0)
+  // The rebuilt voice path covers B1 and B2; later steps still use the scripted walkthrough.
+  const [onVoicePath, setOnVoicePath] = useState(true)
   const threadRef = useRef<HTMLOListElement>(null)
   const step = steps[index]
   const last = index === steps.length - 1
@@ -96,6 +99,15 @@ export function CaseStudy4Prototype({ id }: { id: string }) {
             walkthrough on mock data, with no live agent behind it.
           </p>
         </div>
+        {onVoicePath ? (
+          <VoicePath
+            onContinue={(next) => {
+              setIndex(next)
+              setOnVoicePath(false)
+            }}
+          />
+        ) : (
+          <>
         <div className="cs-proto">
           <div className="cs-proto-phone">
             <p className="cs-proto-viewer">
@@ -119,7 +131,10 @@ export function CaseStudy4Prototype({ id }: { id: string }) {
               <button
                 type="button"
                 className="cs-proto-next"
-                onClick={() => setIndex(last ? 0 : index + 1)}
+                onClick={() => {
+                  if (last) setOnVoicePath(true)
+                  setIndex(last ? 0 : index + 1)
+                }}
               >
                 {step.action}
               </button>
@@ -152,6 +167,8 @@ export function CaseStudy4Prototype({ id }: { id: string }) {
             </li>
           ))}
         </ol>
+          </>
+        )}
       </section>
     </div>
   )

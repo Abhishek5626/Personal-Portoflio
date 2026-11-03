@@ -1,3 +1,6 @@
+import { TeamMap } from './TeamMap.tsx'
+import { VisionBoard } from './VisionBoard.tsx'
+
 const plan = [
   {
     code: '01', title: 'Listen', when: 'Weeks 1 to 4',
@@ -26,16 +29,6 @@ const plan = [
     owner: 'The PM, with the whole team',
     part: 'Coach the team, and turn each lesson into the design system.',
   },
-]
-
-const owned = [
-  { title: 'The experience, end to end', text: 'Buyers and merchants, across every channel.' },
-  { title: 'The agent spec, written with the PM', text: 'Act, ask, explain, fall back and undo, which I sign off.' },
-  { title: 'The AI-native design system', text: 'Tokens, skills and the card check.' },
-  { title: 'The research agenda', text: 'The researcher runs each study.' },
-  { title: 'Two sign-offs before anything ships', text: 'QA on function, and me on experience.' },
-  { title: 'Go or stop, called with the PM', text: 'At every gate, on evidence.' },
-  { title: 'Coaching the design team and researcher', text: 'A monthly 1:1, and a quarterly focus they choose.' },
 ]
 
 const quadrants = [
@@ -78,26 +71,11 @@ export function CaseStudy4Vision({ id }: { id: string }) {
           </p>
         </div>
         <div className="cs-block-body">
-          <ol className="cs-plan-steps">
-            {plan.map((step) => (
-              <li key={step.code} className="cs-summary-fact">
-                <p className="cs-journey-code">{step.code}</p>
-                <h4 className="cs-card-label">{step.title}</h4>
-                <p className="cs-b3 cs-source">{step.when}</p>
-                <p className="cs-b3">{step.text}</p>
-                <p className="cs-b3 cs-source">
-                  <strong>Owner:</strong> {step.owner}
-                </p>
-                <p className="cs-vision-part">
-                  <strong>My part:</strong> {step.part}
-                </p>
-                {step.gate ? <p className="cs-gate">{step.gate}</p> : null}
-              </li>
-            ))}
-          </ol>
-          <p className="cs-small cs-note-text">
+          <VisionBoard steps={plan}>
+            <p>
             The fitment licence and the stock hold could move the pilot date, so both start in week 1.
-          </p>
+            </p>
+          </VisionBoard>
         </div>
       </section>
 
@@ -111,32 +89,7 @@ export function CaseStudy4Vision({ id }: { id: string }) {
             experience and sign off what ships.
           </p>
         </div>
-        <div className="cs-lead">
-          <div className="cs-summary-fact">
-            <h4 className="cs-card-label">What I own and sign off</h4>
-            <ul className="cs-lead-list">
-              {owned.map((item) => (
-                <li key={item.title}>
-                  <p className="cs-step-title">{item.title}</p>
-                  <p className="cs-b3 cs-source">{item.text}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="cs-summary-fact">
-            <h4 className="cs-card-label">What the team decides</h4>
-            <ul className="cs-lead-list">
-              <li>
-                <p className="cs-step-title">Scope and sequence</p>
-                <p className="cs-b3 cs-source">Owned by the PM.</p>
-              </li>
-              <li>
-                <p className="cs-step-title">How it gets built</p>
-                <p className="cs-b3 cs-source">Owned by the engineers.</p>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <TeamMap />
       </section>
 
       <section className="cs-block" aria-labelledby={`${id}-first`}>
