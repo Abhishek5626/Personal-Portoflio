@@ -1012,6 +1012,143 @@ a.cs-toc-row {
   gap: 8px;
 }
 
+/* Proposal */
+.cs-agent-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.cs-role-side.is-neutral {
+  --side: var(--cs-chip);
+  --side-ink: var(--cs-text);
+}
+
+.cs-map-nodes {
+  list-style: none;
+}
+
+.cs-map-node {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--cs-border);
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+.cs-route {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, auto);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  list-style: none;
+}
+
+.cs-route-step {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cs-route-step .cs-b3 {
+  padding-top: 2px;
+}
+
+.cs-agent-side {
+  color: var(--cs-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.56px;
+}
+
+.cs-agent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--cs-border);
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+.cs-agent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.cs-agent-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cs-agent-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cs-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-agent-never {
+  margin-top: auto;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--cs-side-b);
+}
+
+.cs-agent-never .cs-agent-label {
+  color: var(--cs-side-b-ink);
+}
+
+.cs-two-up {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cs-people {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.cs-people-always {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+.cs-people-always .cs-tag {
+  background: var(--cs-chip);
+}
+
+.cs-system .cs-always-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 18px;
+  color: var(--cs-text);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-people-roles {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+}
+
 /* The two columns no longer fit: same break as Case Study 2. */
 @media (max-width: 1199px) {
   .cs-system {
@@ -1121,6 +1258,11 @@ a.cs-toc-row {
     grid-template-rows: none;
   }
 
+  .cs-agent-map,
+  .cs-route,
+  .cs-agent-grid,
+  .cs-two-up,
+  .cs-people,
   .cs-flow,
   .cs-finding,
   .cs-numbers,
@@ -1132,6 +1274,11 @@ a.cs-toc-row {
 
   .cs-decision-body {
     gap: 8px;
+  }
+
+  .cs-route {
+    grid-auto-flow: row;
+    grid-template-rows: none;
   }
 
   .cs-table th,

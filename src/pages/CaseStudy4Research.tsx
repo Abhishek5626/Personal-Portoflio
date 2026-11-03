@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { DecisionNote } from './caseStudyParts.tsx'
+import { DecisionNote, ShowAll } from './caseStudyParts.tsx'
 
 const flow = [
   { title: 'What I know', value: '1', unit: 'finding', text: 'Published research and 3 informal calls', link: 'the gaps' },
@@ -63,39 +63,6 @@ const measures = [
   { title: 'Approver answer time', note: 'instant approvals every time are a warning' },
   { title: 'Buyers who check the part before fitting it', note: 'asked in the monthly buyer interviews' },
 ]
-
-function ShowAll({
-  open,
-  label,
-  controls,
-  onToggle,
-}: {
-  open: boolean
-  label: string
-  controls: string
-  onToggle: () => void
-}) {
-  return (
-    <button
-      type="button"
-      className="cs-show-all"
-      aria-expanded={open}
-      aria-controls={controls}
-      onClick={onToggle}
-    >
-      {open ? 'Show fewer' : label}
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-        <path
-          d={open ? 'M2 6.5 5 3.5 8 6.5' : 'M2 3.5 5 6.5 8 3.5'}
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
-  )
-}
 
 function Star() {
   return (
