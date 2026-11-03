@@ -156,6 +156,14 @@ export const landingCards = {
       height: '105.2778%',
     },
   },
+  // No summary or image yet: a title-only card.
+  agenticAi: {
+    id: 'agentic-ai',
+    label: 'Agentic AI',
+    href: '/case-study-4',
+    surfacePadding: 14,
+    showcaseTone: 'light',
+  },
 } as const satisfies Record<string, LandingCardContent>
 
 export type AboutPlaceId = 'thailand' | 'vietnam' | 'azerbaijan'

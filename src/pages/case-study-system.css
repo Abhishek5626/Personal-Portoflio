@@ -1,0 +1,662 @@
+/*
+  Shared case study system, Figma "Portfolio 2026" node 182:17.
+  Spec: docs/case-study-design-system.md. Only what a built section uses lives here.
+*/
+.cs-system {
+  --cs-page: #f6f6f6;
+  --cs-toc: #edf3f2;
+  --cs-toc-current: #fcfdfd;
+  --cs-media: #e2dcdc;
+  --cs-surface: #fff;
+  --cs-surface-soft: #f9fbfd;
+  --cs-chip: #f4f4f4;
+  --cs-border: #efefef;
+  --cs-border-soft: #f6f6f6;
+  --cs-heading: #403e3e;
+  --cs-text: #3e3d3d;
+  --cs-text-soft: #494949;
+  --cs-text-muted: #645e5e;
+  --cs-marker: #6f6a6a;
+  --cs-side-a: #e7f0fb;
+  --cs-side-a-ink: #1f64bd;
+  --cs-side-b: #f9eae6;
+  --cs-side-b-ink: #ad4b2f;
+  --cs-note: #fff9f1;
+  --cs-note-ink: #96611a;
+  --cs-toc-text: #373737;
+  --cs-toc-detail: #757575;
+  --cs-pill-text: #3a3838;
+  --cs-status-dot: #05b24a;
+  --cs-pill: linear-gradient(
+    129deg,
+    rgb(253 253 253 / 0.66) 8%,
+    rgb(241 245 253 / 0.66) 57%,
+    rgb(243 247 254 / 0.66) 116%
+  );
+  --cs-focus: #403e3e;
+
+  min-height: 100dvh;
+  box-sizing: border-box;
+  /* The drawer's fixed controls take the top; Figma's own top padding is 54px. */
+  padding: 88px 72px 112px;
+  background: var(--cs-page);
+  color: var(--cs-text);
+  font-family: Inter, sans-serif;
+  transition: background-color var(--theme-duration) var(--theme-ease);
+}
+
+html[data-theme="dark"] .cs-system {
+  --cs-page: var(--theme-page);
+  --cs-toc: var(--theme-surface);
+  --cs-toc-current: var(--theme-chip);
+  --cs-media: var(--theme-chip);
+  --cs-surface: var(--theme-surface);
+  --cs-surface-soft: var(--theme-surface-raised);
+  --cs-chip: var(--theme-chip);
+  --cs-border: var(--theme-border);
+  --cs-border-soft: var(--theme-border);
+  --cs-heading: var(--theme-text);
+  --cs-text: var(--theme-text);
+  --cs-text-soft: var(--theme-text-muted);
+  --cs-text-muted: var(--theme-text-muted);
+  --cs-marker: #bdbdbd;
+  --cs-side-a: #18233a;
+  --cs-side-a-ink: #8db7f2;
+  --cs-side-b: #331e1a;
+  --cs-side-b-ink: #f0a48f;
+  --cs-note: #2b2318;
+  --cs-note-ink: #f0bd6b;
+  --cs-toc-text: var(--theme-text);
+  --cs-toc-detail: var(--theme-text-muted);
+  --cs-pill-text: var(--theme-text);
+  --cs-pill: var(--theme-chip);
+  --cs-focus: #fff;
+}
+
+.cs-system p,
+.cs-system h1,
+.cs-system h2,
+.cs-system h3,
+.cs-system ol,
+.cs-system ul,
+.cs-system figure {
+  margin: 0;
+  padding: 0;
+}
+
+.cs-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 46px;
+  max-width: 1296px;
+  margin-inline: auto;
+}
+
+/* Table of contents */
+.cs-toc {
+  position: sticky;
+  top: 24px;
+  flex: 0 0 319px;
+  box-sizing: border-box;
+  padding: 8px 8px 18px;
+  border-radius: 18px;
+  background: var(--cs-toc);
+  line-height: normal;
+  /* Stays reachable when the screen is shorter than the panel. */
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+
+.cs-toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  list-style: none;
+}
+
+/* 24px to the next row, where the rest are 34px apart. */
+.cs-toc-list .is-current {
+  margin-bottom: -10px;
+}
+
+.cs-toc-row {
+  display: flex;
+  gap: 22px;
+  padding-inline: 18px;
+  color: var(--cs-toc-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.is-current .cs-toc-row {
+  padding-block: 18px;
+  border-radius: 16px;
+  background: var(--cs-toc-current);
+}
+
+.cs-toc-number {
+  font-size: 14px;
+  letter-spacing: -0.28px;
+}
+
+.cs-toc-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cs-toc-name {
+  font-size: 16px;
+  letter-spacing: -0.32px;
+}
+
+.cs-toc-detail {
+  color: var(--cs-toc-detail);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.28px;
+}
+
+.cs-system .cs-toc-note {
+  margin-top: 34px;
+  padding-inline: 18px;
+  color: var(--cs-toc-text);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.32px;
+}
+
+.cs-toc-row:focus-visible {
+  outline: 2px solid var(--cs-focus);
+  outline-offset: 2px;
+}
+
+/* Content */
+.cs-content {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 46px;
+  min-width: 0;
+}
+
+.cs-opening {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  scroll-margin-top: 88px;
+}
+
+.cs-opening-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.cs-opening-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cs-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 6px 6px 8px;
+  border-radius: 99px;
+  background: var(--cs-pill);
+  color: var(--cs-pill-text);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: -0.24px;
+}
+
+.cs-status-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cs-status-dot);
+}
+
+.cs-h1 {
+  color: var(--cs-heading);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 36px;
+  letter-spacing: -1.04px;
+  text-wrap: balance;
+}
+
+.cs-b1 {
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: -0.56px;
+}
+
+.cs-opening-summary {
+  max-width: 563px;
+}
+
+.cs-opening-meta {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  max-width: 40%;
+  text-align: right;
+}
+
+.cs-meta-title {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.56px;
+}
+
+.cs-meta-detail {
+  font-size: 12px;
+  letter-spacing: -0.48px;
+}
+
+.cs-media {
+  display: grid;
+  place-items: center;
+  height: 297px;
+  border-radius: 18px;
+  background: var(--cs-media);
+}
+
+.cs-media-placeholder {
+  padding: 16px;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+  text-align: center;
+}
+
+/* Shared text styles */
+.cs-h2 {
+  color: var(--cs-heading);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: -0.88px;
+  text-wrap: balance;
+}
+
+.cs-h3 {
+  color: var(--cs-text);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.72px;
+  text-wrap: balance;
+}
+
+.cs-h4 {
+  color: var(--cs-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.56px;
+}
+
+.cs-b2 {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: -0.56px;
+}
+
+.cs-b3 {
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-small {
+  color: var(--cs-text-soft);
+  font-size: 12px;
+  line-height: 22px;
+  letter-spacing: -0.24px;
+}
+
+.cs-card-label {
+  color: var(--cs-text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.56px;
+}
+
+.cs-tag,
+.cs-marker {
+  color: var(--cs-marker);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: -0.2px;
+}
+
+.cs-tag {
+  align-self: flex-start;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: var(--cs-surface);
+}
+
+.cs-marker {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 99px;
+  background: var(--cs-chip);
+}
+
+/* North star */
+.cs-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--cs-border-soft);
+  border-radius: 18px;
+  background: var(--cs-surface-soft);
+}
+
+.cs-summary-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-summary-copy .cs-h3 {
+  max-width: 300px;
+}
+
+.cs-summary-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  list-style: none;
+}
+
+.cs-summary-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+/* Sections */
+.cs-block {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.cs-block-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-block-summary {
+  max-width: 613px;
+}
+
+.cs-block-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Roles */
+.cs-roles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.cs-role-side {
+  --side: var(--cs-side-a);
+  --side-ink: var(--cs-side-a-ink);
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.cs-role-side.is-b {
+  --side: var(--cs-side-b);
+  --side-ink: var(--cs-side-b-ink);
+}
+
+.cs-role-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 52px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--side);
+  color: var(--side-ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: -0.56px;
+  text-align: center;
+}
+
+.cs-role-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-role-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 18px;
+  border: 1px solid var(--cs-border);
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+.cs-role-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cs-role-label {
+  color: var(--side-ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-system .cs-role-points {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 18px;
+  color: var(--cs-text-muted);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+/* Assumption and decision notes */
+.cs-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-note-text {
+  max-width: 819px;
+}
+
+.cs-decision {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--cs-surface);
+}
+
+.cs-decision-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: -0.56px;
+}
+
+.cs-decision-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.cs-decision-rows li {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--cs-note);
+  color: var(--cs-note-ink);
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: -0.56px;
+}
+
+/* The two columns no longer fit: same break as Case Study 2. */
+@media (max-width: 1199px) {
+  .cs-system {
+    padding-inline: 24px;
+  }
+
+  .cs-shell {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .cs-toc {
+    position: static;
+    flex: none;
+    width: 100%;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  /* All chapters stay visible but compact, as on the reference. */
+  .cs-toc-list {
+    flex-flow: row wrap;
+    gap: 18px 8px;
+  }
+
+  .cs-toc-list .is-current {
+    flex: 0 0 100%;
+    margin-bottom: 0;
+  }
+
+  .cs-toc-list li:not(.is-current) {
+    flex: 0 0 calc((100% - 16px) / 3);
+    min-width: 0;
+  }
+
+  .cs-toc-row {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .is-current .cs-toc-row {
+    padding-block: 12px;
+  }
+
+  .cs-toc-name,
+  .cs-system .cs-toc-note {
+    font-size: 14px;
+    letter-spacing: -0.28px;
+  }
+
+  .cs-toc-detail {
+    display: none;
+  }
+
+  .cs-system .cs-toc-note {
+    margin-top: 18px;
+    padding-inline: 12px;
+    color: var(--cs-toc-detail);
+    font-weight: 400;
+  }
+
+  .cs-content {
+    flex: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 809px) {
+  .cs-system {
+    padding-inline: 16px;
+  }
+
+  .cs-opening-head {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cs-opening-meta {
+    align-items: flex-start;
+    max-width: none;
+    text-align: left;
+  }
+
+  .cs-h1 {
+    font-size: 22px;
+    line-height: 30px;
+    letter-spacing: -0.88px;
+  }
+
+  .cs-media {
+    height: 200px;
+  }
+
+  .cs-h2 {
+    font-size: 20px;
+    line-height: 26px;
+    letter-spacing: -0.8px;
+  }
+
+  .cs-summary-facts,
+  .cs-roles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cs-content {
+    gap: 32px;
+  }
+}
+
+/* Three columns would clip the longer chapter names. */
+@media (max-width: 359px) {
+  .cs-toc-list li:not(.is-current) {
+    flex-basis: calc((100% - 8px) / 2);
+  }
+}

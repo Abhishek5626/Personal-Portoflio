@@ -24,6 +24,9 @@ const studies = {
   'case-study-3': lazy(() =>
     import('../pages/CaseStudy3.tsx').then((m) => ({ default: m.CaseStudy3 })),
   ),
+  'case-study-4': lazy(() =>
+    import('../pages/CaseStudy4.tsx').then((m) => ({ default: m.CaseStudy4 })),
+  ),
 } as const
 
 function prefersReducedMotion() {
