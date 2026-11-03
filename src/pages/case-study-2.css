@@ -42,13 +42,12 @@
 }
 
 .cs2 .cs2-title-row h1 {
-  width: 214px;
   color: var(--theme-text);
   font-family: Inter, sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 22.4px;
-  letter-spacing: -0.32px;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 50.4px;
+  letter-spacing: -1.08px;
 }
 
 .cs2 .cs2-title-row p {
@@ -610,7 +609,6 @@
     width: 100%;
   }
 
-  .cs2 .cs2-title-row h1,
   .cs2 .cs2-title-row p,
   .cs2 .cs2-copy p,
   .cs2 .cs2-facts dd {
@@ -749,9 +747,9 @@
   }
 
   .cs2 .cs2-title-row h1 {
-    font-size: 12px;
-    line-height: 16.8px;
-    letter-spacing: -0.24px;
+    font-size: 18px;
+    line-height: 25.2px;
+    letter-spacing: -0.54px;
   }
 
   .cs2 .cs2-split h2,
@@ -1286,7 +1284,7 @@
   text-align: center;
 }
 
-.cs2 .cs2-feature-meta-col p:first-child {
+.cs2 .cs2-feature-meta-col > p:first-child {
   color: #595858;
   font-size: 10px;
   font-weight: 400;
@@ -1327,8 +1325,7 @@
 }
 
 .cs2 .cs2-app,
-.cs2 .cs2-streak,
-.cs2 .cs2-reward {
+.cs2 .cs2-streak {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -1351,8 +1348,7 @@
 }
 
 .cs2 .cs2-app p,
-.cs2 .cs2-streak p,
-.cs2 .cs2-reward p {
+.cs2 .cs2-streak p {
   margin: 0;
 }
 
@@ -1664,8 +1660,7 @@
   line-height: 10.8px;
 }
 
-.cs2 .cs2-streak,
-.cs2 .cs2-reward {
+.cs2 .cs2-streak {
   width: 100%;
   align-items: center;
   color: var(--theme-text);
@@ -1711,51 +1706,6 @@
   padding: 12px;
   border-radius: 12px;
   background: rgba(252, 252, 252, 0.12);
-}
-
-.cs2 .cs2-reward {
-  gap: 0;
-  min-height: 377px;
-  padding: 28px 16px 24px;
-  overflow: hidden;
-  border-radius: 8px;
-  background:
-    repeating-conic-gradient(from 0deg at 50% 44%, rgba(160, 120, 220, 0.14) 0 11deg, transparent 11deg 26deg),
-    radial-gradient(circle at 50% 44%, #2d1c45, #130b1c 72%);
-  color: #fff;
-}
-
-.cs2 .cs2-reward-title {
-  font-family: "Alfa Slab One", Georgia, serif;
-  font-size: 17px;
-  font-weight: 400;
-  line-height: 27px;
-}
-
-.cs2 .cs2-reward-doc {
-  flex: 0 0 auto;
-  margin: 34px 0 30px;
-  filter: drop-shadow(0 0 16px rgba(170, 110, 255, 0.85));
-}
-
-.cs2 .cs2-reward-copy {
-  color: #d1cbcb;
-  font-family: Urbanist, Inter, sans-serif;
-  font-size: 11px;
-  line-height: 18px;
-}
-
-.cs2 .cs2-reward-claim {
-  box-sizing: border-box;
-  width: min(189px, 100%);
-  margin-top: 20px !important;
-  padding: 12px;
-  border-radius: 9px;
-  background: #271950;
-  box-shadow: 0 0 0 3px #2e1d63;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 18px;
 }
 
 /* Courses and Showcase screens. Framer crops both to the dashboard's height. */
@@ -2015,7 +1965,7 @@ html:not([data-theme="dark"]) .cs2 .cs2-stage {
     gap: 0;
   }
 
-  .cs2 .cs2-feature-meta-col p:first-child {
+  .cs2 .cs2-feature-meta-col > p:first-child {
     font-family: Haffer, Inter, sans-serif;
     font-size: 14px;
     line-height: 25.2px;
@@ -2053,7 +2003,7 @@ html:not([data-theme="dark"]) .cs2 .cs2-stage {
   }
 
   .cs2 .cs2-system {
-    margin-top: -52px;
+    margin-top: -74px;
   }
 
   .cs2 .cs2-learned {
@@ -2200,8 +2150,7 @@ html:not([data-theme="dark"]) .cs2 .cs2-stage {
     min-height: 81px;
   }
 
-  .cs2 .cs2-streak,
-  .cs2 .cs2-reward {
+  .cs2 .cs2-streak {
     min-height: 0;
     padding: 16px;
   }
@@ -2727,5 +2676,81 @@ html:not([data-theme="dark"]) .cs2 .cs2-stage {
   .cs2 .cs2-touch::before {
     filter: none;
     opacity: 0;
+  }
+}
+
+/* Tighter than the column's 132px rhythm, under the build section's image. */
+@media (min-width: 810px) {
+  .cs2 .cs2-system {
+    margin-top: -44px;
+  }
+}
+
+.cs2 .cs2-reward-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 377px;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+
+/* Goal, Reason and Feature on their own dark cards. */
+.cs2 .cs2-feature-meta-card {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: #121212;
+  text-align: center;
+}
+
+html[data-theme='dark'] .cs2 .cs2-feature-meta-card {
+  box-shadow: inset 0 0 0 1px var(--theme-border);
+}
+
+@media (min-width: 1200px) {
+  .cs2 .cs2-feature-meta.is-carded .cs2-feature-meta-arrow {
+    margin: 10px 0 37px;
+  }
+
+  .cs2 .cs2-feature-meta.is-carded .cs2-feature-meta-card {
+    min-width: 148px;
+  }
+
+  .cs2 .cs2-feature-meta.is-carded .cs2-feature-meta-col:nth-child(2) .cs2-feature-meta-card {
+    min-width: 212px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .cs2 .cs2-feature-meta.is-carded {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 10px;
+    max-width: 560px;
+    min-height: 0;
+    margin-inline: auto;
+  }
+
+  .cs2 .cs2-feature-meta.is-carded .cs2-feature-meta-col {
+    gap: 0;
+    min-width: 0;
+  }
+
+  .cs2 .cs2-feature-meta.is-carded .cs2-feature-meta-arrow {
+    display: block;
+    margin: 5px 0;
+  }
+
+  .cs2 .cs2-feature-meta.is-carded .cs2-feature-meta-card {
+    flex: 1;
+    width: 100%;
+    min-height: 51px;
+    padding: 10px 12px;
   }
 }

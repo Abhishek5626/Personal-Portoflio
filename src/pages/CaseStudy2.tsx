@@ -567,11 +567,13 @@ const features = [
 
 function MetaRow({
   items,
+  cards = false,
 }: {
   items: readonly (readonly [string, string])[]
+  cards?: boolean
 }) {
   return (
-    <div className="cs2-feature-meta">
+    <div className={cards ? 'cs2-feature-meta is-carded' : 'cs2-feature-meta'}>
       {items.map(([label, value]) => (
         <div className="cs2-feature-meta-col" key={label}>
           <p>{label}</p>
@@ -590,7 +592,13 @@ function MetaRow({
               strokeLinejoin="round"
             />
           </svg>
-          <MetaValue>{value}</MetaValue>
+          {cards ? (
+            <div className="cs2-feature-meta-card">
+              <MetaValue>{value}</MetaValue>
+            </div>
+          ) : (
+            <MetaValue>{value}</MetaValue>
+          )}
         </div>
       ))}
     </div>
@@ -919,7 +927,7 @@ export function CaseStudy2() {
               </div>
               <p className="cs2-feature-cap cs2-feature-cap-board">Leaderboard</p>
             </div>
-            <MetaRow items={features[0]} />
+            <MetaRow items={features[0]} cards />
           </article>
 
           <article className="cs2-feature">
@@ -941,39 +949,15 @@ export function CaseStudy2() {
                 </div>
                 <div className="cs2-stage">
                   <div className="cs2-reward-frame">
-                    <div className="cs2-reward">
-                      <p className="cs2-reward-title">UX Audit Doc!</p>
-                      <svg
-                        className="cs2-reward-doc"
-                        width="72"
-                        height="88"
-                        viewBox="0 0 72 88"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M12 2h34l24 24v50a10 10 0 0 1-10 10H12A10 10 0 0 1 2 76V12A10 10 0 0 1 12 2Z"
-                          fill="#8a55e6"
-                        />
-                        <path d="M46 2v14a10 10 0 0 0 10 10h14Z" fill="#d9c6ff" />
-                        <text
-                          x="36"
-                          y="62"
-                          fill="#5c31a8"
-                          fontFamily="Inter, sans-serif"
-                          fontSize="22"
-                          fontWeight="800"
-                          textAnchor="middle"
-                        >
-                          PDF
-                        </text>
-                      </svg>
-                      <p className="cs2-reward-copy">
-                        You got UX Audit Doc worth
-                        <br />
-                        Rps 499 for Free
-                      </p>
-                      <p className="cs2-reward-claim">Claim</p>
-                    </div>
+                    <img
+                      className="cs2-reward-image"
+                      src="/case-study-2/ux-audit-reward.webp"
+                      alt="UX Audit Doc reward: you got UX Audit Doc worth Rps 499 for free, with a Claim button."
+                      width={694}
+                      height={750}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 </div>
               </div>
@@ -981,7 +965,7 @@ export function CaseStudy2() {
                 Streak Calculator & Reward Mechnaism
               </p>
             </div>
-            <MetaRow items={features[1]} />
+            <MetaRow items={features[1]} cards />
           </article>
 
           <article className="cs2-feature">
