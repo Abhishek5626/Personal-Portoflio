@@ -101,7 +101,7 @@ export function AboutMeCard({
   onHowIWork,
 }: {
   content: AboutMeCardContent
-  /** Phone layout only (Figma node 106-1100). */
+  /** Figma nodes 2-270 (desktop) and 106-1100 (phone). */
   onHowIWork?: (opener: HTMLElement) => void
 }) {
   return (

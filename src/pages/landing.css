@@ -789,6 +789,10 @@ html[data-theme="dark"] .tool-logo:not(.is-color) {
     color var(--theme-duration) var(--theme-ease);
 }
 
+html[data-theme="dark"] .about-me-how-i-work {
+  color: #cdb8fb;
+}
+
 .about-me-card .project-card-label {
   font-weight: 500;
 }
@@ -797,7 +801,7 @@ html:not([data-theme="dark"]) .about-me-card .project-card-icon {
   background: var(--landing-glass-fill), var(--theme-chip);
 }
 
-/* Phone layout only, Figma node 106-1100. */
+/* Figma nodes 2-270 (desktop) and 106-1100 (phone). */
 .about-me-how-i-work {
   position: relative;
   padding: 0;
@@ -810,10 +814,6 @@ html:not([data-theme="dark"]) .about-me-card .project-card-icon {
   white-space: nowrap;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-
-html[data-theme="dark"] .about-me-how-i-work {
-  color: #8ea2ff;
 }
 
 .about-me-how-i-work::after {

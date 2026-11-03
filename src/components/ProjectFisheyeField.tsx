@@ -314,7 +314,19 @@ export function ProjectFisheyeField({
         })
     }
     untab()
-    const tabObserver = new MutationObserver(untab)
+    // Only what changed: cards rewrite their own tab stops every time they turn.
+    const tabObserver = new MutationObserver((records) => {
+      for (const record of records) {
+        if (record.type === 'attributes') {
+          if ((record.target as HTMLElement).tabIndex !== -1) {
+            ;(record.target as HTMLElement).tabIndex = -1
+          }
+        } else if (record.addedNodes.length > 0) {
+          untab()
+          return
+        }
+      }
+    })
     tabObserver.observe(plane, {
       subtree: true,
       childList: true,
@@ -353,9 +365,9 @@ export function ProjectFisheyeField({
     const panPeriodY = periodY.reduce((a, b) => a * b, 1)
     const tileLive: (boolean | undefined)[] = []
     const tileSize: (string | undefined)[] = []
-    // Only cards on screen mount in the first task; the ring around them waits
-    // for idle time, so it can't delay the first paint.
-    let mountMargin = TILE_LIVE_MARGIN_PX
+    // Only cards properly on screen mount in the first task. Neighbouring slivers
+    // and the ring around them wait for idle time, so they can't delay first paint.
+    let mountMargin = -24
     let reducedMotion = false
     let frame = 0
     let previous = performance.now()
@@ -603,7 +615,7 @@ export function ProjectFisheyeField({
       mountMargin = CARD_MOUNT_MARGIN_PX
       paint()
     }
-    if ('requestIdleCallback' in window) requestIdleCallback(widenMounting)
+    if ('requestIdleCallback' in window) requestIdleCallback(widenMounting, { timeout: 800 })
     else setTimeout(widenMounting, 200)
 
     const resizeObserver = new ResizeObserver(resize)
@@ -667,15 +679,14 @@ export function ProjectFisheyeField({
         // Taking capture also tells a control that had it to stand down.
         drag.moved = true
         root.dataset.dragging = 'true'
+        // Drop text the press began to select before the drag was recognised.
+        clearSelection()
         try {
           root.setPointerCapture(event.pointerId)
         } catch {
           // The pointer already ended; the drag finishes on its own events.
         }
       }
-      // Drop text the press began to select before the drag was recognised.
-      clearSelection()
-
       const time = performance.now()
       const deltaTime = Math.max(8, time - drag.time)
       const deltaX = event.clientX - drag.x
@@ -907,7 +918,7 @@ export function ProjectFisheyeField({
       <div className="project-fisheye-vignette" aria-hidden="true" />
 
       {links.length > 0 ? (
-        <nav className="project-fisheye-links" aria-label="Projects">
+        <nav className="project-fisheye-links" aria-label="Portfolio shortcuts">
           {links.map((link) => (
             <a
               key={link.href}

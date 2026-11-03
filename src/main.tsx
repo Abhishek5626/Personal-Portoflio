@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import './components/glass-control.css'
+import './components/card-surface.css'
+import { startCardNudge } from './components/cardNudge.ts'
 
 const rootElement = document.getElementById('root')
 
@@ -15,3 +17,5 @@ createRoot(rootElement).render(
     <App />
   </StrictMode>,
 )
+
+startCardNudge()

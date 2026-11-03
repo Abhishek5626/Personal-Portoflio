@@ -1,10 +1,11 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { ApertureMark } from './AboutMeCard.tsx'
 import { howIWorkContent } from './howIWorkContent.ts'
 import './how-i-work.css'
 
 const tabs = ['process', 'bestWhere'] as const
+const RESIZE_MS = 320
 
 export function HowIWorkDialog({
   opener,
@@ -14,14 +15,61 @@ export function HowIWorkDialog({
   onClose: () => void
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const shellRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const fromHeightRef = useRef<string | null>(null)
+  const resizeRef = useRef<Animation | null>(null)
   const [active, setActive] = useState(0)
+  const [leaving, setLeaving] = useState<number | null>(null)
   const id = useId()
   const { process, bestWhere } = howIWorkContent
 
   useEffect(() => {
     dialogRef.current?.showModal()
   }, [])
+
+  // Tweens the shell between the two panels' heights, then hands back to auto
+  // so it keeps fitting its content (and the viewport cap) after any resize.
+  useLayoutEffect(() => {
+    const shell = shellRef.current
+    const from = fromHeightRef.current
+    if (!shell || from === null) return
+    fromHeightRef.current = null
+    resizeRef.current?.cancel()
+    const resize = shell.animate(
+      { height: [from, getComputedStyle(shell).height] },
+      { duration: RESIZE_MS, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+    )
+    resizeRef.current = resize
+    // A cancel means a newer switch took over, and that one clears `leaving`.
+    resize.finished.then(
+      () => setLeaving(null),
+      () => {},
+    )
+  }, [active])
+
+  const selectTab = (next: number) => {
+    if (next === active) return
+    if (
+      shellRef.current &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      // Read mid-flight too, so a quick switch back continues from here.
+      fromHeightRef.current = getComputedStyle(shellRef.current).height
+      setLeaving(active)
+    }
+    setActive(next)
+  }
+
+  const panelClass = (index: number, name: string) =>
+    [
+      'how-i-work-panel',
+      name,
+      leaving === index ? 'is-leaving' : '',
+      leaving !== null && active === index ? 'is-entering' : '',
+    ]
+      .filter(Boolean)
+      .join(' ')
 
   // Plays the exit animation first; with reduced motion there is none to wait on.
   const requestClose = () => {
@@ -49,7 +97,7 @@ export function HowIWorkDialog({
     }[event.key]
     if (next === undefined) return
     event.preventDefault()
-    setActive(next)
+    selectTab(next)
     tabRefs.current[next]?.focus()
   }
 
@@ -68,7 +116,7 @@ export function HowIWorkDialog({
       }}
       onClick={onBackdropClick}
     >
-      <div className="how-i-work-shell">
+      <div ref={shellRef} className="how-i-work-shell">
         <header className="how-i-work-header">
           <h2 id={`${id}-title`} className="how-i-work-title">
             <ApertureMark />
@@ -107,7 +155,7 @@ export function HowIWorkDialog({
               aria-selected={active === index}
               aria-controls={`${id}-panel-${tab}`}
               tabIndex={active === index ? 0 : -1}
-              onClick={() => setActive(index)}
+              onClick={() => selectTab(index)}
               onKeyDown={onTabKeyDown}
             >
               {howIWorkContent[tab].tab}
@@ -115,49 +163,53 @@ export function HowIWorkDialog({
           ))}
         </div>
 
-        <div
-          role="tabpanel"
-          id={`${id}-panel-process`}
-          className="how-i-work-panel is-process"
-          aria-labelledby={`${id}-tab-process`}
-          tabIndex={0}
-          hidden={active !== 0}
-        >
-          <div className="how-i-work-intro">
-            <h3 className="how-i-work-heading">{process.heading}</h3>
-            <p className="how-i-work-summary">{process.summary}</p>
+        <div className="how-i-work-stage">
+          <div
+            role="tabpanel"
+            id={`${id}-panel-process`}
+            className={panelClass(0, 'is-process')}
+            aria-labelledby={`${id}-tab-process`}
+            tabIndex={0}
+            hidden={active !== 0 && leaving !== 0}
+            inert={leaving === 0}
+          >
+            <div className="how-i-work-intro">
+              <h3 className="how-i-work-heading">{process.heading}</h3>
+              <p className="how-i-work-summary">{process.summary}</p>
+            </div>
+            <ul className="how-i-work-list" role="list">
+              {process.items.map((item) => (
+                <li key={item.id} className="how-i-work-item">
+                  <div className="how-i-work-item-top">
+                    <h4 className="how-i-work-item-title">{item.title}</h4>
+                    <span className="how-i-work-tag">{item.id}</span>
+                  </div>
+                  <p className="how-i-work-item-body">{item.body}</p>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="how-i-work-list" role="list">
-            {process.items.map((item) => (
-              <li key={item.id} className="how-i-work-item">
-                <div className="how-i-work-item-top">
-                  <h4 className="how-i-work-item-title">{item.title}</h4>
-                  <span className="how-i-work-tag">{item.id}</span>
-                </div>
-                <p className="how-i-work-item-body">{item.body}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        <div
-          role="tabpanel"
-          id={`${id}-panel-bestWhere`}
-          className="how-i-work-panel is-best-where"
-          aria-labelledby={`${id}-tab-bestWhere`}
-          tabIndex={0}
-          hidden={active !== 1}
-        >
-          <h3 className="how-i-work-heading">{bestWhere.heading}</h3>
-          <ul className="how-i-work-list" role="list">
-            {bestWhere.items.map((item) => (
-              <li key={item.id} className="how-i-work-item">
-                <span className="how-i-work-tag">{item.id}</span>
-                <h4 className="how-i-work-item-title">{item.title}</h4>
-                <p className="how-i-work-item-body">{item.body}</p>
-              </li>
-            ))}
-          </ul>
+          <div
+            role="tabpanel"
+            id={`${id}-panel-bestWhere`}
+            className={panelClass(1, 'is-best-where')}
+            aria-labelledby={`${id}-tab-bestWhere`}
+            tabIndex={0}
+            hidden={active !== 1 && leaving !== 1}
+            inert={leaving === 1}
+          >
+            <h3 className="how-i-work-heading">{bestWhere.heading}</h3>
+            <ul className="how-i-work-list" role="list">
+              {bestWhere.items.map((item) => (
+                <li key={item.id} className="how-i-work-item">
+                  <span className="how-i-work-tag">{item.id}</span>
+                  <h4 className="how-i-work-item-title">{item.title}</h4>
+                  <p className="how-i-work-item-body">{item.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </dialog>

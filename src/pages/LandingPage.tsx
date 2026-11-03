@@ -18,6 +18,7 @@ import { WorkExperienceCard } from '../components/WorkExperienceCard.tsx'
 import { PortfolioNav } from '../components/PortfolioNav.tsx'
 import { ProgressiveBlur } from '../components/ProgressiveBlur.tsx'
 import { HowIWorkDialog } from '../components/HowIWorkDialog.tsx'
+import { howIWorkContent } from '../components/howIWorkContent.ts'
 import { ProjectDrawer } from '../components/ProjectDrawer.tsx'
 import {
   projectFromHash,
@@ -1378,7 +1379,15 @@ export function LandingPage() {
           <ProjectFisheyeField
             aria-label="Portfolio — drag to explore"
             layout={fisheyeLayout}
-            links={fieldLinks}
+            links={[
+              ...fieldLinks,
+              // The card's own button is out of tab order, like every panned tile.
+              {
+                href: '#about',
+                label: howIWorkContent.title,
+                onOpen: setHowIWorkOpener,
+              },
+            ]}
           >
             <div className="fisheye-hero-tile">
               <HeroIntroduction />
@@ -1387,7 +1396,10 @@ export function LandingPage() {
             <ProjectCard card={landingCards.buildingInCode} />
             <ProjectCard card={landingCards.designingAiProduct} />
             <div id="about">
-              <AboutMeCard content={aboutMeCard} />
+              <AboutMeCard
+                content={aboutMeCard}
+                onHowIWork={setHowIWorkOpener}
+              />
             </div>
             <ProjectCard card={landingCards.toolsShipped} />
             <ProjectCard card={landingCards.storytellingPlay} />
