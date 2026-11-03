@@ -88,6 +88,7 @@ html[data-theme="dark"] .cs-system {
 .cs-system h2,
 .cs-system h3,
 .cs-system h4,
+.cs-system h5,
 .cs-system table,
 .cs-system dl,
 .cs-system dd,
@@ -1366,6 +1367,181 @@ a.cs-toc-row {
   }
 }
 
+/* Journeys */
+.cs-path {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+}
+
+.cs-path-step {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  border: 1px solid var(--cs-border);
+  border-radius: 12px;
+  background: var(--cs-surface);
+  color: var(--cs-text);
+  font-family: Inter, sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.cs-path-step:hover {
+  border-color: var(--cs-divider);
+  background: var(--cs-surface-soft);
+}
+
+.cs-path-step[aria-pressed="true"] {
+  border-color: var(--cs-heading);
+}
+
+.cs-path-step:focus-visible,
+.cs-journey-link:focus-visible,
+.cs-journey-why summary:focus-visible {
+  outline: 2px solid var(--cs-focus);
+  outline-offset: 2px;
+}
+
+.cs-journey-code {
+  color: var(--cs-side-a-ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-path-step.is-merchant .cs-journey-code,
+.cs-role-side.is-b .cs-journey-code {
+  color: var(--cs-side-b-ink);
+}
+
+.cs-path-caption {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--cs-surface);
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: -0.56px;
+}
+
+.cs-path-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: var(--cs-text-muted);
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-path-key.is-buyer {
+  color: var(--cs-side-a-ink);
+}
+
+.cs-path-key.is-merchant {
+  color: var(--cs-side-b-ink);
+}
+
+.cs-journey-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--side);
+}
+
+.cs-journey-group {
+  margin-top: 6px;
+  color: var(--cs-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-journey-card {
+  gap: 10px;
+}
+
+.cs-journey-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+.cs-journey-bands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  list-style: none;
+}
+
+.cs-journey-edge strong {
+  color: var(--cs-side-b-ink);
+  font-weight: 500;
+}
+
+.cs-journey-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+}
+
+.cs-journey-tags .cs-confidence {
+  white-space: normal;
+}
+
+.cs-journey-link {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--cs-chip);
+  color: var(--cs-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.cs-journey-why summary {
+  width: fit-content;
+  color: var(--cs-text);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+  cursor: pointer;
+}
+
+.cs-journey-why[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-channels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  list-style: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-path-step {
+    transition: none;
+  }
+}
+
 /* The two columns no longer fit: same break as Case Study 2. */
 @media (max-width: 1199px) {
   .cs-system {
@@ -1375,6 +1551,10 @@ a.cs-toc-row {
   .cs-shell {
     flex-direction: column;
     gap: 24px;
+  }
+
+  .cs-channels {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .cs-toc {
@@ -1475,6 +1655,7 @@ a.cs-toc-row {
     grid-template-rows: none;
   }
 
+  .cs-channels,
   .cs-checks,
   .cs-try,
   .cs-agent-map,
@@ -1498,6 +1679,10 @@ a.cs-toc-row {
   .cs-route {
     grid-auto-flow: row;
     grid-template-rows: none;
+  }
+
+  .cs-path {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .cs-order {
