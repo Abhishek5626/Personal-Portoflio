@@ -1516,102 +1516,12 @@
   border-radius: 50%;
 }
 
-.cs2 .cs2-dash-league {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  align-self: stretch;
-  padding: 40px 0 28px;
-  text-align: center;
-}
-
-.cs2 .cs2-dash-league-name {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 17px;
-}
-
-.cs2 .cs2-dash-muted {
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 12px;
-}
-
-.cs2 .cs2-dash-locks {
-  position: absolute;
-  top: 58px;
-  left: calc(50% + 62px);
-  display: flex;
-  gap: 22px;
-}
-
-.cs2 .cs2-board {
-  box-sizing: border-box;
-  width: min(350px, calc(100% - 24px));
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 4px;
-  list-style: none;
-}
-
-.cs2 .cs2-board li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 42px;
-  padding: 0 8px;
-}
-
-.cs2 .cs2-board li + li {
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
-
 .cs2 .cs2-board-face {
   flex: 0 0 auto;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   background: #fff;
-}
-
-.cs2 .cs2-board-name {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 14px;
-}
-
-.cs2 .cs2-board-xp {
-  flex: 0 0 auto;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 12px;
-}
-
-.cs2 .cs2-dash-cta {
-  box-sizing: border-box;
-  width: min(350px, calc(100% - 24px));
-  margin-top: 14px;
-  padding: 9px;
-  border-radius: 999px;
-  background: #5526a1;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 12px;
-  text-align: center;
-}
-
-@media (max-width: 1199px) {
-  .cs2 .cs2-dash-locks {
-    display: none;
-  }
 }
 
 @media (max-width: 809px) {
@@ -1625,25 +1535,13 @@
     display: none;
   }
 
-  .cs2 .cs2-dash-league {
-    padding: 24px 0 18px;
-  }
+  
 
-  .cs2 .cs2-dash-muted,
-  .cs2 .cs2-board-xp {
-    font-size: 11px;
-    line-height: 14px;
-  }
+  
 
-  .cs2 .cs2-board-name {
-    font-size: 13px;
-    line-height: 16px;
-  }
+  
 
-  .cs2 .cs2-dash-cta {
-    font-size: 12px;
-    line-height: 14px;
-  }
+  
 }
 
 .cs2 .cs2-app-cta {
@@ -2752,5 +2650,34 @@ html[data-theme='dark'] .cs2 .cs2-feature-meta-card {
     width: 100%;
     min-height: 51px;
     padding: 10px 12px;
+  }
+}
+
+/* Supplied screenshot, centred in the same frame the live dashboard used. */
+.cs2 .cs2-board-image {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  place-items: center;
+  box-sizing: border-box;
+  height: 603px;
+}
+
+.cs2 .cs2-board-image img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+@media (max-width: 809px) {
+  /* A fixed height would leave blank bands around the portrait image. */
+  .cs2 .cs2-board-image {
+    grid-template-rows: auto;
+    height: auto;
+  }
+
+  .cs2 .cs2-board-image img {
+    height: auto;
   }
 }

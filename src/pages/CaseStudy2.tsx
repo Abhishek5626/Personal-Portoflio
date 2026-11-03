@@ -320,16 +320,6 @@ function MetaValue({ children }: { children: string }) {
   )
 }
 
-const board = [
-  ['Abhishek Kashid', '2,422 XP'],
-  ['Aniket Kale', '2,222 XP'],
-  ['Aditi Sinha', '2,422 XP'],
-  ['Kirti Bisht', '2,422 XP'],
-  ['Ananya', '2,422 XP'],
-  ['Shreyasi', '2,422 XP'],
-  ['Aditi Sinha', '2,422 XP'],
-]
-
 const dashNav = [
   { items: ['Home', 'Bookmarks'] },
   { title: 'Learn', items: ['Courses', 'Assignments', 'Masterclass', 'Briefs', 'Classes'] },
@@ -392,55 +382,6 @@ function DashChrome({
         </div>
       </div>
     </div>
-  )
-}
-
-function LeaderboardDashboard() {
-  return (
-    <DashChrome>
-          <div className="cs2-dash-league">
-            <svg width="50" height="50" viewBox="0 0 24 24" aria-hidden="true">
-              <defs>
-                <linearGradient id="cs2-dash-star" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#ffd978" />
-                  <stop offset="1" stopColor="#f59a23" />
-                </linearGradient>
-              </defs>
-              <path
-                d="m12 1.8 3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.9l-6.4 3.5L7 14.3l-5.3-5 7.2-.9Z"
-                fill="url(#cs2-dash-star)"
-              />
-            </svg>
-            <span className="cs2-dash-league-name">Gold league</span>
-            <span className="cs2-dash-muted">Top 20 advances to next league</span>
-            <span className="cs2-dash-muted">7 Days left</span>
-            <span className="cs2-dash-locks" aria-hidden="true">
-              {Array.from({ length: 8 }, (_, index) => (
-                <svg key={index} width="16" height="16" viewBox="0 0 16 16">
-                  <path
-                    d="M5 7V5a3 3 0 0 1 6 0v2h1a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm1.5 0h3V5a1.5 1.5 0 0 0-3 0Z"
-                    fill="#8b5cf6"
-                  />
-                </svg>
-              ))}
-            </span>
-          </div>
-
-          <ul className="cs2-board">
-            {board.map(([name, xp], index) => (
-              <li key={`${name}-${index}`}>
-                <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-                  <path d="M3.5 7 2 11.5l2.2-.8L6 12l1.8-1.3 2.2.8L8.5 7Z" fill="#d98a1f" />
-                  <circle cx="6" cy="4.5" r="4" fill="#f7b93e" />
-                </svg>
-                <span className="cs2-board-face" />
-                <span className="cs2-board-name">{name}</span>
-                <span className="cs2-board-xp">{xp}</span>
-              </li>
-            ))}
-          </ul>
-          <span className="cs2-dash-cta">Start Assesment</span>
-    </DashChrome>
   )
 }
 
@@ -923,7 +864,16 @@ export function CaseStudy2() {
           <article className="cs2-feature">
             <div className="cs2-feature-visual">
               <div className="cs2-stage">
-                <LeaderboardDashboard />
+                <div className="cs2-dash-frame cs2-board-image">
+                  <img
+                    src="/case-study-2/leaderboard.webp"
+                    alt="MasterClass leaderboard: Gold league, top 20 advance to the next league, 7 days left, with Abhishek Kashid, Aniket Kale and Aditi Sinha at 2,422 XP each."
+                    width={620}
+                    height={700}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
               </div>
               <p className="cs2-feature-cap cs2-feature-cap-board">Leaderboard</p>
             </div>
