@@ -322,9 +322,10 @@ li:not(.is-current) > a.cs-toc-row:active {
 
 /* One chapter of the story; its sections keep the frame's 46px rhythm. */
 .cs-chapter {
+  --cs-chapter-gap: 64px;
   display: flex;
   flex-direction: column;
-  gap: 64px;
+  gap: var(--cs-chapter-gap);
   min-width: 0;
 }
 
@@ -334,10 +335,13 @@ li:not(.is-current) > a.cs-toc-row:active {
   align-self: flex-start;
 }
 
-/* A chapter's opening: 12px between its lines and 76px to the first section. */
+/* A chapter's opening: 12px between its lines, then 18px to whatever comes next. */
 .cs-chapter > .cs-block:first-child > .cs-block-head {
   gap: 12px;
-  margin-bottom: 12px;
+}
+
+.cs-chapter > .cs-block:first-child:has(> .cs-block-head:last-child) + * {
+  margin-top: calc(18px - var(--cs-chapter-gap));
 }
 
 .cs-chapter-label .shipped-badge {
@@ -357,7 +361,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-opening {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 }
 
 .cs-opening-head {
@@ -373,19 +377,6 @@ li:not(.is-current) > a.cs-toc-row:active {
   align-items: flex-start;
   gap: 12px;
   min-width: 0;
-}
-
-.cs-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 6px 6px 8px;
-  border-radius: 99px;
-  background: var(--cs-pill);
-  color: var(--cs-pill-text);
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: -0.24px;
 }
 
 .cs-status-dot {
@@ -572,7 +563,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-block {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 }
 
 .cs-block-head {
@@ -1008,7 +999,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 }
 
 .cs-plans .cs-block {
-  gap: 24px;
+  gap: 18px;
   min-width: 0;
 }
 
@@ -1765,7 +1756,7 @@ html[data-theme="dark"] .cs-people {
   }
 
   .cs-chapter {
-    gap: 40px;
+    --cs-chapter-gap: 40px;
   }
 
   .cs-closing {

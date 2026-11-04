@@ -233,9 +233,44 @@
   color: var(--theme-text);
 }
 
+.project-drawer {
+  --control-size: 47px;
+}
+
 .project-drawer-control {
-  width: 48px;
-  height: 48px;
+  width: var(--control-size);
+  height: var(--control-size);
+}
+
+/* A round button rather than a sliding switch, as its box is now square. */
+.project-drawer-theme.theme-toggle.is-compact {
+  --toggle-width: var(--control-size);
+  --toggle-height: var(--control-size);
+  --toggle-pad: calc((var(--control-size) - 38px) / 2);
+  border-radius: 50%;
+}
+
+@media (max-width: 760px) {
+  .project-drawer {
+    --control-size: 38px;
+  }
+
+  .project-drawer-tools {
+    top: max(16px, env(safe-area-inset-top));
+    gap: 12px;
+  }
+
+  .project-drawer-control,
+  .project-drawer-theme {
+    position: relative;
+  }
+
+  .project-drawer-control::before,
+  .project-drawer-theme::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+  }
 }
 
 @media (min-width: 768px) {

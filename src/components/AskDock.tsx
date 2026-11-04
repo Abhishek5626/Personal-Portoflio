@@ -12,6 +12,32 @@ const suggestions = [
   { label: 'Adoption', question: 'Why does nobody use the AI we shipped?' },
 ]
 
+/** The case studies with their own facts in api/ask.ts. Each gets its own chat. */
+export const askStudies = {
+  'case-study-4': {
+    greeting: 'I’m Abhishek’s AI assistant. Ask me anything about the Agentic AI case study.',
+    prompt: 'What result is this aiming for?',
+    suggestions: [
+      { label: 'Outcome', question: 'What is the outcome of this project?' },
+      { label: 'Time', question: 'How much time does an urgent order take now, and with the agents?' },
+      { label: 'Easier', question: 'How does it make life easier for buyers and merchants?' },
+      { label: 'Proof', question: 'How will you know it worked?' },
+    ],
+  },
+  'case-study-5': {
+    greeting: 'I’m Abhishek’s AI assistant. Ask me anything about the Quik assistant case study.',
+    prompt: 'What is the outcome of this project?',
+    suggestions: [
+      { label: 'Outcome', question: 'What is the outcome of this project?' },
+      { label: 'Results', question: 'What results is it aiming for?' },
+      { label: 'Easier', question: 'How does it make life easier for people using Quik?' },
+      { label: 'Time', question: 'How much time would it save?' },
+    ],
+  },
+} as const
+
+export type AskStudy = keyof typeof askStudies
+
 const noReply = 'I can’t answer right now. Please book a call with Abhishek instead.'
 const SWAP_AFTER_PX = 24
 
@@ -73,8 +99,10 @@ function Avatar({ size }: { size: 'large' | 'small' }) {
   )
 }
 
-export function AskDock({ hidden }: { hidden: boolean }) {
-  const [showing, setShowing] = useState(false)
+export function AskDock({ hidden, study = null }: { hidden: boolean; study?: AskStudy | null }) {
+  const copy = study ? askStudies[study] : null
+  // In a case study the bar stays up: the nav and arrows have their own places beside it.
+  const [showing, setShowing] = useState(Boolean(study))
   const [messages, setMessages] = useState<Message[]>([])
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
@@ -85,7 +113,7 @@ export function AskDock({ hidden }: { hidden: boolean }) {
 
   // The landing page pans rather than scrolls, so direction comes from the wheel, drags and keys.
   useEffect(() => {
-    if (hidden) return
+    if (hidden || study) return
     let travelled = 0
     let dragY: number | null = null
     const move = (down: number) => {
@@ -127,16 +155,16 @@ export function AskDock({ hidden }: { hidden: boolean }) {
       window.removeEventListener('pointercancel', onUp)
       window.removeEventListener('keydown', onKey)
     }
-  }, [hidden])
+  }, [hidden, study])
 
   // The nav button lives in PortfolioNav, so it reads this state from the page.
   useEffect(() => {
     const root = document.documentElement
-    if (showing && !hidden) root.dataset.askDock = 'chat'
+    if (showing && !hidden && !study) root.dataset.askDock = 'chat'
     return () => {
       delete root.dataset.askDock
     }
-  }, [showing, hidden])
+  }, [showing, hidden, study])
 
   useEffect(() => {
     const log = logRef.current
@@ -160,7 +188,7 @@ export function AskDock({ hidden }: { hidden: boolean }) {
       const response = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ messages: history }),
+        body: JSON.stringify({ messages: history, study }),
         signal: controller.signal,
       })
       if (!response.ok || !response.body) throw new Error('No reply')
@@ -228,8 +256,8 @@ export function AskDock({ hidden }: { hidden: boolean }) {
             <button type="button" className="ask-open" onClick={openPanel}>
               <span className="ask-open-text">
                 <Sparkles size={16} />
-                <span className="ask-prompt is-wide">How fast can you build our AI tool?</span>
-                <span className="ask-prompt is-narrow">Ask about my work</span>
+                <span className="ask-prompt is-wide">{copy?.prompt ?? 'How fast can you build our AI tool?'}</span>
+                <span className="ask-prompt is-narrow">{copy ? 'Ask about this case study' : 'Ask about my work'}</span>
               </span>
               <Arrow size={24} />
             </button>
@@ -282,11 +310,11 @@ export function AskDock({ hidden }: { hidden: boolean }) {
                   <Avatar size="small" />
                   <p className="ask-card-name">Abhishek’s assistant</p>
                 </div>
-                <p className="ask-card-text">I’m Abhishek’s AI assistant. I answer from this site only.</p>
+                <p className="ask-card-text">{copy?.greeting ?? 'I’m Abhishek’s AI assistant. I answer from this site only.'}</p>
               </div>
               {messages.length === 0 ? (
                 <div className="ask-suggestions">
-                  {suggestions.map(({ label, question }) => (
+                  {(copy?.suggestions ?? suggestions).map(({ label, question }) => (
                     <button key={label} type="button" className="ask-card ask-suggestion" onClick={() => void ask(question)}>
                       <span className="ask-suggestion-label">{label}</span>
                       <span className="ask-card-text">{question}</span>
@@ -345,7 +373,7 @@ export function AskDock({ hidden }: { hidden: boolean }) {
                 ref={inputRef}
                 className="ask-input"
                 aria-label="Ask about Abhishek’s work"
-                placeholder="How fast can you build our AI tool?"
+                placeholder={copy?.prompt ?? 'How fast can you build our AI tool?'}
                 maxLength={500}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}

@@ -164,6 +164,13 @@ export const landingCards = {
     surfacePadding: 14,
     showcaseTone: 'light',
   },
+  quikAssistant: {
+    id: 'quik-assistant',
+    label: 'Quik assistant',
+    href: '/case-study-5',
+    surfacePadding: 14,
+    showcaseTone: 'light',
+  },
 } as const satisfies Record<string, LandingCardContent>
 
 export type AboutPlaceId = 'thailand' | 'vietnam' | 'azerbaijan'

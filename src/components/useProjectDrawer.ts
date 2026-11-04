@@ -5,6 +5,7 @@ export const projectOrder = [
   'case-study-2',
   'case-study-3',
   'case-study-4',
+  'case-study-5',
 ] as const
 
 export type ProjectId = (typeof projectOrder)[number]
@@ -14,6 +15,7 @@ export const projectTitles: Record<ProjectId, string> = {
   'case-study-2': 'Developing the PAUX LMS',
   'case-study-3': 'QA Platform For a Trillion Dollar Company',
   'case-study-4': 'Agentic AI',
+  'case-study-5': 'Quik assistant',
 }
 
 type DrawerHistoryState = {

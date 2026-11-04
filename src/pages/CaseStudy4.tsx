@@ -1,4 +1,5 @@
 import { useRef, useState, type MouseEvent } from 'react'
+import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { CaseStudy4Journeys } from './CaseStudy4Journeys.tsx'
 import { CaseStudy4Proposal } from './CaseStudy4Proposal.tsx'
 import { CaseStudy4Prototype } from './CaseStudy4Prototype.tsx'
@@ -261,10 +262,9 @@ export function CaseStudy4() {
           <section className="cs-opening" aria-labelledby="case-title">
             <header className="cs-opening-head">
               <div className="cs-opening-copy">
-                <p className="cs-status">
-                  <span className="cs-status-dot" aria-hidden="true" />
-                  {intro.status}
-                </p>
+                <span className="cs-chapter-label">
+                  <ShippedBadge>{intro.status}</ShippedBadge>
+                </span>
                 <h1 id="case-title" className="cs-h1">
                   {intro.title}
                 </h1>

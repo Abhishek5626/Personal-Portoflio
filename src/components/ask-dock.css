@@ -531,7 +531,21 @@ html[data-ask-dock="chat"] .portfolio-nav:not(.is-open) .portfolio-nav-toggle:no
 }
 
 /* Phones: the nav sits at the top, the bar follows Figma's compact size, and the panel fills the screen. */
+/* In a case study the bar sits between the nav and the arrows, and the page ends clear of it. */
+.project-drawer-scroll .cs-system {
+  padding-bottom: 140px;
+}
+
+html:has(.project-drawer) .ask-dock {
+  width: min(693px, calc(100vw - 300px));
+}
+
 @media (max-width: 760px) {
+  html:has(.project-drawer) .ask-dock {
+    bottom: max(66px, calc(env(safe-area-inset-bottom) + 54px));
+    width: calc(100vw - 24px);
+  }
+
   html[data-ask-dock="chat"] .portfolio-nav:not(.is-open) .portfolio-nav-toggle:not(:focus-visible) {
     transform: translateY(calc(-100% - 60px));
   }

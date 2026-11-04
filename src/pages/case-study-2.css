@@ -598,7 +598,7 @@
 
   .cs2 .cs2-title-row {
     flex-direction: column;
-    gap: 6px;
+    gap: 12px;
   }
 
   .cs2 .cs2-title-row h1,
@@ -2679,5 +2679,34 @@ html[data-theme='dark'] .cs2 .cs2-feature-meta-card {
 
   .cs2 .cs2-board-image img {
     height: auto;
+  }
+}
+
+/* Text above an image sits 18px from it, as in the other case studies. Gaps between the feature groups stay as they are. */
+.cs2 .cs2-lead,
+.cs2 .cs2-problems,
+.cs2 .cs2-vision,
+.cs2 .cs2-vision-body,
+.cs2 .cs2-build,
+.cs2 .cs2-system,
+.cs2 .cs2-strategy {
+  gap: 18px;
+}
+
+.cs2 .cs2-system > .cs2-feature + .cs2-feature {
+  margin-top: 64px;
+}
+
+.cs2 .cs2-build-copy > .cs2-build-text + .cs2-stack-card {
+  margin-top: -4px;
+}
+
+@media (max-width: 1199px) {
+  .cs2 .cs2-system > .cs2-feature + .cs2-feature {
+    margin-top: 2px;
+  }
+
+  .cs2 .cs2-build-copy > .cs2-build-text + .cs2-stack-card {
+    margin-top: -2px;
   }
 }

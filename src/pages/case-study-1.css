@@ -2231,7 +2231,7 @@ html[data-theme='dark'] .cs1-results-body > p {
 
   .cs1-title-row {
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
 
   .cs1-title-row h1 {
@@ -3222,5 +3222,39 @@ html[data-theme='dark'] .cs1-results-body > p {
     max-width: 100%;
     margin: 58px auto 0;
     padding: 0 16px 48px;
+  }
+}
+
+/* Text above an image sits 18px from it, as in the other case studies. Captions under an image and the gaps between groups stay as they are. */
+.cs1-lead,
+.cs1-why,
+.cs1-problem {
+  gap: 18px;
+}
+
+@media (min-width: 901px) {
+  .cs1 .cs1-owner > .cs1-owner-head + *,
+  .cs1 .cs1-strategy > .cs1-strategy-head + * {
+    margin-top: 18px;
+  }
+}
+
+/* On phones these two sections keep a row gap, so the margin makes up the difference. */
+@media (max-width: 900px) {
+  .cs1 .cs1-owner > .cs1-owner-head + * {
+    margin-top: -8px;
+  }
+
+  .cs1 .cs1-strategy > .cs1-strategy-head + * {
+    margin-top: 2px;
+  }
+
+  /* Phones put each section's text above its image, so these follow text too. */
+  .cs1 .cs1-owner > .cs1-modules-stage {
+    margin-top: -8px;
+  }
+
+  .cs1 .cs1-program > .cs1-feature-stage {
+    margin-top: 2px;
   }
 }

@@ -337,7 +337,7 @@ html[data-theme="dark"] .portfolio-nav {
 */
 @media (max-width: 760px) {
   /* Figma node 106-774: full-width 205px cards under the plus, 18px apart. */
-  html:not(:has(.project-drawer)) .portfolio-nav {
+  html .portfolio-nav {
     --nav-card-w: 100%;
     --nav-card-h: 205px;
     --nav-card-gap: 18px;
@@ -345,7 +345,7 @@ html[data-theme="dark"] .portfolio-nav {
     --nav-top-zone: calc(max(16px, env(safe-area-inset-top)) + 54px);
   }
 
-  html:not(:has(.project-drawer)) .portfolio-nav-bar {
+  html .portfolio-nav-bar {
     top: 0;
     align-items: flex-start;
     padding: max(16px, env(safe-area-inset-top))
@@ -354,7 +354,7 @@ html[data-theme="dark"] .portfolio-nav {
   }
 
   /* The cards outgrow the screen, so the whole screen scrolls under the controls. */
-  html:not(:has(.project-drawer)) .portfolio-nav-panel {
+  html .portfolio-nav-panel {
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -391,31 +391,31 @@ html[data-theme="dark"] .portfolio-nav {
     transform: scaleY(-1);
   }
 
-  html:not(:has(.project-drawer)) .portfolio-nav-toggle {
+  html .portfolio-nav-toggle {
     z-index: 3;
   }
 
-  html:not(:has(.project-drawer)) .portfolio-nav-list {
+  html .portfolio-nav-list {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }
 
-  html:not(:has(.project-drawer)) .portfolio-nav-card-label {
+  html .portfolio-nav-card-label {
     font-size: 22px;
   }
 
-  html:not(:has(.project-drawer)) .portfolio-nav-toggle,
-  html:not(:has(.project-drawer)) .portfolio-nav-toggle-face {
+  html .portfolio-nav-toggle,
+  html .portfolio-nav-toggle-face {
     width: 38px;
     height: 38px;
   }
 
-  html:not(:has(.project-drawer)) .portfolio-nav-toggle {
+  html .portfolio-nav-toggle {
     transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Comfortable tap target without changing the drawn size. */
-  html:not(:has(.project-drawer)) .portfolio-nav-toggle::after {
+  html .portfolio-nav-toggle::after {
     content: "";
     position: absolute;
     inset: -3px;
@@ -433,7 +433,7 @@ html[data-theme="dark"] .portfolio-nav {
 }
 
 @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
-  html:not(:has(.project-drawer)) .portfolio-nav-toggle {
+  html .portfolio-nav-toggle {
     transition: none;
   }
 }

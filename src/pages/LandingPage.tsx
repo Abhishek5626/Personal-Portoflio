@@ -15,7 +15,7 @@ import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { MusicCard } from '../components/MusicCard.tsx'
 import { TestimonialCard } from '../components/TestimonialCard.tsx'
 import { WorkExperienceCard } from '../components/WorkExperienceCard.tsx'
-import { AskDock } from '../components/AskDock.tsx'
+import { AskDock, askStudies, type AskStudy } from '../components/AskDock.tsx'
 import { PortfolioNav } from '../components/PortfolioNav.tsx'
 import { ProgressiveBlur } from '../components/ProgressiveBlur.tsx'
 import { HowIWorkDialog } from '../components/HowIWorkDialog.tsx'
@@ -35,6 +35,7 @@ import {
 import { aboutMeCard, heroContent, landingCards } from './landingContent.ts'
 import type { LandingCardContent, LandingTool } from './landingContent.ts'
 import './landing.css'
+import './landing-type.css'
 
 const cursorLabel = 'View project'
 
@@ -580,12 +581,13 @@ const fisheyeLayout: FisheyeLayout = {
       ],
     },
     {
-      height: 1512,
+      height: 1896,
       items: [
         { item: 10, x: 947, y: 0, w: 423, h: 360 },
         { item: 11, x: 947, y: 384, w: 423, h: 360 },
         { item: 12, x: 947, y: 768, w: 423, h: 360 },
         { item: 13, x: 947, y: 1152, w: 423, h: 360 },
+        { item: 14, x: 947, y: 1536, w: 423, h: 360 },
       ],
     },
   ],
@@ -598,7 +600,7 @@ const fisheyeLayout: FisheyeLayout = {
  * vertically, so every column reads in that order. Rows start 61px down so the
  * first clears the nav, yet the loop seam stays 18px. Design Strategy isn't in
  * the frame; it sits last so it never interrupts the Figma sequence. Agentic AI
- * isn't either; it joins the other projects.
+ * and Quik aren't either; they join the other projects.
  */
 const phoneFisheyeLayout: FisheyeLayout = {
   viewWidth: 393,
@@ -611,7 +613,7 @@ const phoneFisheyeLayout: FisheyeLayout = {
   maxScale: 1.45,
   strips: [
     {
-      height: 3897,
+      height: 4238,
       items: [
         { item: 0, x: 16, y: 61, w: 361, h: 240 }, // 1 Hero
         { item: 1, x: 16, y: 319, w: 361, h: 321 }, // 2 About Me
@@ -619,14 +621,15 @@ const phoneFisheyeLayout: FisheyeLayout = {
         { item: 3, x: 16, y: 999, w: 361, h: 323 }, // 4 Gen-Z Learning Platform
         { item: 4, x: 16, y: 1340, w: 361, h: 323 }, // 5 Enterprise QA Platform
         { item: 5, x: 16, y: 1681, w: 361, h: 323 }, // 6 Agentic AI
-        { item: 6, x: 16, y: 2022, w: 361, h: 208 }, // 7 Tools
-        { item: 7, x: 16, y: 2248, w: 361, h: 158 }, // 8 Building in Code
-        { item: 8, x: 16, y: 2424, w: 361, h: 158 }, // 9 Designing AI Product
-        { item: 9, x: 16, y: 2600, w: 361, h: 158 }, // 10 Storytelling + Play
-        { item: 10, x: 16, y: 2776, w: 361, h: 212 }, // 11 Testimonial
-        { item: 11, x: 16, y: 3006, w: 361, h: 191 }, // 12 Current
-        { item: 12, x: 16, y: 3215, w: 361, h: 191 }, // 13 Music
-        { item: 13, x: 16, y: 3424, w: 361, h: 534 }, // Design Strategy
+        { item: 6, x: 16, y: 2022, w: 361, h: 323 }, // 7 Quik assistant
+        { item: 7, x: 16, y: 2363, w: 361, h: 208 }, // 8 Tools
+        { item: 8, x: 16, y: 2589, w: 361, h: 158 }, // 9 Building in Code
+        { item: 9, x: 16, y: 2765, w: 361, h: 158 }, // 10 Designing AI Product
+        { item: 10, x: 16, y: 2941, w: 361, h: 158 }, // 11 Storytelling + Play
+        { item: 11, x: 16, y: 3117, w: 361, h: 212 }, // 12 Testimonial
+        { item: 12, x: 16, y: 3347, w: 361, h: 191 }, // 13 Current
+        { item: 13, x: 16, y: 3556, w: 361, h: 191 }, // 14 Music
+        { item: 14, x: 16, y: 3765, w: 361, h: 534 }, // Design Strategy
       ],
     },
   ],
@@ -1243,6 +1246,7 @@ export function LandingPage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
   const { projectId, open, close } = useProjectDrawer()
+  const askStudy = projectId && projectId in askStudies ? (projectId as AskStudy) : null
   const [drawerPresent, setDrawerPresent] = useState(
     () => projectFromHash(window.location.hash) !== null,
   )
@@ -1290,6 +1294,11 @@ export function LandingPage() {
       href: landingCards.agenticAi.href,
       label: landingCards.agenticAi.label,
       onOpen: (opener: HTMLAnchorElement) => openProject('case-study-4', opener),
+    },
+    {
+      href: landingCards.quikAssistant.href,
+      label: landingCards.quikAssistant.label,
+      onOpen: (opener: HTMLAnchorElement) => openProject('case-study-5', opener),
     },
   ]
 
@@ -1362,6 +1371,11 @@ export function LandingPage() {
               activeProject={projectId}
               onOpenProject={openProject}
             />
+            <ProjectCard
+              card={landingCards.quikAssistant}
+              activeProject={projectId}
+              onOpenProject={openProject}
+            />
             <ProjectCard card={landingCards.toolsShipped} />
             <ProjectCard card={landingCards.buildingInCode} />
             <ProjectCard card={landingCards.designingAiProduct} />
@@ -1427,6 +1441,11 @@ export function LandingPage() {
               activeProject={projectId}
               onOpenProject={openProject}
             />
+            <ProjectCard
+              card={landingCards.quikAssistant}
+              activeProject={projectId}
+              onOpenProject={openProject}
+            />
           </ProjectFisheyeField>
         </main>
         )}
@@ -1442,7 +1461,7 @@ export function LandingPage() {
           onClose={() => setHowIWorkOpener(null)}
         />
       ) : null}
-      <AskDock hidden={drawerPresent} />
+      <AskDock key={askStudy ?? 'site'} study={askStudy} hidden={drawerPresent && !askStudy} />
       <PortfolioNav
         onHowIWork={isMobile && !drawerPresent ? setHowIWorkOpener : undefined}
         activeProject={projectId}

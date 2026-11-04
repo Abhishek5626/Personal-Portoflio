@@ -34,7 +34,7 @@ Each one came from a correction or a real defect.
 - **Nothing invented.** Don't add elements, copy or decoration that the design doesn't contain. If something is missing, ask for it or leave a labelled placeholder.
 - **Ask for assets first.** Before a build that needs icons or images, tell the user which ones, because they can supply them from Figma. Drawn stand-ins must be reported as stand-ins.
 - **Fonts.** The Agentic AI case study uses Geist, Fraunces, JetBrains Mono and Departure Mono at the reference's sizes, by the user's request, all set in `src/pages/case-study-type.css`. Load fonts from their open source releases, never a reference site's files. Landing fonts as listed in `references/tokens.md`.
-- **Facts.** Don't present figures or claims from a reference site as true of the user's work. Use the user's Figma text or repo text, or a visibly marked placeholder such as `[00]`.
+- **Facts.** Don't present figures or claims from a reference site as true of the user's work. Use the user's Figma text or repo text. Otherwise write finished original copy, never placeholder text, and label anything assumed as a concept or a target.
 - **Reference text.** Don't copy a reference site's sentences into the build. Text the user wrote in their own Figma frames is theirs to use, verbatim.
 - **Reuse before adding.** Look in `references/components.md` first. A new token or component is a decision, so report it.
 - **Light and dark.** Every colour needs a dark value, through `--cs-*` or `--theme-*`. A literal hex with no dark override is a bug unless it's a fixed status colour.
@@ -69,6 +69,14 @@ Each one came from a correction or a real defect.
 - Tailwind's reset is absent, so converted code needs `border-width: 0` first, or a one-sided border draws the others at 3px.
 - Case studies live in a drawer that scrolls `.project-drawer-scroll`, not the window. Use it as the scroll root.
 - `/#/case-study-N` works in production. The direct path `/case-study-N` returned a 404 when last checked, as there's no `vercel.json` rewrite.
+
+## Chat in a case study
+
+Add a case study to the chat with one entry in `askStudies` in `src/components/AskDock.tsx` and one in `STUDIES` in `api/ask.ts`, written from what the page says. Suggested questions go straight to outcomes, time and results.
+
+## Type and spacing
+
+Use the `portfolio-type` skill for fonts, sizes, line height, tracking and the gaps around text.
 
 ## Reference files
 

@@ -27,6 +27,9 @@ const studies = {
   'case-study-4': lazy(() =>
     import('../pages/CaseStudy4.tsx').then((m) => ({ default: m.CaseStudy4 })),
   ),
+  'case-study-5': lazy(() =>
+    import('../pages/CaseStudy5.tsx').then((m) => ({ default: m.CaseStudy5 })),
+  ),
 } as const
 
 function prefersReducedMotion() {
@@ -236,6 +239,9 @@ export function ProjectDrawer({
     if (!panel) return
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // The chat is a modal of its own, so its keys stay with it.
+      if (document.querySelector('.ask-panel[open]')) return
+
       if (event.key === 'Escape') {
         event.preventDefault()
         onClose()
@@ -258,9 +264,8 @@ export function ProjectDrawer({
       }
 
       if (event.key !== 'Tab') return
-      const navRoot = document.querySelector('.portfolio-nav')
-      const navItems =
-        navRoot instanceof HTMLElement ? focusableElements(navRoot) : []
+      const outside = [...document.querySelectorAll<HTMLElement>('.portfolio-nav, .ask-dock')]
+      const navItems = outside.flatMap(focusableElements)
       const items = [...focusableElements(panel), ...navItems]
       if (items.length === 0) return
       const first = items[0]
@@ -268,9 +273,7 @@ export function ProjectDrawer({
       const active = document.activeElement
       const inScope =
         (active instanceof Node && panel.contains(active)) ||
-        (navRoot instanceof HTMLElement &&
-          active instanceof Node &&
-          navRoot.contains(active))
+        (active instanceof Node && outside.some((root) => root.contains(active)))
       if (event.shiftKey && (active === first || !inScope)) {
         event.preventDefault()
         last.focus()
