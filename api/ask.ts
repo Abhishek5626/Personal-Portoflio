@@ -1,7 +1,7 @@
 /** Answers visitors' questions about Abhishek through Groq. The key stays on the server. */
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const MODEL = 'llama-3.1-8b-instant'
+const MODEL = 'openai/gpt-oss-120b'
 const MAX_MESSAGES = 10
 const MAX_QUESTION_CHARS = 500
 const MAX_REPLY_CHARS = 2000
@@ -118,7 +118,10 @@ export async function POST(request: Request) {
     body: JSON.stringify({
       model: MODEL,
       stream: true,
-      max_tokens: 300,
+      // The hidden reasoning shares this budget, so it needs room beyond the 80 word reply.
+      max_completion_tokens: 800,
+      reasoning_effort: 'low',
+      include_reasoning: false,
       temperature: 0.3,
       messages: [{ role: 'system', content: SYSTEM }, ...messages],
     }),
