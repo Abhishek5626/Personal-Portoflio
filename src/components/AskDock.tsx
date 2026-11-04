@@ -31,7 +31,7 @@ export const askStudies = {
       { label: 'Outcome', question: 'What is the outcome of this project?' },
       { label: 'Results', question: 'What results is it aiming for?' },
       { label: 'Easier', question: 'How does it make life easier for people using Quik?' },
-      { label: 'Time', question: 'How much time would it save?' },
+      { label: 'Time', question: 'How fast could a new user launch with it?' },
     ],
   },
 } as const

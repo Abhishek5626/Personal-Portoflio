@@ -80,7 +80,10 @@ export function systemFor(study: unknown) {
   if (typeof study !== 'string' || !Object.hasOwn(STUDIES, study)) return SYSTEM
   return `${SYSTEM}
 
-The visitor is reading this case study, so "this project" and "the outcome" mean it. Answer directly from it, leading with the answer:
+The visitor is reading this case study, so "this project" and "the outcome" mean it. Answer directly from it, leading with the answer.
+When asked about the outcome or result: open with the intended outcome and what changes for the people using it, then add one short clause saying it hasn't been measured yet. Include the main target or pass mark if there is one. Don't open with what hasn't happened.
+When you give an assumed figure or a target, call it an assumption or a target in the same sentence.
+
 ${STUDIES[study]}`
 }
 
