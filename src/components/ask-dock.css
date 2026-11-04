@@ -4,7 +4,7 @@
   --ask-glass: rgb(255 255 255 / 42%);
   --ask-glass-line: rgb(255 255 255 / 26%);
   --ask-tint: rgb(206 200 243 / 36%);
-  --ask-panel: rgb(245 243 255 / 66%);
+  --ask-panel: rgb(245 243 255 / 95%);
   --ask-field: #fff;
   --ask-card: rgb(255 255 255 / 68%);
   --ask-ink: #373535;
@@ -23,7 +23,7 @@ html[data-theme="dark"] {
   --ask-glass: rgb(30 30 34 / 42%);
   --ask-glass-line: rgb(255 255 255 / 14%);
   --ask-tint: rgb(120 112 180 / 22%);
-  --ask-panel: rgb(26 25 34 / 72%);
+  --ask-panel: rgb(26 25 34 / 96%);
   --ask-field: var(--theme-surface);
   --ask-card: rgb(255 255 255 / 7%);
   --ask-ink: var(--theme-text);
@@ -506,6 +506,17 @@ html[data-ask-dock="chat"] .portfolio-nav:not(.is-open) .portfolio-nav-toggle:no
 .ask-form:focus-within {
   outline: 2px solid var(--ask-solid);
   outline-offset: 1px;
+}
+
+/* The form draws the focus ring, so the input's own would double it. */
+.ask-input:focus-visible {
+  outline: none;
+}
+
+/* The closed bar would otherwise show through the open panel. */
+.ask-dock:has(+ .ask-panel[open]) {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .ask-open:focus-visible,
