@@ -15,6 +15,7 @@ import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { MusicCard } from '../components/MusicCard.tsx'
 import { TestimonialCard } from '../components/TestimonialCard.tsx'
 import { WorkExperienceCard } from '../components/WorkExperienceCard.tsx'
+import { AskDock } from '../components/AskDock.tsx'
 import { PortfolioNav } from '../components/PortfolioNav.tsx'
 import { ProgressiveBlur } from '../components/ProgressiveBlur.tsx'
 import { HowIWorkDialog } from '../components/HowIWorkDialog.tsx'
@@ -1441,6 +1442,7 @@ export function LandingPage() {
           onClose={() => setHowIWorkOpener(null)}
         />
       ) : null}
+      <AskDock hidden={drawerPresent} />
       <PortfolioNav
         onHowIWork={isMobile && !drawerPresent ? setHowIWorkOpener : undefined}
         activeProject={projectId}

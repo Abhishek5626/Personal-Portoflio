@@ -19,6 +19,7 @@ Parent frame: `236:2004`. Sections were matched by comparing each frame's text w
 | `236:2434` | Channel overview | 1178 × 220 | Journeys: Channel map | Reflowed, generated |
 | `270:92` | Feature delivery framework | Full column | System: Evidence first | Built by hand, `SystemFrames.tsx` |
 | `272:753` | Channel preview, on Page 2 | 1386 × 707 | System: The playground | Built by hand, `Playground.tsx`. Figma draws only Webshop at size L |
+| `292:278`, `292:60`, `292:160` | Ask bar closed, phone closed, panel open | 693, phone, 1074 × 597 | Landing page | Built by hand, `AskDock.tsx`. Avatar and copy differ, see the code |
 | `236:2492` | Channel state rules | 1178 × 147 | System: One change, everywhere | Reflowed, `SystemFrames.tsx` |
 | `236:2480` | Voice token rationale | 1180 × 156 | System: One change, everywhere | Reflowed, `SystemFrames.tsx` |
 | `236:2599` | Outcomes and measurement | 1180 × 406 | Vision: What changes | Reflowed, generated |
