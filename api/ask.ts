@@ -110,7 +110,7 @@ export async function POST(request: Request) {
   if (!messages) return fail(400, 'invalid')
 
   const key = process.env.GROQ_API_KEY
-  if (!key) return fail(503, 'unavailable')
+  if (!key) return fail(503, 'no_key')
 
   const upstream = await fetch(GROQ_URL, {
     method: 'POST',
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
     }),
   }).catch(() => null)
 
-  if (!upstream?.ok || !upstream.body) return fail(upstream?.status === 429 ? 429 : 503, 'unavailable')
+  if (!upstream?.ok || !upstream.body) return fail(upstream?.status === 429 ? 429 : 503, `upstream_${upstream?.status ?? 'unreachable'}`)
   return new Response(toText(upstream.body), {
     headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
   })
