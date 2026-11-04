@@ -55,7 +55,7 @@ html[data-theme="dark"] .pg {
   border-radius: 100px;
   background: transparent;
   color: var(--pg-soft);
-  font: 500 16px/1 Inter, sans-serif;
+  font: 500 16px/1 var(--cs-font);
   white-space: nowrap;
   cursor: pointer;
   transition: background-color 200ms ease, color 200ms ease;
@@ -379,7 +379,7 @@ html[data-theme="dark"] .pg {
   border-radius: 100px;
   background: #eef0ee;
   color: #20221f;
-  font: 500 13px/1 Inter, sans-serif;
+  font: 500 13px/1 var(--cs-font);
   white-space: nowrap;
 }
 

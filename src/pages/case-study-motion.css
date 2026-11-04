@@ -45,7 +45,7 @@ html[data-theme="dark"] .cs-system {
   border-radius: 99px;
   background: transparent;
   color: var(--fx-ink-2);
-  font: 500 13px/24px Inter, sans-serif;
+  font: 500 13px/24px var(--cs-font);
   cursor: pointer;
   transition: color 150ms cubic-bezier(0.2, 0, 0, 1), background-color 150ms cubic-bezier(0.2, 0, 0, 1);
 }
@@ -291,4 +291,24 @@ html[data-theme="dark"] .fx-pill.is-rule {
   .cs-proto-pair {
     animation: none;
   }
+}
+
+/* Fills whatever icon box a panel gives it. */
+.fx-glyph {
+  display: block;
+  width: 100%;
+  max-width: 20px;
+  height: 100%;
+  max-height: 20px;
+}
+
+.fx-glyph.is-mask {
+  background: currentColor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+html[data-theme="dark"] .cs-content img[src*="/case-study-4/icons/"] {
+  filter: invert(1);
 }

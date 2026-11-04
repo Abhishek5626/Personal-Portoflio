@@ -33,7 +33,7 @@ Each one came from a correction or a real defect.
 - **Same as the design, or say so.** When the user gives a design, match it. "Close" has been rejected as half done. List every remaining difference plainly, and why it exists.
 - **Nothing invented.** Don't add elements, copy or decoration that the design doesn't contain. If something is missing, ask for it or leave a labelled placeholder.
 - **Ask for assets first.** Before a build that needs icons or images, tell the user which ones, because they can supply them from Figma. Drawn stand-ins must be reported as stand-ins.
-- **Fonts.** Inter in case studies. Landing fonts as listed in `references/tokens.md`. Never load a reference site's font.
+- **Fonts.** The Agentic AI case study uses Geist, Fraunces, JetBrains Mono and Departure Mono at the reference's sizes, by the user's request, all set in `src/pages/case-study-type.css`. Load fonts from their open source releases, never a reference site's files. Landing fonts as listed in `references/tokens.md`.
 - **Facts.** Don't present figures or claims from a reference site as true of the user's work. Use the user's Figma text or repo text, or a visibly marked placeholder such as `[00]`.
 - **Reference text.** Don't copy a reference site's sentences into the build. Text the user wrote in their own Figma frames is theirs to use, verbatim.
 - **Reuse before adding.** Look in `references/components.md` first. A new token or component is a decision, so report it.

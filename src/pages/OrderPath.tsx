@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, type CSSProperties } from 'react'
 import { agentIcons } from './AgentFlow.tsx'
-import { PlayButton, playWire, prefersReducedMotion, useRun } from './caseStudyMotion.tsx'
+import { Glyph, PlayButton, playWire, prefersReducedMotion, useRun } from './caseStudyMotion.tsx'
 import './order-path.css'
 
 type Step = { code: string; title: string; hint: string; text: string; person?: boolean }
@@ -217,9 +217,7 @@ export function OrderPath({ steps, control, summary }: { steps: Step[]; control:
                     ) : null}
                     {kind ? (
                       <span className="op-kind" aria-hidden="true">
-                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                          <path d={kind.icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <Glyph icon={kind.icon} />
                       </span>
                     ) : null}
                   </span>

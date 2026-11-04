@@ -1,12 +1,12 @@
 import { useEffect, useId, type CSSProperties } from 'react'
-import { PlayButton, playWire, prefersReducedMotion, useRun } from './caseStudyMotion.tsx'
+import { Glyph, PlayButton, playWire, prefersReducedMotion, useRun } from './caseStudyMotion.tsx'
 import './agent-flow.css'
 
 const agents = [
-  { id: 'setup', name: 'Setup agent', does: 'Turns the catalogue and past orders into rules and thresholds', forWho: 'For the merchant admin', note: 'A person approves every change it suggests', icon: 'M2 3.5h4v3H2zM10 9.5h4v3h-4zM6 5h3a1.5 1.5 0 0 1 1.5 1.500v3' },
-  { id: 'ordering', name: 'Ordering agent', does: 'Talks to the buyer and decides within the merchant’s rules', forWho: 'For the merchant', note: 'Takes voice, WhatsApp or email. The buyer’s agent checks the buyer’s rules and asks the approver, and stops go to a sales rep', icon: 'M2.5 3h11v8h-6l-3 2.500V11h-2zM5 6h6M5 8.500h4' },
-  { id: 'fulfilment', name: 'Fulfilment agent', does: 'Holds stock, books the van and writes the order', forWho: 'For the merchant', note: 'Reads live stock and contract prices from the ERP', icon: 'M2.5 5.500h10M10 3l2.5 2.500L10 8M13.5 10.500h-10M6 8l-2.5 2.500L6 13' },
-  { id: 'review', name: 'Review agent', does: 'Sums up the month and suggests changes', forWho: 'For the merchant admin', note: 'Never touches a live order', icon: 'M8 2.500a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM8 8l2.5-2.5' },
+  { id: 'setup', name: 'Setup agent', does: 'Turns the catalogue and past orders into rules and thresholds', forWho: 'For the merchant admin', note: 'A person approves every change it suggests', icon: 'model-builder' },
+  { id: 'ordering', name: 'Ordering agent', does: 'Talks to the buyer and decides within the merchant’s rules', forWho: 'For the merchant', note: 'Takes voice, WhatsApp or email. The buyer’s agent checks the buyer’s rules and asks the approver, and stops go to a sales rep', icon: 'chat' },
+  { id: 'fulfilment', name: 'Fulfilment agent', does: 'Holds stock, books the van and writes the order', forWho: 'For the merchant', note: 'Reads live stock and contract prices from the ERP', icon: 'transfer' },
+  { id: 'review', name: 'Review agent', does: 'Sums up the month and suggests changes', forWho: 'For the merchant admin', note: 'Never touches a live order', icon: 'meter' },
 ]
 
 export const agentIcons = Object.fromEntries(agents.map(({ id, icon }) => [id, icon]))
@@ -193,9 +193,7 @@ export function AgentFlow() {
           {agents.map((agent) => (
             <li key={agent.id} className="af-agent fx-step" data-af={agent.id}>
               <span className="af-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
-                  <path d={agent.icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Glyph icon={agent.icon} />
               </span>
               <span className="af-name">
                 <span className="af-status" aria-hidden="true" />

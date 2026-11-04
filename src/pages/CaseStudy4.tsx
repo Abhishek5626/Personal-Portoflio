@@ -9,6 +9,7 @@ import { CaseStudy4Vision } from './CaseStudy4Vision.tsx'
 import { Beats, useReveal } from './caseStudyMotion.tsx'
 import { DecisionNote } from './caseStudyParts.tsx'
 import './case-study-system.css'
+import './case-study-type.css'
 
 /** The page's opening content; nothing else needs to change to replace it. */
 const intro = {

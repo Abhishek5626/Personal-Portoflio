@@ -1,11 +1,11 @@
 import { useEffect, useId, useState } from 'react'
-import { PlayButton, playWire, prefersReducedMotion, useRun } from './caseStudyMotion.tsx'
+import { Glyph, PlayButton, playWire, prefersReducedMotion, useRun } from './caseStudyMotion.tsx'
 import './system-flow.css'
 
 const process = [
   { id: 'doc', title: 'Requirements doc', text: 'The single source of truth', icon: 'M4 2.5h6l2.5 2.5v8.5H4ZM10 2.5V5h2.5M6 8h4M6 10.5h4' },
-  { id: 'bet', title: 'Hypothesis', text: 'A bet that a test can prove wrong', icon: 'M2 8a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0M11 4a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0M11 12a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0M5 7.25l6-2.5M5 8.75l6 2.5' },
-  { id: 'test', title: 'Test', text: 'A replay, shadow mode or A/B', icon: 'M6 2.5h4M7 2.5v4L3.5 12a1 1 0 0 0 .9 1.5h7.2a1 1 0 0 0 .9-1.5L9 6.5v-4M5.5 9.5h5' },
+  { id: 'bet', title: 'Hypothesis', text: 'A bet that a test can prove wrong', icon: 'decision-tree' },
+  { id: 'test', title: 'Test', text: 'A replay, shadow mode or A/B', icon: 'chemistry' },
 ]
 
 const layers = [
@@ -16,11 +16,11 @@ const layers = [
 
 const channels = [
   { title: 'Webshop', icon: 'M2.5 3.5h11v9h-11ZM2.5 6.5h11' },
-  { title: 'WhatsApp', icon: 'M2.5 3h11v8h-6l-3 2.5V11h-2ZM5 6h6M5 8.5h4' },
-  { title: 'Email', icon: 'M2.5 4h11v8h-11ZM2.5 4.5 8 9l5.5-4.5' },
-  { title: 'Voice', icon: 'M8 2a2 2 0 0 0-2 2v4a2 2 0 0 0 4 0V4a2 2 0 0 0-2-2ZM4 7.5a4 4 0 0 0 8 0M8 11.5V14' },
-  { title: 'Agents', note: 'Buyer’s and merchant’s', icon: 'M2 3.5h4v3H2ZM10 9.5h4v3h-4ZM6 5h3a1.5 1.5 0 0 1 1.5 1.5v3' },
-  { title: 'New channel', note: 'One skill, one renderer', icon: 'M8 3v10M3 8h10', isNew: true },
+  { title: 'WhatsApp', icon: 'chat' },
+  { title: 'Email', icon: 'email' },
+  { title: 'Voice', icon: 'microphone' },
+  { title: 'Agents', note: 'Buyer’s and merchant’s', icon: 'model-builder' },
+  { title: 'New channel', note: 'One skill, one renderer', icon: 'plus', isNew: true },
 ]
 
 const foot = [
@@ -219,9 +219,7 @@ export function SystemFlow() {
           {process.map((item) => (
             <li key={item.id} className="sf-card fx-step">
               <span className="sf-icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
-                  <path d={item.icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Glyph icon={item.icon} />
               </span>
               <span className="sf-name">{item.title}</span>
               <span className="sf-note">{item.text}</span>
@@ -255,9 +253,7 @@ export function SystemFlow() {
           {channels.map((channel) => (
             <li key={channel.title} className={channel.isNew ? 'sf-channel is-new' : 'sf-channel'}>
               <span className="sf-channel-icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d={channel.icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Glyph icon={channel.icon} />
               </span>
               <span className="sf-channel-text">
                 <span className="sf-channel-name">{channel.title}</span>
@@ -289,9 +285,7 @@ export function SystemFlow() {
           {foot.map((item) => (
             <li key={item.title} className="sf-foot-item">
               <span className="sf-foot-icon" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <path d={item.icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Glyph icon={item.icon} />
               </span>
               <p className="sf-foot-text">
                 <strong>{item.title}</strong>

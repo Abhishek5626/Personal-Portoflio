@@ -5,7 +5,7 @@ export function WhyDecidedFrame() {
   return (
     <aside className="pf-why" aria-label="Why I decided this">
       <div className="pf-why-head">
-        <span className="pf-mark is-small" aria-hidden="true">A</span>
+        <span className="pf-mark is-small" aria-hidden="true">i</span>
         <p className="pf-why-label">Why I decided this</p>
       </div>
       <div className="pf-why-columns">
@@ -27,7 +27,7 @@ export function BuyerAgentFrame() {
   return (
     <article className="pf-agent">
       <div className="pf-agent-head">
-        <span className="pf-mark" aria-hidden="true">A</span>
+        <img className="pf-mark-icon" src="/case-study-4/icons/checkmark-filled.svg" alt="" width="20" height="20" />
         <h4 className="pf-agent-name">Buyer’s Agent</h4>
       </div>
       <div className="pf-agent-columns">
@@ -60,7 +60,7 @@ export function BuyerAgentFrame() {
 const merchantAgents = [
   {
     name: 'Setup agent',
-    icon: 'a504973230.svg',
+    icon: 'model-builder.svg',
     value: 'A merchant fills 1 template instead of running a setup project.',
     test: 'Tested by the replay and the days from signup to live',
     does: (
@@ -72,7 +72,7 @@ const merchantAgents = [
   },
   {
     name: 'Ordering agent',
-    icon: '52673cf2b5.svg',
+    icon: 'chat.svg',
     value: 'The buyer gets an answer without waiting for a sales rep.',
     test: 'Tested by the pilot’s 5 minute pass mark',
     does: (
@@ -84,7 +84,7 @@ const merchantAgents = [
   },
   {
     name: 'Fulfilment agent',
-    icon: '6752c108c0.svg',
+    icon: 'transfer.svg',
     value: 'No rekeying, so no typing errors on the way to the ERP.',
     test: 'Checked in the pilot, against the ERP log',
     does: 'Holds stock, books the van and writes the order to the ERP. In the pilot, a sales rep books the van.',
@@ -92,7 +92,7 @@ const merchantAgents = [
   },
   {
     name: 'Review agent',
-    icon: 'b55429eee4.svg',
+    icon: 'meter.svg',
     value: 'The merchant sees where to trust the agent more, with numbers.',
     test: 'Tested by the override rate and the monthly threshold review',
     does: 'Sums up each category and suggests threshold changes.',
@@ -109,7 +109,7 @@ export function MerchantAgentsFrame() {
           <li key={agent.name} className="pf-merchant">
             <div className="pf-merchant-head">
               <span className="pf-merchant-icon" aria-hidden="true">
-                <img src={`/case-study-4/figma/${agent.icon}`} alt="" width="20" height="20" />
+                <img src={`/case-study-4/icons/${agent.icon}`} alt="" width="20" height="20" />
               </span>
               <h4 className="pf-merchant-name">{agent.name}</h4>
             </div>

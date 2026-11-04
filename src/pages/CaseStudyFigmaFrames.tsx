@@ -14,7 +14,7 @@ export function AgentLimitsFrame() {
         </div>
         <div className="fg-03029c">
           <div className="fg-5d451d">
-            <img alt="" className="fg-84b775" src="/case-study-4/figma/1b150850c3.svg" />
+            <img alt="" className="fg-84b775" src="/case-study-4/icons/checkmark-filled.svg" />
           </div>
           <div className="fg-886cbc">
             <p className="fg-60a0a1">
@@ -27,7 +27,7 @@ export function AgentLimitsFrame() {
         </div>
         <div className="fg-03029c">
           <div className="fg-5d451d">
-            <img alt="" className="fg-84b775" src="/case-study-4/figma/774b5f418f.svg" />
+            <img alt="" className="fg-84b775" src="/case-study-4/icons/model-builder.svg" />
           </div>
           <div className="fg-886cbc">
             <p className="fg-c493a5">
@@ -40,7 +40,7 @@ export function AgentLimitsFrame() {
         </div>
         <div className="fg-03029c">
           <div className="fg-5d451d">
-            <img alt="" className="fg-84b775" src="/case-study-4/figma/afd9defa97.svg" />
+            <img alt="" className="fg-84b775" src="/case-study-4/icons/chat.svg" />
           </div>
           <div className="fg-886cbc">
             <p className="fg-c493a5">
@@ -53,7 +53,7 @@ export function AgentLimitsFrame() {
         </div>
         <div className="fg-03029c">
           <div className="fg-5d451d">
-            <img alt="" className="fg-84b775" src="/case-study-4/figma/38334ad1e5.svg" />
+            <img alt="" className="fg-84b775" src="/case-study-4/icons/transfer.svg" />
           </div>
           <div className="fg-886cbc">
             <p className="fg-c493a5">
@@ -66,7 +66,7 @@ export function AgentLimitsFrame() {
         </div>
         <div className="fg-03029c">
           <div className="fg-5d451d">
-            <img alt="" className="fg-84b775" src="/case-study-4/figma/9e41798f03.svg" />
+            <img alt="" className="fg-84b775" src="/case-study-4/icons/meter.svg" />
           </div>
           <div className="fg-886cbc">
             <p className="fg-c493a5">
@@ -626,7 +626,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/0dc6486b4e.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/direction-loop-left.svg" />
                 </div>
               </div>
               <p className="fg-de6c68">
@@ -637,7 +637,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/51ea22da71.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/user-plus.svg" />
                 </div>
               </div>
               <p className="fg-299b85">
@@ -647,7 +647,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/c84396e992.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/search.svg" />
                 </div>
               </div>
               <p className="fg-299b85">
@@ -657,7 +657,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/10dd447a7b.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/chat.svg" />
                 </div>
               </div>
               <p className="fg-299b85">
@@ -674,7 +674,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/94b90f82e5.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/meter.svg" />
                 </div>
               </div>
               <p className="fg-de6c68">
@@ -685,7 +685,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/82b3c1b454.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/money.svg" />
                 </div>
               </div>
               <p className="fg-299b85">
@@ -695,7 +695,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/e940d723cf.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/pause.svg" />
                 </div>
               </div>
               <p className="fg-299b85">
@@ -705,7 +705,7 @@ export function SafeguardsFrame() {
             <div className="fg-4cfff4">
               <div className="fg-b5938b">
                 <div className="fg-5b80da">
-                  <img alt="" className="fg-84b775" src="/case-study-4/figma/f5699e4b6f.svg" />
+                  <img alt="" className="fg-84b775" src="/case-study-4/icons/event-schedule.svg" />
                 </div>
               </div>
               <p className="fg-299b85">

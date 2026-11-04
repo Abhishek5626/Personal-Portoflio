@@ -233,21 +233,6 @@
   }
 }
 
-.cs-system .fg-frame-AgentLimitsFrame p,
-.cs-system .fg-frame-AgentLimitsFrame span {
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.cs-system .fg-frame-AgentLimitsFrame .fg-205b09,
-.cs-system .fg-frame-AgentLimitsFrame .fg-1bf165,
-.cs-system .fg-frame-AgentLimitsFrame .fg-5fa3ac,
-.cs-system .fg-frame-AgentLimitsFrame .fg-9618f9,
-.cs-system .fg-frame-AgentLimitsFrame .fg-e53a0a {
-  font-size: 12px;
-  line-height: 16px;
-}
-
 /* The Figma highlight was a fixed width box, which stops fitting "Never" at other sizes. */
 .cs-system .fg-frame-AgentLimitsFrame .fg-9c3581 {
   display: none;
@@ -287,23 +272,6 @@
 
 .cs-system .fg-frame-AgentLimitsFrame .fg-row > :first-child p {
   white-space: nowrap;
-}
-
-.cs-system .fg-frame-DecidesFrame p,
-.cs-system .fg-frame-DecidesFrame span {
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.cs-system .fg-frame-DecidesFrame .fg-f951cf {
-  font-size: 12px;
-  line-height: 16px;
-}
-
-.cs-system .fg-8057cc p,
-.cs-system .fg-8057cc span {
-  font-size: 14px;
-  line-height: 20px;
 }
 
 /* The header's second column shares the rows' width, so "What happens" sits over its answers. */
@@ -393,7 +361,7 @@ html[data-theme="dark"] .td {
   border-radius: 100px;
   background: transparent;
   color: var(--td-soft);
-  font: 500 16px/1 Inter, sans-serif;
+  font: 500 16px/1 var(--cs-font);
   cursor: pointer;
 }
 
@@ -728,25 +696,8 @@ html[data-theme="dark"] .td {
   }
 }
 
-/* Journeys: every label in the order path at 14px. */
-.cs-system .op :is(p, span, button, h4, h5, strong, li, div) {
-  font-size: 13px;
-  line-height: 18px;
-}
-
 .cs-system .fg-frame-ChannelsFrame {
   align-items: stretch;
-}
-
-.cs-system .fg-frame-ChannelsFrame p,
-.cs-system .fg-frame-ChannelsFrame span {
-  font-size: 12px;
-  line-height: 18px;
-}
-
-.cs-system .fg-frame-ChannelsFrame .fg-b91d7b {
-  font-size: 14px;
-  line-height: 20px;
 }
 
 /* Beside the threshold card the panel is narrower than Figma's, so its long lines wrap. */

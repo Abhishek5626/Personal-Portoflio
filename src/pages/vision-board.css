@@ -188,7 +188,7 @@ html[data-theme="dark"] .vb {
 
 .vb-name {
   color: var(--fx-ink);
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 28px;
 }
@@ -338,9 +338,4 @@ html[data-theme="dark"] .vb {
   .vb-card {
     transition: none;
   }
-}
-
-/* Shared pieces inside the board, such as the play button and pills, match its 13px. */
-.cs-system .vb :is(p, span, button, h3, h4, h5, strong, li, div) {
-  font-size: 13px;
 }

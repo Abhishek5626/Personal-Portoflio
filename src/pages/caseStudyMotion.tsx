@@ -224,3 +224,14 @@ export function useReveal(rootRef: RefObject<HTMLElement | null>, chapter: strin
     return () => observer.disconnect()
   }, [rootRef, chapter])
 }
+
+/** A reference icon by name, or a hand-drawn path where the reference draws its own. */
+export function Glyph({ icon }: { icon: string }) {
+  if (icon.startsWith('M'))
+    return (
+      <svg className="fx-glyph" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d={icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  return <span className="fx-glyph is-mask" style={{ maskImage: `url(/case-study-4/icons/${icon}.svg)` }} />
+}

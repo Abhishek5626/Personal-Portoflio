@@ -1245,22 +1245,17 @@
 
 .cs-system .vp-title {
   color: var(--fx-ink);
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 500;
-  line-height: 28px;
+  line-height: 36px;
   letter-spacing: -0.3px;
   text-wrap: balance;
 }
 
-/* The title sits 8px above its text, as in every other section. */
-.cs-system .vp-title + .vp-copy {
-  margin-top: -8px;
-}
-
 .cs-system .vp-copy {
   color: var(--fx-ink-2);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: 16px;
+  line-height: 26px;
   text-wrap: pretty;
 }
 

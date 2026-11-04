@@ -19,10 +19,11 @@
   --cs-chip: #f4f4f4;
   --cs-border: #efefef;
   --cs-border-soft: #f6f6f6;
-  --cs-heading: #403e3e;
-  --cs-text: #3e3d3d;
-  --cs-text-soft: #494949;
-  --cs-text-muted: #645e5e;
+  --cs-font: Geist, system-ui, sans-serif;
+  --cs-heading: #191919;
+  --cs-text: #191919;
+  --cs-text-soft: #616161;
+  --cs-text-muted: #616161;
   --cs-marker: #6f6a6a;
   --cs-side-a: #e7f0fb;
   --cs-side-a-ink: #1f64bd;
@@ -53,7 +54,8 @@
   padding: 88px 46px 64px;
   background: var(--cs-page);
   color: var(--cs-text);
-  font-family: Inter, sans-serif;
+  font-family: var(--cs-font);
+  -webkit-font-smoothing: antialiased;
   transition: background-color var(--theme-duration) var(--theme-ease);
 }
 
@@ -116,14 +118,14 @@ html[data-theme="dark"] .cs-system {
 .cs-shell {
   display: flex;
   align-items: flex-start;
-  gap: 46px;
+  gap: 32px;
 }
 
 /* Table of contents */
 .cs-toc {
   position: sticky;
   top: 48px;
-  flex: 0 0 319px;
+  flex: 0 0 264px;
   box-sizing: border-box;
   padding: 8px 8px 18px;
   border: 1px solid var(--cs-toc-border);
@@ -322,7 +324,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-chapter {
   display: flex;
   flex-direction: column;
-  gap: 46px;
+  gap: 64px;
   min-width: 0;
 }
 
@@ -332,8 +334,14 @@ li:not(.is-current) > a.cs-toc-row:active {
   align-self: flex-start;
 }
 
+/* A chapter's opening: 12px between its lines and 76px to the first section. */
+.cs-chapter > .cs-block:first-child > .cs-block-head {
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .cs-chapter-label .shipped-badge {
-  font-family: Inter, sans-serif;
+  font-family: var(--cs-font);
 }
 
 /* A chapter label has no live status, so its dot is grey with no glow. */
@@ -349,7 +357,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-opening {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
 .cs-opening-head {
@@ -363,7 +371,7 @@ li:not(.is-current) > a.cs-toc-row:active {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -537,7 +545,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-summary-copy {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .cs-summary-copy .cs-h3 {
@@ -564,22 +572,17 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-block {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-}
-
-/* 22px from the last line of a section's text to its content, counting the 4px of line height below that text. 32px between anything after that. */
-.cs-block > .cs-block-head + * {
-  margin-top: -14px;
+  gap: 24px;
 }
 
 .cs-block-head {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .cs-block-summary {
-  max-width: 613px;
+  max-width: 636px;
 }
 
 .cs-block-body {
@@ -837,7 +840,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 
 /* Research */
 .cs-block-summary {
-  max-width: 613px;
+  max-width: 636px;
 }
 
 .cs-flow-value {
@@ -972,7 +975,7 @@ li:not(.is-current) > a.cs-toc-row:active {
   border-radius: 99px;
   background: var(--cs-chip);
   color: var(--cs-text);
-  font: 500 12px/16px Inter, sans-serif;
+  font: 500 12px/16px var(--cs-font);
   letter-spacing: -0.48px;
   cursor: pointer;
   transition: background-color 200ms ease;
@@ -1005,12 +1008,8 @@ li:not(.is-current) > a.cs-toc-row:active {
 }
 
 .cs-plans .cs-block {
-  gap: 18px;
+  gap: 24px;
   min-width: 0;
-}
-
-.cs-plans .cs-block > .cs-block-head + * {
-  margin-top: 0;
 }
 
 .cs-plan-list {
@@ -1345,7 +1344,7 @@ html[data-theme="dark"] .cs-people {
   display: grid;
   grid-template-columns: minmax(0, 584fr) minmax(0, 714fr);
   align-items: stretch;
-  gap: 14px;
+  gap: 24px;
 }
 
 .cs-link:focus-visible {
@@ -1474,7 +1473,7 @@ html[data-theme="dark"] .cs-people {
   border-radius: 99px;
   background: var(--cs-heading);
   color: var(--cs-page);
-  font: 500 12px/16px Inter, sans-serif;
+  font: 500 12px/16px var(--cs-font);
   letter-spacing: -0.48px;
   cursor: pointer;
 }
@@ -1766,7 +1765,7 @@ html[data-theme="dark"] .cs-people {
   }
 
   .cs-chapter {
-    gap: 32px;
+    gap: 40px;
   }
 
   .cs-closing {
@@ -1781,26 +1780,4 @@ html[data-theme="dark"] .cs-people {
   }
 }
 
-/*
-  Every container in the case study, static or animated, sets its text at 13px.
-  !important because this one rule has to beat each panel's own sizes.
-*/
-.cs-system .cs-content :is(
-  .cs-summary, .cs-summary-fact, .cs-media, .cs-role-header, .cs-role-card, .cs-decision, .cs-compare, .cs-timing,
-  .rf, .cs-finding, .cs-finding-side, .cs-callout, .cs-table-card, .cs-plan-list, .pf-why, .pf-agent, .pf-merchant,
-  .pf-data-card, .cs-people, .fg-scroll, .td, .fg-frame-DecidesFrame, .fg-8057cc, .jb-col, .jb-label,
-  .fg-frame-ChannelsFrame, .sf, .ef, .ts, .sx-states, .sx-voice, .pg, .sr, .tm, .fg-3da00f, .cs-closing
-),
-.cs-system .cs-content :is(
-  .cs-summary, .cs-summary-fact, .cs-media, .cs-role-header, .cs-role-card, .cs-decision, .cs-compare, .cs-timing,
-  .rf, .cs-finding, .cs-finding-side, .cs-callout, .cs-table-card, .cs-plan-list, .pf-why, .pf-agent, .pf-merchant,
-  .pf-data-card, .cs-people, .fg-scroll, .td, .fg-frame-DecidesFrame, .fg-8057cc, .jb-col, .jb-label,
-  .fg-frame-ChannelsFrame, .sf, .ef, .ts, .sx-states, .sx-voice, .pg, .sr, .tm, .fg-3da00f, .cs-closing
-) * {
-  font-size: 13px !important;
-}
 
-/* The Prototype's phone mock-ups set all their text at 10px. */
-.cs-system .cs-content :is(.vp-phone, .cs-proto-phone) * {
-  font-size: 10px !important;
-}

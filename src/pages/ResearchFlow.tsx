@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ENTER, PlayButton, TRAVEL, enter, prefersReducedMotion, pulse, travelLight, useRun } from './caseStudyMotion.tsx'
+import { Glyph, ENTER, PlayButton, TRAVEL, enter, prefersReducedMotion, pulse, travelLight, useRun } from './caseStudyMotion.tsx'
 import './research-flow.css'
 
 /** Replace the [bracketed] values with real ones; nothing else needs to change. */
@@ -8,10 +8,10 @@ const content = {
   text: 'Evidence comes first, then the bets it can’t settle, then the key tests, until the pilot proves the case.',
   loop: 'Pilot results feed back into the bets',
   steps: [
-    { title: 'What I know', section: 'know', figure: '[00]', unit: '[unit]', note: '[Add the evidence]', wire: 'the gaps', icon: 'M7 2.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9ZM10.5 10.5l3 3' },
-    { title: 'What I assume', section: 'assume', figure: '[00]', unit: '[unit]', note: '[Add the bets]', wire: 'top bets first', icon: 'M2 8a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0M11 4a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0M11 12a1.5 1.5 0 1 0 3 0 1.5 1.5 0 1 0-3 0M5 7.25l6-2.5M5 8.75l6 2.5' },
-    { title: 'What we test first', section: 'first', figure: '[00]', unit: '[unit]', note: '[Add the pass mark]', wire: 'what passes', icon: 'M6 2.5h4M7 2.5v4L3.5 12a1 1 0 0 0 .9 1.5h7.2a1 1 0 0 0 .9-1.5L9 6.5v-4M5.5 9.5h5' },
-    { title: 'How we know', section: 'after', figure: '[00]', unit: '[unit]', note: '[Add the pilot size]', icon: 'M8 2.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM8 8l2.5-2.5' },
+    { title: 'What I know', section: 'know', figure: '[00]', unit: '[unit]', note: '[Add the evidence]', wire: 'the gaps', icon: 'search' },
+    { title: 'What I assume', section: 'assume', figure: '[00]', unit: '[unit]', note: '[Add the bets]', wire: 'top bets first', icon: 'decision-tree' },
+    { title: 'What we test first', section: 'first', figure: '[00]', unit: '[unit]', note: '[Add the pass mark]', wire: 'what passes', icon: 'chemistry' },
+    { title: 'How we know', section: 'after', figure: '[00]', unit: '[unit]', note: '[Add the pilot size]', icon: 'meter' },
   ],
 }
 
@@ -76,9 +76,7 @@ export function ResearchFlow({ chapterId }: { chapterId: string }) {
               <li key={step.title} className="rf-cell">
                 <a className="rf-card fx-step" href={`#${chapterId}-${step.section}`}>
                   <span className="rf-icon" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d={step.icon} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <Glyph icon={step.icon} />
                   </span>
                   <span className="rf-title">{step.title}</span>
                   <span className="rf-figure">{step.figure}</span>
