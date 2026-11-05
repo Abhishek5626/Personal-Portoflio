@@ -3,7 +3,7 @@ import './ask-dock.css'
 
 const calLink = 'abhishek-kashid-nqthrz/15min'
 /** Add these to show the matching buttons. A button with no value stays hidden. */
-const contact = { email: '', whatsapp: '', resume: '' }
+const contact = { email: '', whatsapp: '', resume: '/resume.pdf' }
 
 const suggestions = [
   { label: 'Your team', question: 'What would you build for my team?' },
@@ -40,6 +40,13 @@ export type AskStudy = keyof typeof askStudies
 
 const noReply = 'I can’t answer right now. Please book a call with Abhishek instead.'
 const SWAP_AFTER_PX = 24
+const OPEN_MS = 420
+const CLOSE_MS = 240
+const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
+const EASE_IN = 'cubic-bezier(0.4, 0, 1, 1)'
+const PANEL_REST = 'translateY(24px) scale(0.96)'
+
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 type Message = { role: 'user' | 'assistant'; content: string }
 type CalApi = ((...args: unknown[]) => void) & { loaded?: boolean; q?: unknown[]; ns?: object }
@@ -101,8 +108,7 @@ function Avatar({ size }: { size: 'large' | 'small' }) {
 
 export function AskDock({ hidden, study = null }: { hidden: boolean; study?: AskStudy | null }) {
   const copy = study ? askStudies[study] : null
-  // In a case study the bar stays up: the nav and arrows have their own places beside it.
-  const [showing, setShowing] = useState(Boolean(study))
+  const [showing, setShowing] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
@@ -110,11 +116,14 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
   const inputRef = useRef<HTMLInputElement>(null)
   const logRef = useRef<HTMLDivElement>(null)
   const requestRef = useRef<AbortController | null>(null)
+  const closingRef = useRef(false)
 
   // The landing page pans rather than scrolls, so direction comes from the wheel, drags and keys.
+  // A case study scrolls its drawer, so direction there comes from the scroll position.
   useEffect(() => {
-    if (hidden || study) return
+    if (hidden) return
     let travelled = 0
+    let lastY = 0
     let dragY: number | null = null
     const move = (down: number) => {
       if (dialogRef.current?.open) return
@@ -122,6 +131,12 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
       if (Math.abs(travelled) >= SWAP_AFTER_PX) setShowing(travelled > 0)
     }
     const onField = (target: EventTarget | null) => target instanceof Element && target.closest('.project-fisheye-field')
+    const onScroll = (event: Event) => {
+      if (!(event.target instanceof Element) || !event.target.matches('.project-drawer-scroll')) return
+      const y = event.target.scrollTop
+      move(y - lastY)
+      lastY = y
+    }
     const onWheel = (event: WheelEvent) => {
       if (onField(event.target) && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) move(event.deltaY)
     }
@@ -147,7 +162,9 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
     window.addEventListener('pointerup', onUp, { passive: true })
     window.addEventListener('pointercancel', onUp, { passive: true })
     window.addEventListener('keydown', onKey)
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true })
     return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true })
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('pointerdown', onDown)
       window.removeEventListener('pointermove', onMove)
@@ -155,16 +172,16 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
       window.removeEventListener('pointercancel', onUp)
       window.removeEventListener('keydown', onKey)
     }
-  }, [hidden, study])
+  }, [hidden])
 
   // The nav button lives in PortfolioNav, so it reads this state from the page.
   useEffect(() => {
     const root = document.documentElement
-    if (showing && !hidden && !study) root.dataset.askDock = 'chat'
+    if (showing && !hidden) root.dataset.askDock = 'chat'
     return () => {
       delete root.dataset.askDock
     }
-  }, [showing, hidden, study])
+  }, [showing, hidden])
 
   useEffect(() => {
     const log = logRef.current
@@ -223,8 +240,41 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
 
   // Focusing on phones would open the keyboard over the suggestions.
   const openPanel = () => {
-    dialogRef.current?.showModal()
+    const dialog = dialogRef.current
+    if (!dialog || dialog.open) return
+    dialog.showModal()
     if (window.matchMedia('(pointer: fine)').matches) inputRef.current?.focus()
+    if (reducedMotion()) return
+    // The panel rises out of the bar, then its contents settle in order.
+    const timing = { duration: OPEN_MS, easing: EASE_OUT }
+    dialog.animate({ opacity: [0, 1], transform: [PANEL_REST, 'none'] }, timing)
+    dialog.animate({ opacity: [0, 1] }, { ...timing, pseudoElement: '::backdrop' })
+    dialog.querySelectorAll('.ask-head, .ask-log, .ask-compose').forEach((part, index) => {
+      part.animate(
+        { opacity: [0, 1], transform: ['translateY(8px)', 'none'] },
+        { ...timing, delay: 60 + index * 50, fill: 'backwards' },
+      )
+    })
+  }
+
+  const closePanel = () => {
+    const dialog = dialogRef.current
+    if (!dialog?.open || closingRef.current) return
+    if (reducedMotion()) {
+      dialog.close()
+      return
+    }
+    closingRef.current = true
+    const timing = { duration: CLOSE_MS, easing: EASE_IN, fill: 'forwards' as const }
+    const runs = [
+      dialog.animate({ opacity: [1, 0], transform: ['none', PANEL_REST] }, timing),
+      dialog.animate({ opacity: [1, 0] }, { ...timing, pseudoElement: '::backdrop' }),
+    ]
+    void Promise.allSettled(runs.map((run) => run.finished)).then(() => {
+      dialog.close()
+      runs.forEach((run) => run.cancel())
+      closingRef.current = false
+    })
   }
 
   // Cal.com's popup can't sit above a modal dialog, so the chat closes first and keeps its messages.
@@ -257,12 +307,12 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
               <span className="ask-open-text">
                 <Sparkles size={16} />
                 <span className="ask-prompt is-wide">{copy?.prompt ?? 'How fast can you build our AI tool?'}</span>
-                <span className="ask-prompt is-narrow">{copy ? 'Ask about this case study' : 'Ask about my work'}</span>
+                <span className="ask-prompt is-narrow">{copy ? 'Ask about this work' : 'Ask about my work'}</span>
               </span>
               <Arrow size={24} />
             </button>
             {contact.resume ? (
-              <a className="ask-chip ask-dock-resume" href={contact.resume} download>
+              <a className="ask-chip ask-dock-resume" href={contact.resume} download="Abhishek Kashid Resume.pdf">
                 <Send />
                 Download Resume
               </a>
@@ -275,8 +325,12 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
         ref={dialogRef}
         className="ask-panel"
         aria-label="Ask Abhishek"
+        onCancel={(event) => {
+          event.preventDefault()
+          closePanel()
+        }}
         onClick={(event) => {
-          if (event.target === dialogRef.current) dialogRef.current?.close()
+          if (event.target === dialogRef.current) closePanel()
         }}
       >
         <div className="ask-panel-inner">
@@ -295,7 +349,7 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
               <button type="button" className="ask-new" onClick={newChat}>
                 New Chat
               </button>
-              <button type="button" className="ask-close" aria-label="Close" onClick={() => dialogRef.current?.close()}>
+              <button type="button" className="ask-close" aria-label="Close" onClick={closePanel}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" aria-hidden="true">
                   <path d="M3 3l8 8M11 3l-8 8" />
                 </svg>
@@ -361,7 +415,7 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
                 </a>
               ) : null}
               {contact.resume ? (
-                <a className="ask-chip" href={contact.resume} download>
+                <a className="ask-chip" href={contact.resume} download="Abhishek Kashid Resume.pdf">
                   <Send />
                   Download Resume
                 </a>

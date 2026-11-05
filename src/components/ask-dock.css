@@ -1,6 +1,9 @@
 /* Figma 292:278 (closed), 292:60 (phone closed) and 292:160 (open). Scroll timings measured from the reference. */
 :root {
   --ask-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ask-swap: 0.8s;
+  --ask-swap-fade: 0.6s;
+  --ask-swap-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --ask-glass: rgb(255 255 255 / 42%);
   --ask-glass-line: rgb(255 255 255 / 26%);
   --ask-tint: rgb(206 200 243 / 36%);
@@ -49,8 +52,8 @@ html[data-theme="dark"] {
   transform: translate(-50%, calc(100% + 40px));
   pointer-events: none;
   transition:
-    transform 0.4s var(--ask-ease) 0.3s,
-    opacity 0.3s var(--ask-ease) 0.3s;
+    transform var(--ask-swap) var(--ask-swap-ease),
+    opacity var(--ask-swap-fade) var(--ask-swap-ease);
 }
 
 .ask-dock.is-showing,
@@ -58,15 +61,12 @@ html[data-theme="dark"] {
   opacity: 1;
   transform: translate(-50%, 0);
   pointer-events: auto;
-  transition:
-    transform 0.4s var(--ask-ease),
-    opacity 0.3s var(--ask-ease);
 }
 
 .portfolio-nav-toggle {
   transition:
-    transform 0.4s var(--ask-ease),
-    opacity 0.3s var(--ask-ease);
+    transform var(--ask-swap) var(--ask-swap-ease),
+    opacity var(--ask-swap-fade) var(--ask-swap-ease);
 }
 
 html[data-ask-dock="chat"] .portfolio-nav:not(.is-open) .portfolio-nav-toggle:not(:focus-visible) {
@@ -153,45 +153,14 @@ html[data-ask-dock="chat"] .portfolio-nav:not(.is-open) .portfolio-nav-toggle:no
   background: var(--ask-glass);
   color: var(--ask-ink);
   font-family: Inter, sans-serif;
-  opacity: 0;
-  transform: translateY(56px) scale(0.98);
+  transform-origin: 50% 100%;
   backdrop-filter: blur(24px) saturate(1.2);
   -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  transition:
-    transform 0.3s var(--ask-ease),
-    opacity 0.2s var(--ask-ease),
-    overlay 0.3s allow-discrete,
-    display 0.3s allow-discrete;
 }
 
-.ask-panel[open] {
-  opacity: 1;
-  transform: none;
-}
-
-@starting-style {
-  .ask-panel[open] {
-    opacity: 0;
-    transform: translateY(56px) scale(0.98);
-  }
-}
-
+/* AskDock animates the panel in and out, so every browser gets the closing motion too. */
 .ask-panel::backdrop {
-  background: rgb(0 0 0 / 0%);
-  transition:
-    background-color 0.3s var(--ask-ease),
-    overlay 0.3s allow-discrete,
-    display 0.3s allow-discrete;
-}
-
-.ask-panel[open]::backdrop {
   background: rgb(0 0 0 / 28%);
-}
-
-@starting-style {
-  .ask-panel[open]::backdrop {
-    background: rgb(0 0 0 / 0%);
-  }
 }
 
 .ask-panel-inner {
@@ -540,19 +509,35 @@ html:has(.project-drawer) .ask-dock {
   width: min(693px, calc(100vw - 300px));
 }
 
+@media (min-width: 1200px) {
+  html:has(.project-drawer) .ask-dock {
+    left: calc(50% + 148px);
+    width: min(693px, calc(100vw - 596px));
+  }
+}
+
 @media (max-width: 760px) {
   html:has(.project-drawer) .ask-dock {
     bottom: max(66px, calc(env(safe-area-inset-bottom) + 54px));
-    width: calc(100vw - 24px);
+    width: min(331px, calc(100vw - 24px));
   }
 
   html[data-ask-dock="chat"] .portfolio-nav:not(.is-open) .portfolio-nav-toggle:not(:focus-visible) {
     transform: translateY(calc(-100% - 60px));
   }
 
+  /* Figma 292:59, 331 by 50. The field and button are 30 tall, with 44px tap areas. */
   .ask-dock {
     bottom: max(12px, env(safe-area-inset-bottom));
-    width: calc(100vw - 24px);
+    width: min(331px, calc(100vw - 24px));
+  }
+
+  .ask-glass {
+    padding: 1px;
+  }
+
+  .ask-tint {
+    gap: 8px;
   }
 
   .ask-glass,
@@ -561,9 +546,21 @@ html:has(.project-drawer) .ask-dock {
     border-radius: 8px;
   }
 
+  .ask-open,
+  .ask-dock-resume {
+    position: relative;
+  }
+
+  .ask-open::before,
+  .ask-dock-resume::before {
+    content: "";
+    position: absolute;
+    inset: -7px 0;
+  }
+
   .ask-open {
-    min-height: 44px;
     box-sizing: border-box;
+    min-height: 30px;
     padding: 8px;
     font-size: 10px;
     line-height: 14px;
@@ -594,7 +591,12 @@ html:has(.project-drawer) .ask-dock {
 
   .ask-dock-resume {
     flex: 1 1 0;
-    padding-block: 5px;
+    box-sizing: border-box;
+    min-width: 0;
+    height: 30px;
+    padding-block: 0;
+    font-size: 12px;
+    white-space: nowrap;
   }
 
   .ask-panel {
@@ -685,9 +687,7 @@ html:has(.project-drawer) .ask-dock {
   .ask-dock,
   .ask-dock.is-showing,
   .ask-dock:focus-within,
-  .portfolio-nav-toggle,
-  .ask-panel,
-  .ask-panel::backdrop {
+  .portfolio-nav-toggle {
     transition: none;
   }
 
