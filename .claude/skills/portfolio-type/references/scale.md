@@ -33,7 +33,7 @@ Prototype screens use the reference's larger step copy: title Fraunces 32/40/500
 
 | Gap | Desktop | Phone |
 |---|---|---|
-| Title to its text | 4px | 4px |
+| Title to its text | 8px | 8px |
 | Lines of a chapter opening | 12px | 12px |
 | Text to container | 18px | 18px |
 | Container to container | 24px | 24px |

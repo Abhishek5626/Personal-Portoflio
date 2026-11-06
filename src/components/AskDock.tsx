@@ -311,7 +311,7 @@ export function AskDock({ hidden, study = null }: { hidden: boolean; study?: Ask
               </span>
               <Arrow size={24} />
             </button>
-            {contact.resume ? (
+            {contact.resume && !study ? (
               <a className="ask-chip ask-dock-resume" href={contact.resume} download="Abhishek Kashid Resume.pdf">
                 <Send />
                 Download Resume

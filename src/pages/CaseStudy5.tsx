@@ -1,6 +1,8 @@
-import { useRef, useState, type MouseEvent } from 'react'
+import { useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { ShippedBadge } from '../components/ShippedBadge.tsx'
 import { useReveal } from './caseStudyMotion.tsx'
+import { QuikDemo } from './QuikDemo.tsx'
+import { ActionSchema, BeforeAfter, BuildingBlocks, Directions, ResearchMap, VisualDirections } from './QuikFigures.tsx'
 import './case-study-system.css'
 import './case-study-type.css'
 import './case-study-5.css'
@@ -21,7 +23,7 @@ const sections = [
     title: 'Who and why',
     lead: 'Quik asks people to learn its menus before they can get anything done. Beginners stall at that step, and experts leave for their own tools.',
     blocks: [
-      { title: 'Research process', text: 'I started from the first hour a person spends in Quik, and listed each point where they have to stop and look something up. I then ranked those points by how often the task comes up and how much it blocks. This concept rests on my own assumptions, so user interviews would be the first step on a real project.', ratio: '901 / 393' },
+      { title: 'Research process', text: 'For this concept, I’d have an AI research agent read Quik’s docs, public support threads and my own persona notes, and flag every point in a new user’s first hour where they stop to look something up. I’d rank those stops by how often they happen and how much they block, and turn the top three into the brief. The ranking below is my assumption until user interviews confirm it.', ratio: '901 / 393', figure: <ResearchMap /> },
       { title: 'Target customers and their pain points', text: 'Two groups matter most. First-time builders know what they want to launch, but not which Quik feature does it. Experienced developers know exactly what to do, and work faster in a terminal than in any dashboard. Both lose time for the same reason: Quik is organised around its features, not around their goals.', ratio: '901 / 518' },
     ],
   },
@@ -31,10 +33,10 @@ const sections = [
     title: 'Define the foundational experience',
     lead: 'One workspace had to suit both groups without becoming two products. People describe a goal, see the plan, and stay in control of each step.',
     blocks: [
-      { title: 'Design process', text: 'I compared three directions: a chat added to the current dashboard, a separate assistant app, and a new workspace built around tasks. The first left the menu problem in place, and the second split people from their projects. The workspace solved both, so I took it forward.', ratio: '901 / 462' },
-      { title: 'Identify building blocks and define interface layout', text: 'The experience needs four parts: a place to ask, a place to type commands, a plan to check, and a result to review. These became three panels. The terminal sits on the left, the conversation in the centre, and the plan and results on the right.', ratio: '901 / 623' },
+      { title: 'Design process', text: 'I compared three directions: a chat added to the current dashboard, a separate assistant app, and a new workspace built around tasks. The first left the menu problem in place, and the second split people from their projects. The workspace solved both, so I took it forward.', ratio: '901 / 462', figure: <Directions /> },
+      { title: 'Identify building blocks and define interface layout', text: 'The experience needs four parts: a place to ask, a place to type commands, a plan to check, and a result to review. These became three panels. The terminal sits on the left, the conversation in the centre, and the plan and results on the right.', ratio: '901 / 623', figure: <BuildingBlocks /> },
       { title: 'Motion and interaction', text: 'Panels open and close as the work changes. Beginners start with the conversation alone, and the plan slides in once there is something to check. Experts can widen the terminal and keep the rest out of the way. Each move stays short, so it shows what changed without slowing anyone down.', ratio: '901 / 589' },
-      { title: 'Backend structure and syntax', text: 'Each assistant action needs a clear structure behind it: what it will do, what it needs, what it costs, and whether it can be undone. The same structure drives the plan on screen and the matching terminal command, so the two views always agree.', ratio: '901 / 435' },
+      { title: 'Backend structure and syntax', text: 'Each assistant action needs a clear structure behind it: what it will do, what it needs, what it costs, and whether it can be undone. The same structure drives the plan on screen and the matching terminal command, so the two views always agree.', ratio: '901 / 435', figure: <ActionSchema /> },
     ],
   },
   {
@@ -43,8 +45,8 @@ const sections = [
     title: 'Detailed design and visual exploration',
     lead: 'A quiet interface suits a tool people work in all day. The visual direction gives the content the most weight, and keeps colour for status and decisions.',
     blocks: [
-      { title: 'Visual exploration', text: 'I tested a dense, technical look against a softer, more open one. The final direction sits between them: compact text for experts, with enough space that a beginner can find the next step.', ratio: '901 / 501' },
-      { title: 'Component decisions', text: 'I removed borders that only separated things space could separate, along with decorative icons and repeated labels. Plans became simple numbered steps. Colour now appears only where someone needs to act or something needs attention.', ratio: '901 / 819' },
+      { title: 'Visual exploration', text: 'I tested a dense, technical look against a softer, more open one. The final direction sits between them: compact text for experts, with enough space that a beginner can find the next step.', ratio: '901 / 501', figure: <VisualDirections /> },
+      { title: 'Component decisions', text: 'I removed borders that only separated things space could separate, along with decorative icons and repeated labels. Plans became simple numbered steps. Colour now appears only where someone needs to act or something needs attention.', ratio: '901 / 819', figure: <BeforeAfter /> },
     ],
   },
 ]
@@ -86,7 +88,7 @@ function ChapterHead({ id, label, title, lead }: { id: string; label: string; ti
 }
 
 /** Header, then body text, then the image. */
-function Block({ id, title, text, ratios }: { id: string; title: string; text: string; ratios: string[] }) {
+function Block({ id, title, text, ratios, figure }: { id: string; title: string; text: string; ratios: string[]; figure?: ReactNode }) {
   return (
     <section className="cs-block" aria-labelledby={id}>
       <div className="cs-block-head">
@@ -96,7 +98,7 @@ function Block({ id, title, text, ratios }: { id: string; title: string; text: s
         <p className="cs-b1 cs-block-summary">{text}</p>
       </div>
       <div className="cs-block-body">
-        {ratios.map((ratio, index) => (
+        {figure ?? ratios.map((ratio, index) => (
           <Blank ratio={ratio} key={index} />
         ))}
       </div>
@@ -168,7 +170,7 @@ export function CaseStudy5() {
                     terminal. This project explores one workspace that serves both.
                   </p>
                 </div>
-                <Blank ratio="1361 / 765" />
+                <QuikDemo />
               </section>
             </div>
           ) : (
@@ -181,7 +183,7 @@ export function CaseStudy5() {
             <div id={section.id} className="cs-chapter">
               <ChapterHead id={section.id} label={section.label} title={section.title} lead={section.lead} />
               {section.blocks.map((block, index) => (
-                <Block key={block.title} id={`${section.id}-${index}`} title={block.title} text={block.text} ratios={[block.ratio]} />
+                <Block key={block.title} id={`${section.id}-${index}`} title={block.title} text={block.text} ratios={[block.ratio]} figure={block.figure} />
               ))}
             </div>
           ) : null}

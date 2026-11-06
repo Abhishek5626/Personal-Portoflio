@@ -20,7 +20,7 @@ Reading rhythm comes from contrast: a serif title, calm body text, small labels,
 - **Tracking.** `normal` everywhere, with -0.3px on Fraunces only. Tight tracking on sans body text is what made the old pages feel cramped.
 - **Weight carries hierarchy.** Inside a container, a 600 name or lead-in over 400 text does more than a size change. Bold the sentence that matters and let the rest be soft.
 - **Colour.** Primary `#191919` and soft `#616161`, through `--cs-text` and `--cs-text-soft` so dark mode works. Section text is soft; the bold lead-in is primary.
-- **Spacing.** Title to its text is 4px. Text to container is 18px. Container to container is 24px. Section to section is 64px, or 40px on phones. A chapter opening is 12px between its lines and 18px to whatever follows it, including its first section heading.
+- **Spacing.** Title to its text is 8px. Text to container is 18px. Container to container is 24px. Section to section is 64px, or 40px on phones. A chapter opening is 12px between its lines and 18px to whatever follows it, including its first section heading.
 - **Line length.** Section text stops at 636px and a chapter intro at 720px, so lines stay readable in a wide column.
 
 ## Where it lives

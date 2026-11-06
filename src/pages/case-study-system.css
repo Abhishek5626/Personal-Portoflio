@@ -569,7 +569,7 @@ li:not(.is-current) > a.cs-toc-row:active {
 .cs-block-head {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .cs-block-summary {
